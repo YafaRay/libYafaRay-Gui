@@ -1,6 +1,6 @@
 /****************************************************************************
  *      yafarayicon.h: Yafaray icon for window title bar
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
  *      This library is free software; you can redistribute it and/or

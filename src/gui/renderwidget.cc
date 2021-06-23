@@ -1,6 +1,6 @@
 /****************************************************************************
  *      renderwidget.cc: a widget for displaying the rendering output
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2008 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -24,9 +24,11 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QPaintEvent>
-#include "renderwidget.h"
-#include "events.h"
+#include "gui/renderwidget.h"
+#include "gui/events.h"
 #include <iostream>
+
+BEGIN_YAFARAY_GUI_QT
 
 /*=====================================
 /	RenderWidget implementation
@@ -287,3 +289,5 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *e)
 		e->ignore();
 	}
 }
+
+END_YAFARAY_GUI_QT

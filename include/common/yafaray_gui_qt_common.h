@@ -1,8 +1,6 @@
+#pragma once
 /****************************************************************************
- *      events.cc: custom events to enable thread communication to the UI
  *      This is part of the libYafaRay-Gui-Qt package
- *      Copyright (C) 2009 Gustavo Pichorim Boiko
- *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -19,28 +17,10 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/events.h"
+#ifndef YAFARAY_GUI_QT_COMMON_H
+#define YAFARAY_GUI_QT_COMMON_H
 
-BEGIN_YAFARAY_GUI_QT
+#define BEGIN_YAFARAY_GUI_QT namespace yafaray_gui_qt {
+#define END_YAFARAY_GUI_QT }
 
-GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent((QEvent::Type)GuiUpdate), m_rect_(rect), m_full_(full_update)
-{
-}
-
-GuiAreaHighliteEvent::GuiAreaHighliteEvent(const QRect &rect)
-	: QEvent((QEvent::Type)GuiAreaHighlite), m_rect_(rect)
-{
-}
-
-ProgressUpdateEvent::ProgressUpdateEvent(int progress, int min, int max)
-	: QEvent((QEvent::Type)ProgressUpdate), m_progress_(progress), m_min_(min), m_max_(max)
-{
-}
-
-ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
-	: QEvent((QEvent::Type)ProgressUpdateTag), m_tag_(tag)
-{
-}
-
-END_YAFARAY_GUI_QT
+#endif /* YAFARAY_GUI_QT_COMMON_H */

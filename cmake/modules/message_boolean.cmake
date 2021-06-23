@@ -16,18 +16,13 @@
 #      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-target_sources(libyafaray4_gui_qt
-	PRIVATE
-		animworking.cc
-		events.cc
-#		qtoutput.cc
-		qtprogress.cc
-		renderwidget.cc
-		worker.cc
-		mywindow.cc
-		#Adding directly all include files with classes containing "Q_OBJECT" for Qt MOC to generate proper code and linking virtual parent Qt classes correctly
-		${PROJECT_SOURCE_DIR}/include/gui/animworking.h
-		${PROJECT_SOURCE_DIR}/include/gui/renderwidget.h #For Qt MOC to generate proper code
-		${PROJECT_SOURCE_DIR}/include/gui/worker.h #For Qt MOC to generate proper code
-		${PROJECT_SOURCE_DIR}/include/gui/mywindow.h #For Qt MOC to generate proper code
-)
+include_guard()
+
+# Function to show a message with an appended text that depends on a boolean variable (for example: "with PNG: yes" (or no))
+function(message_boolean MESSAGE BOOL_VAR TEXT_TRUE TEXT_FALSE)
+	if(${BOOL_VAR})
+		message("${MESSAGE}: ${TEXT_TRUE}")
+	else()
+		message("${MESSAGE}: ${TEXT_FALSE}")
+	endif()
+endfunction()

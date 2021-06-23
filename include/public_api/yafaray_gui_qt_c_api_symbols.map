@@ -1,0 +1,16 @@
+# Symbols for GCC
+
+LIBYAFARAYXML_4.0.0 {
+    global:
+        yafaray_gui_qt_init;
+        yafaray_gui_qt_createRenderWidget;
+        yafaray_gui_qt_ParseFile;
+        yafaray_gui_qt_ParseMemory;
+        yafaray_gui_qt_getVersionString;
+        yafaray_gui_qt_getVersionMajor;
+        yafaray_gui_qt_getVersionMinor;
+        yafaray_gui_qt_getVersionPatch;
+
+    local:
+        *;
+};

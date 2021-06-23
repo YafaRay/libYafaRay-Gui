@@ -1,6 +1,6 @@
 /****************************************************************************
  *      mywindow.cc: the main window for the yafray GUI
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2008 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -19,19 +19,13 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// YafaRay Headers
-#include "common/logger.h"
-#include "color/color_console.h"
-#include "gui/interface_qt.h"
-#include "mywindow.h"
-#include "worker.h"
-#include "qtoutput.h"
+#include "gui/mywindow.h"
+#include "gui/renderwidget.h"
+#include "gui/worker.h"
+#include "gui/qtoutput.h"
 #include "ui_windowbase.h"
-#include "events.h"
-#include "animworking.h"
-#include "common/param.h"
-#include "output/output_image.h"
-#include "format/format.h"
+#include "gui/events.h"
+#include <yafaray_c_api.h>
 
 // Embeded Resources:
 
@@ -51,7 +45,7 @@
 #include "resource/toolbar_quit_icon.h"
 
 // GUI Font
-#if !defined(__APPLE__) && defined(YAFQT_EMBEDED_FONT)
+#if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
 #include "resource/guifont.h"
 #endif
 
@@ -67,44 +61,10 @@
 #include <QDesktopWidget>
 #include <QSettings>
 
-static QApplication *app_global = nullptr;
+BEGIN_YAFARAY_GUI_QT
 
-/**************************
- *
- * yafqtapi functions
- *
- *************************/
-
-void initGui_global()
-{
-	static int argc = 0;
-
-	if(!QApplication::instance())
-	{
-#if defined(__APPLE__)
-		QApplication::instance()->setAttribute(Qt::AA_MacPluginApplication);
-		QApplication::instance()->setAttribute(Qt::AA_DontUseNativeMenuBar);
-#endif
-		using namespace yafaray4;
-		Y_INFO << "Starting Qt graphical interface..." << YENDL;
-		app_global = new QApplication(argc, 0);
-	}
-	else app_global = static_cast<QApplication *>(QApplication::instance());
-}
-
-int createRenderWidget_global(yafaray4::Interface *interf, int xsize, int ysize, int b_start_x, int b_start_y, Settings settings)
-{
-	MainWindow w(interf, xsize, ysize, b_start_x, b_start_y, settings);
-	w.show();
-	w.adjustWindow();
-	w.slotRender();
-
-	return app_global->exec();
-}
-
-
-MainWindow::MainWindow(yafaray4::Interface *interface, int resx, int resy, int b_start_x, int b_start_y, Settings settings)
-	: QMainWindow(), interface_(interface), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), use_zbuf_(false)
+MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool auto_save_alpha, bool close_after_finish)
+	: QMainWindow(), yafaray_interface_(yafaray_interface), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), use_zbuf_(false), auto_save_(auto_save), auto_save_alpha_(auto_save_alpha), auto_close_(close_after_finish)
 {
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -142,7 +102,7 @@ MainWindow::MainWindow(yafaray4::Interface *interface, int resx, int resy, int b
 	zoom_out_icon.loadFromData(zoomout_icon_global, zoomout_icon_size_global);
 	quit_icon.loadFromData(quit_icon_global, quit_icon_size_global);
 
-#if !defined(__APPLE__) && defined(YAFQT_EMBEDED_FONT)
+#if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
 	int fId = QFontDatabase::addApplicationFontFromData(QByteArray((const char *)guifont, guifont_size));
 	QStringList fam = QFontDatabase::applicationFontFamilies(fId);
 	QFont gFont = QFont(fam[0]);
@@ -156,7 +116,7 @@ MainWindow::MainWindow(yafaray4::Interface *interface, int resx, int resy, int b
 #endif
 #endif
 
-	ui_ = std::unique_ptr<Ui_WindowBase>(new Ui_WindowBase());
+	ui_ = std::unique_ptr<::Ui_WindowBase>(new ::Ui_WindowBase());
 	ui_->setupUi(this);
 
 	setWindowIcon(QIcon(yaf_icon));
@@ -166,20 +126,21 @@ MainWindow::MainWindow(yafaray4::Interface *interface, int resx, int resy, int b
 	m_ui->toolBar->close(); //FIXME: I was unable to make the icons in the tool bar to show in MacOS, really weird... so for now we just hide the toolbar entirely in Mac
 #endif
 
+
 	render_saved_ = false;
 	render_cancelled_ = false;
 	save_with_alpha_ = false;
 
 	ui_->actionAskSave->setChecked(ask_unsaved_);
 
-	yafaray4::ParamMap *p = interface_->getRenderParameters();
-	p->getParam("z_channel", use_zbuf_);
+/*	yafaray4::ParamMap *p = yafaray_interface_->getRenderParameters();
+	p->getParam("z_channel", use_zbuf_);*/
 
 	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(ui_->renderArea, use_zbuf_));
-	output_ = std::unique_ptr<QtOutput>(new QtOutput(render_.get()));
-	worker_ = std::unique_ptr<Worker>(new Worker(interface_, this, output_.get()));
+//FIXME	output_ = std::unique_ptr<QtOutput>(new QtOutput(render_.get()));
+	worker_ = std::unique_ptr<Worker>(new Worker(yafaray_interface_, this, output_.get()));
 
-	output_->setRenderSize(QSize(resx, resy));
+//FIXME	output_->setRenderSize(QSize(resx, resy));
 
 	// animation widget
 	anim_ = std::unique_ptr<AnimWorking>(new AnimWorking(ui_->renderArea));
@@ -244,22 +205,17 @@ MainWindow::MainWindow(yafaray4::Interface *interface, int resx, int resy, int b
 	//FIXME:		this, SLOT(setDrawParams(bool)));
 
 	ui_->actionShowRGB->setChecked(true);
-	//FIXME badge use_draw_params_ = interface_->getDrawParams();
+	//FIXME badge use_draw_params_ = yafaray_interface_->getDrawParams();
 	//FIXME badge ui_->actionDrawParams->setChecked(use_draw_params_);
 
 	// offset when using border rendering
 	render_->setRenderBorderStart(QPoint(b_start_x, b_start_y));
 
-	auto_save_ = settings.auto_save_;
-	auto_save_alpha_ = settings.auto_save_alpha_;
-	auto_close_ = settings.close_after_finish_;
-	save_with_alpha_ = auto_save_alpha_;
-
 	if(auto_save_)
 	{
-		this->file_name_ = settings.file_name_;
 		this->setWindowTitle(this->windowTitle() + QString(" (") + QString(file_name_.c_str()) + QString(")"));
 	}
+
 
 	// filter the resize events of the render area to center the animation widget
 	ui_->renderArea->installEventFilter(this);
@@ -271,7 +227,7 @@ bool MainWindow::event(QEvent *e)
 {
 	if(e->type() == (QEvent::Type)ProgressUpdate)
 	{
-		ProgressUpdateEvent *p = static_cast<ProgressUpdateEvent *>(e);
+		auto *p = dynamic_cast<ProgressUpdateEvent *>(e);
 		if(p->min() >= 0)
 			ui_->progressbar->setMinimum(p->min());
 		if(p->max() >= 0)
@@ -282,7 +238,7 @@ bool MainWindow::event(QEvent *e)
 
 	if(e->type() == (QEvent::Type)ProgressUpdateTag)
 	{
-		ProgressUpdateTagEvent *p = static_cast<ProgressUpdateTagEvent *>(e);
+		auto *p = dynamic_cast<ProgressUpdateTagEvent *>(e);
 		if(p->tag().contains("Rendering")) anim_->hide();
 		ui_->yafLabel->setText(p->tag());
 		return true;
@@ -301,7 +257,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 	{
 		slotCancel();
 
-		if(render_cancelled_) app_global->exit(1); //check if a render was stopped and exit with the appropiate code
+		//if(render_cancelled_) app_global->exit(1); //check if a render was stopped and exit with the appropiate code
 		e->accept();
 	}
 
@@ -323,33 +279,30 @@ void MainWindow::slotRender()
 
 void MainWindow::slotFinished()
 {
-	using namespace yafaray4;
-	QString rt = "";
+	QString rt;
 
 	if(auto_save_)
 	{
-		Y_INFO << " Image saved to " << file_name_;
-		if(auto_save_alpha_) std::cout << " with alpha" << YENDL;
-		else std::cout << " without alpha" << YENDL;
+		yafaray_printInfo(yafaray_interface_, (" Image saved to " + file_name_).c_str());
+		if(auto_save_alpha_) yafaray_printInfo(yafaray_interface_, " with alpha");
+		else yafaray_printInfo(yafaray_interface_, " without alpha");
 
-		using namespace yafaray4;
-
-		interface_->paramsClearAll();
-		interface_->paramsSetString("type", "image_output");
-		interface_->paramsSetString("image_path", "file_name_");
-		interface_->paramsSetInt("border_x", b_x_);
-		interface_->paramsSetInt("border_y", b_y_);
-		interface_->createOutput("image_output");
-		interface_->paramsClearAll();
+		yafaray_paramsClearAll(yafaray_interface_);
+		yafaray_paramsSetString(yafaray_interface_, "type", "image_output");
+		yafaray_paramsSetString(yafaray_interface_, "image_path", "file_name_");
+		yafaray_paramsSetInt(yafaray_interface_, "border_x", b_x_);
+		yafaray_paramsSetInt(yafaray_interface_, "border_y", b_y_);
+		//FIXME yafaray_createOutput(yafaray_interface_, "image_output");
+		yafaray_paramsClearAll(yafaray_interface_);
 		render_saved_ = true;
 
 		rt = QString("Image Auto-saved. ");
-		if(auto_close_)
+/*		if(auto_close_)
 		{
 			if(render_cancelled_) app_global->exit(1);
 			else app_global->quit();
 			return;
-		}
+		}*/
 	}
 
 	int render_time = time_measure_.elapsed();
@@ -389,19 +342,19 @@ void MainWindow::slotFinished()
 
 	rt.append(QString("Render time: %1 [%2s.]").arg(time_str).arg(time_sec, 5));
 	ui_->yafLabel->setText(rt);
-	Y_INFO << ConsoleColor(ConsoleColor::Green, true) << "Render completed!" << ConsoleColor() << YENDL;
+	yafaray_printInfo(yafaray_interface_, "Render completed!");
 
 	render_->finishRendering();
 	update();
 
 	slotEnableDisable(true);
 
-	if(auto_close_)
+/*	if(auto_close_)
 	{
 		if(render_cancelled_) app_global->exit(1);
 		else app_global->quit();
 		return;
-	}
+	}*/
 
 	ui_->progressbar->hide();
 
@@ -457,7 +410,7 @@ void MainWindow::setDrawParams(bool checked)
 	if(!render_->isRendering())
 	{
 		//FIXME: interf->setDrawParams(useDrawParams);
-		//interface_->getRenderedImage(0, *output_); //FIXME DAVID VIEWS!!
+		//yafaray_interface_->getRenderedImage(0, *output_); //FIXME DAVID VIEWS!!
 		showColor(true);
 	}
 }
@@ -493,8 +446,8 @@ void MainWindow::slotSaveAs()
 bool MainWindow::saveDlg()
 {
 	QString formats;
-/* FIXME	std::vector<std::string> format_list = interface_->listImageHandlers();
-	std::vector<std::string> format_desc = interface_->listImageHandlersFullName();
+/* FIXME	std::vector<std::string> format_list = yafaray_interface_->listImageHandlers();
+	std::vector<std::string> format_desc = yafaray_interface_->listImageHandlersFullName();
 
 	std::sort(format_list.begin(), format_list.end());
 	std::sort(format_desc.begin(), format_desc.end());
@@ -526,20 +479,19 @@ bool MainWindow::saveDlg()
 
 	if(!file_name.isNull())
 	{
-		using namespace yafaray4;
-		interface_->paramsClearAll();
-		interface_->paramsSetString("type", selected_filter.toStdString().c_str());
-		interface_->paramsSetInt("width", res_x_);
-		interface_->paramsSetInt("height", res_y_);
-		interface_->paramsSetBool("alpha_channel", save_with_alpha_);
+		yafaray_paramsClearAll(yafaray_interface_);
+		yafaray_paramsSetString(yafaray_interface_, "type", selected_filter.toStdString().c_str());
+		yafaray_paramsSetInt(yafaray_interface_, "width", res_x_);
+		yafaray_paramsSetInt(yafaray_interface_, "height", res_y_);
+		yafaray_paramsSetBool(yafaray_interface_, "alpha_channel", static_cast<yafaray_bool_t>(save_with_alpha_));
 		last_path_ = QDir(file_name).absolutePath();
 
-		interface_->paramsSetString("type", "image_output");
-		interface_->paramsSetString("image_path", last_path_.toStdString().c_str());
-		interface_->paramsSetInt("border_x", b_x_);
-		interface_->paramsSetInt("border_y", b_y_);
-		interface_->createOutput("image_output");
-		interface_->paramsClearAll();
+		yafaray_paramsSetString(yafaray_interface_, "type", "image_output");
+		yafaray_paramsSetString(yafaray_interface_, "image_path", last_path_.toStdString().c_str());
+		yafaray_paramsSetInt(yafaray_interface_, "border_x", b_x_);
+		yafaray_paramsSetInt(yafaray_interface_, "border_y", b_y_);
+		//FIXME yafaray_createOutput(yafaray_interface_, "image_output");
+		yafaray_paramsClearAll(yafaray_interface_);
 		//FIXME: interf->setDrawParams(useDrawParams);
 
 		render_saved_ = true;
@@ -581,8 +533,7 @@ void MainWindow::slotCancel()
 	// cancel the render and cleanup, especially wait for the worker to finish up
 	// (otherwise the app will crash (if this is followed by a quit))
 	if(render_->isRendering()) render_cancelled_ = true;
-
-	interface_->abort();
+	yafaray_cancel(yafaray_interface_);
 	worker_->wait();
 }
 
@@ -629,3 +580,5 @@ void MainWindow::adjustWindow()
 	ui_->renderArea->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 	ui_->renderArea->setMinimumSize(0, 0);
 }
+
+END_YAFARAY_GUI_QT

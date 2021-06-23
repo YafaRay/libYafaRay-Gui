@@ -1,6 +1,6 @@
 /****************************************************************************
  *      progressbar.h: A progress updater for the yafray GUI
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2009 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -19,18 +19,14 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "qtprogress.h"
-#include "events.h"
-#include "mywindow.h"
+#include "gui/qtprogress.h"
+#include "gui/events.h"
+#include "gui/mywindow.h"
 #include <QCoreApplication>
 
-QtProgress::QtProgress(MainWindow *window, int cwidth)
-	: yafaray4::ConsoleProgressBar(cwidth), win_(window), current_step_(0), total_steps_(0)
-{
+BEGIN_YAFARAY_GUI_QT
 
-}
-
-QtProgress::~QtProgress()
+QtProgress::QtProgress(MainWindow *window) : win_(window)
 {
 }
 
@@ -65,3 +61,5 @@ void QtProgress::setTag(const char *tag)
 
 	//yafaray4::ConsoleProgressBar_t::done();
 }
+
+END_YAFARAY_GUI_QT

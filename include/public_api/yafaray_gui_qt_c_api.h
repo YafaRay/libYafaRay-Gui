@@ -1,8 +1,5 @@
 /****************************************************************************
- *      events.cc: custom events to enable thread communication to the UI
  *      This is part of the libYafaRay-Gui-Qt package
- *      Copyright (C) 2009 Gustavo Pichorim Boiko
- *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -19,28 +16,27 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/events.h"
+#ifndef YAFARAY_GUI_QT_C_API_H
+#define YAFARAY_GUI_QT_C_API_H
 
-BEGIN_YAFARAY_GUI_QT
+#include "yafaray_gui_qt_c_api_export.h"
+#include <yafaray_c_api.h>
 
-GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent((QEvent::Type)GuiUpdate), m_rect_(rect), m_full_(full_update)
-{
+#define YAFARAY_GUI_QT_C_API_VERSION_MAJOR 4
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+	YAFARAY_GUI_QT_C_API_EXPORT void yafaray_gui_qt_init();
+	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool auto_save, bool auto_save_alpha, bool close_after_finish, const char *file_name);
+	YAFARAY_GUI_QT_C_API_EXPORT void yafaray_gui_qt_getVersionString(char *dest_string, unsigned int dest_string_size);
+	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionMajor();
+	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionMinor();
+	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionPatch();
+
+#ifdef __cplusplus
 }
+#endif
 
-GuiAreaHighliteEvent::GuiAreaHighliteEvent(const QRect &rect)
-	: QEvent((QEvent::Type)GuiAreaHighlite), m_rect_(rect)
-{
-}
-
-ProgressUpdateEvent::ProgressUpdateEvent(int progress, int min, int max)
-	: QEvent((QEvent::Type)ProgressUpdate), m_progress_(progress), m_min_(min), m_max_(max)
-{
-}
-
-ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
-	: QEvent((QEvent::Type)ProgressUpdateTag), m_tag_(tag)
-{
-}
-
-END_YAFARAY_GUI_QT
+#endif /* YAFARAY_GUI_QT_C_API_H */

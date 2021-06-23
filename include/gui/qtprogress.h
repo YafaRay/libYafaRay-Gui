@@ -1,5 +1,5 @@
 /****************************************************************************
- *      events.cc: custom events to enable thread communication to the UI
+ *      progressbar.h: A progress updater for the yafray GUI
  *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2009 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
@@ -19,28 +19,30 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/events.h"
+#ifndef YAFARAY_GUI_QT_PROGRESS_H
+#define YAFARAY_GUI_QT_PROGRESS_H
+
+#include "common/yafaray_gui_qt_common.h"
 
 BEGIN_YAFARAY_GUI_QT
 
-GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent((QEvent::Type)GuiUpdate), m_rect_(rect), m_full_(full_update)
-{
-}
+class MainWindow;
 
-GuiAreaHighliteEvent::GuiAreaHighliteEvent(const QRect &rect)
-	: QEvent((QEvent::Type)GuiAreaHighlite), m_rect_(rect)
+class QtProgress final
 {
-}
-
-ProgressUpdateEvent::ProgressUpdateEvent(int progress, int min, int max)
-	: QEvent((QEvent::Type)ProgressUpdate), m_progress_(progress), m_min_(min), m_max_(max)
-{
-}
-
-ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
-	: QEvent((QEvent::Type)ProgressUpdateTag), m_tag_(tag)
-{
-}
+	public:
+		QtProgress(MainWindow *window);
+		~QtProgress() = default;
+		void init(int total_steps);
+		void update(int steps = 1);
+		void setTag(const char *tag);
+		void done();
+	private:
+		MainWindow *win_ = nullptr;
+		int current_step_ = 0;
+		int total_steps_ = 0;
+};
 
 END_YAFARAY_GUI_QT
+
+#endif //YAFARAY_GUI_QT_PROGRESS_H

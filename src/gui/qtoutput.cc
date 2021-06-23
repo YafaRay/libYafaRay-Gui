@@ -1,6 +1,6 @@
 /****************************************************************************
  *      qtoutput.cc: a Qt color output for yafray
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2008 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -19,10 +19,11 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "qtoutput.h"
-#include "events.h"
-#include "color/color_layers.h"
+#include "gui/qtoutput.h"
+#include "gui/events.h"
 #include <QCoreApplication>
+
+BEGIN_YAFARAY_GUI_QT
 
 QtOutput::QtOutput(RenderWidget *render): render_buffer_(render)
 {
@@ -68,3 +69,5 @@ void QtOutput::highlightArea(int x_0, int y_0, int x_1, int y_1)
 {
 	QCoreApplication::postEvent(render_buffer_, new GuiAreaHighliteEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
 }
+
+END_YAFARAY_GUI_QT

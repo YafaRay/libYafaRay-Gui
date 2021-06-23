@@ -1,8 +1,7 @@
 /****************************************************************************
- *      events.cc: custom events to enable thread communication to the UI
+ *      animworking.h: a widget to show something is being processed
  *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2009 Gustavo Pichorim Boiko
- *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -19,28 +18,34 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/events.h"
+
+#ifndef YAFARAY_ANIMWORKING_H
+#define YAFARAY_ANIMWORKING_H
+
+#include "common/yafaray_gui_qt_common.h"
+#include <QWidget>
+#include <vector>
 
 BEGIN_YAFARAY_GUI_QT
 
-GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent((QEvent::Type)GuiUpdate), m_rect_(rect), m_full_(full_update)
+class AnimWorking final : public QWidget
 {
-}
+		Q_OBJECT
 
-GuiAreaHighliteEvent::GuiAreaHighliteEvent(const QRect &rect)
-	: QEvent((QEvent::Type)GuiAreaHighlite), m_rect_(rect)
-{
-}
+	public:
+		explicit AnimWorking(QWidget *parent = nullptr);
+		~AnimWorking() override;
 
-ProgressUpdateEvent::ProgressUpdateEvent(int progress, int min, int max)
-	: QEvent((QEvent::Type)ProgressUpdate), m_progress_(progress), m_min_(min), m_max_(max)
-{
-}
+	private:
+		void paintEvent(QPaintEvent *e) override;
+		void timerEvent(QTimerEvent *e) override;
 
-ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
-	: QEvent((QEvent::Type)ProgressUpdateTag), m_tag_(tag)
-{
-}
+		std::vector<QPixmap> sprites_;
+		size_t timer_act_frame_ = 0;
+		int timer_id_ = -1;
+		static const size_t timer_top_frame_ = 50;
+};
 
 END_YAFARAY_GUI_QT
+
+#endif // YAFARAY_ANIMWORKING_H

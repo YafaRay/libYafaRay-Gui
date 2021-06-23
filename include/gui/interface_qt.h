@@ -1,6 +1,6 @@
 #pragma once
 /****************************************************************************
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 #else
 #define YAFARAY_QT_EXPORT YF_IMPORT
 #endif
-#include "interface/interface.h"
+#include "yafaray_c_api.h"
 #include <string>
 
 namespace yafaray4
@@ -33,7 +33,7 @@ namespace yafaray4
 class Interface;
 }
 
-struct YAFARAY_QT_EXPORT Settings
+struct Settings
 {
 	bool auto_save_;
 	bool auto_save_alpha_;
@@ -44,7 +44,7 @@ struct YAFARAY_QT_EXPORT Settings
 extern "C"
 {
 	YAFARAY_QT_EXPORT void initGui_global();
-	YAFARAY_QT_EXPORT int createRenderWidget_global(yafaray4::Interface *interf, int xsize, int ysize, int b_start_x, int b_start_y, Settings settings);
+	YAFARAY_QT_EXPORT int createRenderWidget_global(yafaray4::Interface *interf, int xsize, int ysize, int b_start_x, int b_start_y, bool auto_save, bool auto_save_alpha, bool close_after_finish, std::string file_name);
 }
 
 #endif // YAFARAY_INTERFACE_QT_H

@@ -1,6 +1,6 @@
 /****************************************************************************
  *      worker.cc: a thread for running the rendering process
- *      This is part of the libYafaRay package
+ *      This is part of the libYafaRay-Gui-Qt package
  *      Copyright (C) 2008-2009 Gustavo Pichorim Boiko
  *
  *      This library is free software; you can redistribute it and/or
@@ -18,17 +18,21 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "worker.h"
-#include "qtoutput.h"
-#include "qtprogress.h"
-#include "mywindow.h"
 
-Worker::Worker(yafaray4::Interface *interface, MainWindow *win, QtOutput *output)
-	: QThread(), interface_(interface), output_(output), win_(win)
+#include "gui/mywindow.h"
+#include "gui/worker.h"
+#include "gui/qtoutput.h"
+
+BEGIN_YAFARAY_GUI_QT
+
+Worker::Worker(::yafaray_Interface_t *yafaray_interface, MainWindow *win, QtOutput *output)
+	: QThread(), yafaray_interface_(yafaray_interface), output_(output), win_(win)
 {
 }
 
 void Worker::run()
 {
-	interface_->render(new QtProgress(win_));
+	//interface_->render(new QtProgress(win_));
 }
+
+END_YAFARAY_GUI_QT
