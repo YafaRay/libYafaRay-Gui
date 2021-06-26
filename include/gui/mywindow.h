@@ -45,7 +45,7 @@ class MainWindow final : public QMainWindow
 		Q_OBJECT
 
 	public:
-		MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool auto_save_alpha, bool close_after_finish);
+		MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish);
 		~MainWindow() override;
 		bool event(QEvent *e) override;
 		void adjustWindow();
@@ -56,13 +56,7 @@ class MainWindow final : public QMainWindow
 		void slotEnableDisable(bool enable = true);
 		void slotSaveAs();
 		void slotCancel();
-		void setAlpha(bool checked);
-		void showColor(bool checked);
-		void showAlpha(bool checked);
-		//FIXME: void showDepth(bool checked);
 		void setAskSave(bool checked);
-		//FIXME: void setSaveDepth(bool checked);
-		void setDrawParams(bool checked);
 		void zoomIn();
 		void zoomOut();
 
@@ -78,21 +72,14 @@ class MainWindow final : public QMainWindow
 		std::unique_ptr<QtOutput> output_;
 		std::unique_ptr<Worker> worker_;
 		yafaray_Interface_t *yafaray_interface_;
-		QString output_path_;
 		QString last_path_;
 		int res_x_, res_y_, b_x_, b_y_;
 		std::string file_name_;
 		bool auto_close_;	// if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
 		bool auto_save_;	// if true, rendering gets saved to fileName after finish but GUI stays opened
-		bool auto_save_alpha_;	// if true, the automatically saved image contains no alpha channel
-		bool save_with_alpha_;
-		bool save_with_depth_ = false;
-		bool use_draw_params_ = false;
 		QTime time_measure_;		// time measure for the render
 		std::unique_ptr<AnimWorking> anim_;
 		bool render_saved_;
-		bool render_cancelled_;
-		bool use_zbuf_ = false;
 		bool ask_unsaved_;
 };
 

@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	yafaray_Interface_t *yi = yafaray_createInterface(YAFARAY_INTERFACE_FOR_RENDERING, nullptr, nullptr, nullptr, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 	yafaray_printInfo(yi, ("YafaRay GUI Qt loader v" + version_string).c_str());
 	yafaray_gui_qt_init();
-	yafaray_gui_qt_createRenderWidget(yi, 640, 480, 0, 0, false, false, false, nullptr);
+	yafaray_gui_qt_createRenderWidget(yi, 640, 480, 0, 0, false, false);
 	yafaray_destroyInterface(yi);
 	return 0;
 }

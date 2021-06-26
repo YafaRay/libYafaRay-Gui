@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>160</width>
-    <height>164</height>
+    <width>1028</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <property name="spacing">
@@ -23,7 +32,16 @@
     </property>
     <item row="0" column="0">
      <layout class="QGridLayout" name="yafarayLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
        <number>2</number>
       </property>
       <property name="spacing">
@@ -51,8 +69,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>150</width>
-           <height>60</height>
+           <width>1022</width>
+           <height>491</height>
           </rect>
          </property>
         </widget>
@@ -138,7 +156,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>160</width>
+     <width>1028</width>
      <height>22</height>
     </rect>
    </property>
@@ -157,8 +175,6 @@
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="separator"/>
-    <addaction name="actionSaveAlpha"/>
-    <addaction name="actionSaveDepth"/>
    </widget>
    <widget class="QMenu" name="menuRender_Oprions">
     <property name="title">
@@ -167,11 +183,7 @@
     <addaction name="actionRender"/>
     <addaction name="actionCancel"/>
     <addaction name="separator"/>
-    <addaction name="actionShowRGB"/>
-    <addaction name="actionShowAlpha"/>
-    <addaction name="actionShowDepth"/>
     <addaction name="separator"/>
-    <addaction name="actionDrawParams"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -225,14 +237,8 @@
    <addaction name="actionCancel"/>
    <addaction name="separator"/>
    <addaction name="actionSave_As"/>
-   <addaction name="actionSaveAlpha"/>
-   <addaction name="actionSaveDepth"/>
    <addaction name="separator"/>
-   <addaction name="actionShowRGB"/>
-   <addaction name="actionShowAlpha"/>
-   <addaction name="actionShowDepth"/>
    <addaction name="separator"/>
-   <addaction name="actionDrawParams"/>
    <addaction name="separator"/>
    <addaction name="actionQuit"/>
   </widget>

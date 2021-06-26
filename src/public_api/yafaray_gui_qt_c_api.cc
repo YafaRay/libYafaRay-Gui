@@ -38,9 +38,9 @@ void yafaray_gui_qt_init()
 	else app_global = dynamic_cast<QApplication *>(QApplication::instance());
 }
 
-int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool auto_save, bool auto_save_alpha, bool close_after_finish, const char *file_name)
+int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish)
 {
-	yafaray_gui_qt::MainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, auto_save, auto_save_alpha, close_after_finish);
+	yafaray_gui_qt::MainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, auto_save, close_after_finish);
 	w.show();
 	w.adjustWindow();
 	w.slotRender();

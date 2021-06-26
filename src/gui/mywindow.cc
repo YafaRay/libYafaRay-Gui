@@ -63,8 +63,8 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool auto_save_alpha, bool close_after_finish)
-	: QMainWindow(), yafaray_interface_(yafaray_interface), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), use_zbuf_(false), auto_save_(auto_save), auto_save_alpha_(auto_save_alpha), auto_close_(close_after_finish)
+MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish)
+	: QMainWindow(), yafaray_interface_(yafaray_interface), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), auto_save_(auto_save), auto_close_(close_after_finish)
 {
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -128,15 +128,13 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 
 
 	render_saved_ = false;
-	render_cancelled_ = false;
-	save_with_alpha_ = false;
 
 	ui_->actionAskSave->setChecked(ask_unsaved_);
 
 /*	yafaray4::ParamMap *p = yafaray_interface_->getRenderParameters();
 	p->getParam("z_channel", use_zbuf_);*/
 
-	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(ui_->renderArea, use_zbuf_));
+	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(ui_->renderArea));
 //FIXME	output_ = std::unique_ptr<QtOutput>(new QtOutput(render_.get()));
 	worker_ = std::unique_ptr<Worker>(new Worker(yafaray_interface_, this, output_.get()));
 
@@ -193,12 +191,6 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 			this, SLOT(zoomIn()));
 	connect(ui_->actionZoom_Out, SIGNAL(triggered(bool)),
 			this, SLOT(zoomOut()));
-	connect(ui_->actionSaveAlpha, SIGNAL(triggered(bool)),
-			this, SLOT(setAlpha(bool)));
-	connect(ui_->actionShowAlpha, SIGNAL(triggered(bool)),
-			this, SLOT(showAlpha(bool)));
-	connect(ui_->actionShowRGB, SIGNAL(triggered(bool)),
-			this, SLOT(showColor(bool)));
 	connect(ui_->actionAskSave, SIGNAL(triggered(bool)),
 			this, SLOT(setAskSave(bool)));
 	//FIXME: connect(m_ui->actionDrawParams, SIGNAL(triggered(bool)),
@@ -273,7 +265,6 @@ void MainWindow::slotRender()
 	ui_->actionShowRGB->setChecked(true);
 	ui_->actionShowAlpha->setChecked(false);
 	render_saved_ = false;
-	render_cancelled_ = false;
 	worker_->start();
 }
 
@@ -284,9 +275,6 @@ void MainWindow::slotFinished()
 	if(auto_save_)
 	{
 		yafaray_printInfo(yafaray_interface_, (" Image saved to " + file_name_).c_str());
-		if(auto_save_alpha_) yafaray_printInfo(yafaray_interface_, " with alpha");
-		else yafaray_printInfo(yafaray_interface_, " without alpha");
-
 		yafaray_paramsClearAll(yafaray_interface_);
 		yafaray_paramsSetString(yafaray_interface_, "type", "image_output");
 		yafaray_paramsSetString(yafaray_interface_, "image_path", "file_name_");
@@ -306,7 +294,7 @@ void MainWindow::slotFinished()
 	}
 
 	int render_time = time_measure_.elapsed();
-	float time_sec = render_time / 1000.f;
+	const float time_sec = static_cast<float>(render_time) / 1000.f;
 
 	int ms = render_time % 1000;
 	render_time = render_time / 1000;
@@ -372,47 +360,11 @@ void MainWindow::slotEnableDisable(bool enable)
 	ui_->actionDrawParams->setEnabled(enable);
 }
 
-void MainWindow::setAlpha(bool checked)
-{
-	save_with_alpha_ = checked;
-}
-
-void MainWindow::showColor(bool checked)
-{
-	if(checked)
-	{
-		render_->paintColorBuffer();
-		ui_->actionShowAlpha->setChecked(false);
-	}
-	else ui_->actionShowRGB->setChecked(true);
-}
-
-void MainWindow::showAlpha(bool checked)
-{
-	if(checked)
-	{
-		render_->paintAlpha();
-		ui_->actionShowRGB->setChecked(false);
-	}
-	else ui_->actionShowAlpha->setChecked(true);
-}
-
 void MainWindow::setAskSave(bool checked)
 {
 	QSettings set;
 	ask_unsaved_ = checked;
 	set.setValue("qtGui/askSave", ask_unsaved_);
-}
-
-void MainWindow::setDrawParams(bool checked)
-{
-	use_draw_params_ = checked;
-	if(!render_->isRendering())
-	{
-		//FIXME: interf->setDrawParams(useDrawParams);
-		//yafaray_interface_->getRenderedImage(0, *output_); //FIXME DAVID VIEWS!!
-		showColor(true);
-	}
 }
 
 /*void MainWindow::slotOpen()
@@ -483,7 +435,6 @@ bool MainWindow::saveDlg()
 		yafaray_paramsSetString(yafaray_interface_, "type", selected_filter.toStdString().c_str());
 		yafaray_paramsSetInt(yafaray_interface_, "width", res_x_);
 		yafaray_paramsSetInt(yafaray_interface_, "height", res_y_);
-		yafaray_paramsSetBool(yafaray_interface_, "alpha_channel", static_cast<yafaray_bool_t>(save_with_alpha_));
 		last_path_ = QDir(file_name).absolutePath();
 
 		yafaray_paramsSetString(yafaray_interface_, "type", "image_output");
@@ -498,9 +449,7 @@ bool MainWindow::saveDlg()
 
 		QString savemesg;
 		savemesg.append("Render ");
-		savemesg.append(((use_zbuf_) ? "(RGBA + Z) " : "(RGBA) "));
 		savemesg.append("saved.");
-
 		ui_->yafLabel->setText(savemesg);
 	}
 
@@ -532,7 +481,6 @@ void MainWindow::slotCancel()
 {
 	// cancel the render and cleanup, especially wait for the worker to finish up
 	// (otherwise the app will crash (if this is followed by a quit))
-	if(render_->isRendering()) render_cancelled_ = true;
 	yafaray_cancel(yafaray_interface_);
 	worker_->wait();
 }

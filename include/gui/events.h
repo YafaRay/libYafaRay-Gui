@@ -42,9 +42,9 @@ enum CustomEvents
 class GuiUpdateEvent : public QEvent
 {
 	public:
-		GuiUpdateEvent(const QRect &rect, bool full_update = false);
-		inline QRect rect() { return m_rect_; }
-		inline bool fullUpdate() { return m_full_; }
+		explicit GuiUpdateEvent(const QRect &rect, bool full_update = false);
+		QRect rect() const { return m_rect_; }
+		bool fullUpdate() const { return m_full_; }
 	private:
 		QRect m_rect_;
 		bool m_full_;
@@ -53,8 +53,8 @@ class GuiUpdateEvent : public QEvent
 class GuiAreaHighliteEvent : public QEvent
 {
 	public:
-		GuiAreaHighliteEvent(const QRect &rect);
-		inline QRect rect() { return m_rect_; }
+		explicit GuiAreaHighliteEvent(const QRect &rect);
+		QRect rect() const { return m_rect_; }
 	private:
 		QRect m_rect_;
 };
@@ -62,10 +62,10 @@ class GuiAreaHighliteEvent : public QEvent
 class ProgressUpdateEvent : public QEvent
 {
 	public:
-		ProgressUpdateEvent(int progress, int min = -1, int max = -1);
-		inline int progress() { return m_progress_; }
-		inline int min() { return m_min_; }
-		inline int max() { return m_max_; }
+		explicit ProgressUpdateEvent(int progress, int min = -1, int max = -1);
+		int progress() const { return m_progress_; }
+		int min() const { return m_min_; }
+		int max() const { return m_max_; }
 	private:
 		int m_progress_;
 		int m_min_;
@@ -75,8 +75,9 @@ class ProgressUpdateEvent : public QEvent
 class ProgressUpdateTagEvent : public QEvent
 {
 	public:
-		ProgressUpdateTagEvent(const char *tag);
-		inline QString &tag() { return m_tag_; }
+		explicit ProgressUpdateTagEvent(const char *tag);
+		const QString &tag() const { return m_tag_; }
+		QString &tag() { return m_tag_; }
 	private:
 		QString m_tag_;
 };
