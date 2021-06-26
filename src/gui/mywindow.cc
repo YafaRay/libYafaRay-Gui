@@ -23,7 +23,7 @@
 #include "gui/renderwidget.h"
 #include "gui/worker.h"
 #include "gui/qtoutput.h"
-#include "ui_windowbase.h"
+#include "gui/ui.h"
 #include "gui/events.h"
 #include <yafaray_c_api.h>
 
@@ -116,7 +116,7 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 #endif
 #endif
 
-	ui_ = std::unique_ptr<::Ui_WindowBase>(new ::Ui_WindowBase());
+	ui_ = std::unique_ptr<Ui_WindowBase>(new Ui_WindowBase());
 	ui_->setupUi(this);
 
 	setWindowIcon(QIcon(yaf_icon));
@@ -167,13 +167,9 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	anim_->move(r.topLeft());
 
 	// Set toolbar icons
-	ui_->actionSaveAlpha->setIcon(QIcon(alpha_icon));
 	ui_->actionCancel->setIcon(QIcon(cancel_icon));
 	ui_->actionSave_As->setIcon(QIcon(save_as_icon));
 	ui_->actionRender->setIcon(QIcon(render_icon));
-	ui_->actionShowAlpha->setIcon(QIcon(show_alpha_icon));
-	ui_->actionShowRGB->setIcon(QIcon(show_color_icon));
-	ui_->actionDrawParams->setIcon(QIcon(draw_params_icon));
 	ui_->actionZoom_In->setIcon(QIcon(zoom_in_icon));
 	ui_->actionZoom_Out->setIcon(QIcon(zoom_out_icon));
 	ui_->actionQuit->setIcon(QIcon(quit_icon));
@@ -193,12 +189,6 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 			this, SLOT(zoomOut()));
 	connect(ui_->actionAskSave, SIGNAL(triggered(bool)),
 			this, SLOT(setAskSave(bool)));
-	//FIXME: connect(m_ui->actionDrawParams, SIGNAL(triggered(bool)),
-	//FIXME:		this, SLOT(setDrawParams(bool)));
-
-	ui_->actionShowRGB->setChecked(true);
-	//FIXME badge use_draw_params_ = yafaray_interface_->getDrawParams();
-	//FIXME badge ui_->actionDrawParams->setChecked(use_draw_params_);
 
 	// offset when using border rendering
 	render_->setRenderBorderStart(QPoint(b_start_x, b_start_y));
@@ -262,8 +252,6 @@ void MainWindow::slotRender()
 	time_measure_.start();
 	ui_->yafLabel->setText(tr("Rendering image..."));
 	render_->startRendering();
-	ui_->actionShowRGB->setChecked(true);
-	ui_->actionShowAlpha->setChecked(false);
 	render_saved_ = false;
 	worker_->start();
 }
@@ -357,7 +345,6 @@ void MainWindow::slotEnableDisable(bool enable)
 	ui_->actionCancel->setVisible(!enable);
 	ui_->actionZoom_In->setEnabled(enable);
 	ui_->actionZoom_Out->setEnabled(enable);
-	ui_->actionDrawParams->setEnabled(enable);
 }
 
 void MainWindow::setAskSave(bool checked)

@@ -26,9 +26,9 @@
 #include "renderwidget.h"
 #include <QImage>
 
-BEGIN_YAFARAY_GUI_QT
-
 class QWidget;
+
+BEGIN_YAFARAY_GUI_QT
 
 class QtOutput final
 {
