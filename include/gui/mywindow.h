@@ -53,6 +53,7 @@ class MainWindow final : public QMainWindow
 	public slots:
 		void slotRender();
 		void slotFinished();
+		void slotOpen();
 		void slotSaveAs();
 		void slotCancel();
 		void setAskSave(bool checked);
@@ -64,6 +65,7 @@ class MainWindow final : public QMainWindow
 		void keyPressEvent(QKeyEvent *event) override;
 		void closeEvent(QCloseEvent *e) override;
 		bool closeUnsaved();
+		bool openDlg();
 		bool saveDlg();
 
 		std::unique_ptr<Ui> ui_;

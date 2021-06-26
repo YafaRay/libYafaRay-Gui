@@ -6,8 +6,12 @@ set_target_properties(libyafaray4_gui_qt PROPERTIES AUTOMOC ON)
 target_include_directories(libyafaray4_gui_qt PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
 target_include_directories(libyafaray4_gui_qt INTERFACE $<INSTALL_INTERFACE:include>)
 target_link_libraries(libyafaray4_gui_qt PRIVATE LibYafaRay::libyafaray4 Qt5::Widgets)
+
 if(YAFARAY_GUI_QT_WITH_XML)
-	target_link_libraries(libyafaray4_gui_qt LibYafaRay-Xml::libyafaray4_xml)
+	list(APPEND YAFARAY_GUI_QT_CUSTOM_DEFINITIONS "YAFARAY_GUI_QT_WITH_XML")
+	find_package(LibXml2 2.9.1 REQUIRED)
+	find_package(LibYafaRay_Xml 4.0.0 REQUIRED)
+	target_link_libraries(libyafaray4_gui_qt PRIVATE LibYafaRay_Xml::libyafaray4_xml)
 endif()
 
 add_subdirectory(common)
@@ -15,8 +19,8 @@ add_subdirectory(gui)
 add_subdirectory(public_api)
 
 # Custom definitions
-if(EMBED_FONT_QT)
-	APPEND(STRING YAFARAY_GUI_QT_CUSTOM_DEFINITIONS "YAFARAY_GUI_QT_EMBEDDED_FONT")
+if(YAFARAY_GUI_QT_EMBED_FONT_QT)
+	list(APPEND YAFARAY_GUI_QT_CUSTOM_DEFINITIONS "YAFARAY_GUI_QT_EMBEDDED_FONT")
 endif()
 target_compile_definitions(libyafaray4_gui_qt
 		PRIVATE

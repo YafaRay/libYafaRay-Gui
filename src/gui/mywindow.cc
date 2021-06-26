@@ -27,9 +27,11 @@
 #include "gui/events.h"
 #include "resource/yafarayicon.h"
 #include <yafaray_c_api.h>
+#include <yafaray_xml_c_api.h>
 
 // GUI Font
 #if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
+#include <QFontDatabase>
 #include "resource/guifont.h"
 #endif
 
@@ -59,7 +61,7 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 
 
 #if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
-	int fId = QFontDatabase::addApplicationFontFromData(QByteArray((const char *)guifont, guifont_size));
+	int fId = QFontDatabase::addApplicationFontFromData(QByteArray((const char *)guifont_global, guifont_size_global));
 	QStringList fam = QFontDatabase::applicationFontFamilies(fId);
 	QFont gFont = QFont(fam[0]);
 	gFont.setPointSize(8);
@@ -293,9 +295,25 @@ void MainWindow::setAskSave(bool checked)
 	}
 }*/
 
+void MainWindow::slotOpen()
+{
+	openDlg();
+}
+
 void MainWindow::slotSaveAs()
 {
 	saveDlg();
+}
+
+bool MainWindow::openDlg()
+{
+#ifdef YAFARAY_GUI_QT_WITH_XML
+	const QString xml_file_path = QFileDialog::getOpenFileName(this, tr("Load YafaRay XML file"), last_path_, "*.xml");
+	return yafaray_xml_Parse(yafaray_interface_, xml_file_path.toStdString().c_str());
+#else
+	yafaray_printError(yafaray_interface_, "libYafaRay-Gui-Qt is built without XML support, cannot open the file");
+	return false;
+#endif
 }
 
 bool MainWindow::saveDlg()

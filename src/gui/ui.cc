@@ -75,6 +75,12 @@ void Ui::setupActions(QMainWindow *window_base)
 	action_quit_->setShortcut(QKeySequence("Ctrl+Q"));
 	QAbstractButton::connect(action_quit_, SIGNAL(triggered(bool)), window_base, SLOT(close()));
 
+	action_open_ = new QAction(window_base);
+	action_open_->setText("Open");
+	action_open_->setToolTip("Open a YafaRay XML file");
+	action_open_->setShortcut(QKeySequence("Ctrl+O"));
+	QAbstractButton::connect(action_open_, SIGNAL(triggered(bool)), window_base, SLOT(slotOpen()));
+
 	action_save_as_ = new QAction(window_base);
 	action_save_as_->setText("Save As...");
 	action_save_as_->setToolTip("Save the render");
@@ -116,6 +122,9 @@ QMenuBar *Ui::setupMenuBar(QMainWindow *window_base)
 
 	auto menu_file = new QMenu(menu_bar);
 	menu_file->setTitle("File");
+#ifdef YAFARAY_GUI_QT_WITH_XML
+	menu_file->addAction(action_open_);
+#endif
 	menu_file->addAction(action_save_as_);
 	menu_file->addSeparator();
 	menu_file->addAction(action_quit_);
@@ -155,6 +164,9 @@ QToolBar *Ui::setupToolBar(QMainWindow *window_base)
 	tool_bar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	tool_bar->setFloatable(false);
 	tool_bar->setWindowTitle("toolBar");
+#ifdef YAFARAY_GUI_QT_WITH_XML
+	tool_bar->addAction(action_open_);
+#endif
 	tool_bar->addAction(action_render_);
 	tool_bar->addAction(action_cancel_);
 	tool_bar->addSeparator();
@@ -220,6 +232,7 @@ QScrollArea *Ui::setupRenderArea(QWidget *widget_base)
 void Ui::setButtonsIcons()
 {
 	QPixmap cancel_icon;
+	QPixmap open_icon;
 	QPixmap save_as_icon;
 	QPixmap render_icon;
 	QPixmap zoom_in_icon;
@@ -227,6 +240,7 @@ void Ui::setButtonsIcons()
 	QPixmap quit_icon;
 
 	cancel_icon.loadFromData(cancel_icon_global, cancel_icon_size_global);
+	open_icon.loadFromData(alpha_icon_global, alpha_icon_size_global);
 	save_as_icon.loadFromData(saveas_icon_global, saveas_icon_size_global);
 	render_icon.loadFromData(render_icon_global, render_icon_size_global);
 	zoom_in_icon.loadFromData(zoomin_icon_global, zoomin_icon_size_global);
@@ -234,6 +248,7 @@ void Ui::setButtonsIcons()
 	quit_icon.loadFromData(quit_icon_global, quit_icon_size_global);
 
 	action_cancel_->setIcon(QIcon(cancel_icon));
+	action_open_->setIcon(QIcon(open_icon));
 	action_save_as_->setIcon(QIcon(save_as_icon));
 	action_render_->setIcon(QIcon(render_icon));
 	action_zoom_in_->setIcon(QIcon(zoom_in_icon));

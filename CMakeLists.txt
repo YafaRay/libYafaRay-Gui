@@ -16,7 +16,8 @@ project(libYafaRay-Gui-Qt
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 option(BUILD_SHARED_LIBS "Build project libraries as shared libraries" ON)
-option(YAFARAY_GUI_QT_WITH_XML "Build with XML files loading support" OFF)
+option(YAFARAY_GUI_QT_WITH_XML "Build with XML files loading support" ON)
+option(YAFARAY_GUI_QT_EMBED_FONT_QT "Embed Qt Fonts" OFF)
 option(YAFARAY_GUI_QT_BUILD_TESTS "Build test libYafaRay-Gui-Qt client examples" ON)
 
 include(message_boolean)
@@ -42,10 +43,9 @@ find_package(PNG 1.6 REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
 add_subdirectory(src)
+
 if(YAFARAY_GUI_QT_BUILD_TESTS)
 	add_subdirectory(tests)
 endif()
-if(YAFARAY_GUI_QT_WITH_XML)
-	find_package(LibYafaRay-Xml 4.0.0 REQUIRED)
-endif()
+
 add_subdirectory(cmake)

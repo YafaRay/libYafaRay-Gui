@@ -58,6 +58,7 @@ class Ui final
 		static QScrollArea *setupRenderArea(QWidget *widget_base);
 
 		QAction *action_quit_;
+		QAction *action_open_;
 		QAction *action_save_as_;
 		QAction *action_zoom_in_;
 		QAction *action_zoom_out_;
