@@ -38,7 +38,7 @@ class AnimWorking;
 class QtOutput;
 class RenderWidget;
 class Worker;
-class Ui_WindowBase;
+class Ui;
 
 class MainWindow final : public QMainWindow
 {
@@ -67,7 +67,7 @@ class MainWindow final : public QMainWindow
 		bool closeUnsaved();
 		bool saveDlg();
 
-		std::unique_ptr<Ui_WindowBase> ui_;
+		std::unique_ptr<Ui> ui_;
 		std::unique_ptr<RenderWidget> render_;
 		std::unique_ptr<QtOutput> output_;
 		std::unique_ptr<Worker> worker_;

@@ -116,8 +116,8 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 #endif
 #endif
 
-	ui_ = std::unique_ptr<Ui_WindowBase>(new Ui_WindowBase());
-	ui_->setupUi(this);
+	ui_ = std::unique_ptr<Ui>(new Ui());
+	ui_->setup(this);
 
 	setWindowIcon(QIcon(yaf_icon));
 
