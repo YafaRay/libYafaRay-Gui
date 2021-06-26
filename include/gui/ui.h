@@ -51,11 +51,11 @@ class Ui final
 	private:
 		void setButtonsIcons();
 		void setupActions(QMainWindow *window_base);
-		void setupMenuBar(QMainWindow *window_base);
-		void setupToolBar(QMainWindow *window_base);
-		void setupLabel(QMainWindow *window_base);
-		void setupProgressBar(QMainWindow *window_base);
-		void setupRenderArea(QMainWindow *window_base);
+		QMenuBar *setupMenuBar(QMainWindow *window_base);
+		QToolBar *setupToolBar(QMainWindow *window_base);
+		static QLabel *setupLabel(QWidget *widget_base);
+		static QProgressBar *setupProgressBar(QWidget *widget_base);
+		static QScrollArea *setupRenderArea(QWidget *widget_base);
 
 		QAction *action_quit_;
 		QAction *action_save_as_;
@@ -63,17 +63,7 @@ class Ui final
 		QAction *action_zoom_out_;
 		QAction *action_render_;
 		QAction *action_cancel_;
-		QWidget *central_widget_;
-		QGridLayout *grid_layout_;
-		QGridLayout *yafaray_layout_;
-		QWidget *scroll_area_widget_contents_;
 		QPushButton *cancel_button_;
-		QMenuBar *menubar_;
-		QMenu *menu_file_;
-		QMenu *menu_image_;
-		QMenu *menu_render_options_;
-		QMenu *menu_options_;
-		QToolBar *tool_bar_;
 };
 
 END_YAFARAY_GUI_QT
