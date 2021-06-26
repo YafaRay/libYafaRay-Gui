@@ -53,7 +53,6 @@ class MainWindow final : public QMainWindow
 	public slots:
 		void slotRender();
 		void slotFinished();
-		void slotEnableDisable(bool enable = true);
 		void slotSaveAs();
 		void slotCancel();
 		void setAskSave(bool checked);

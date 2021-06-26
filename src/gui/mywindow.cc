@@ -25,24 +25,8 @@
 #include "gui/qtoutput.h"
 #include "gui/ui.h"
 #include "gui/events.h"
-#include <yafaray_c_api.h>
-
-// Embeded Resources:
-
-// Images
 #include "resource/yafarayicon.h"
-#include "resource/toolbar_z_buffer_icon.h"
-#include "resource/toolbar_alpha_icon.h"
-#include "resource/toolbar_cancel_icon.h"
-#include "resource/toolbar_save_as_icon.h"
-#include "resource/toolbar_render_icon.h"
-#include "resource/toolbar_show_alpha_icon.h"
-#include "resource/toolbar_colorbuffer_icon.h"
-#include "resource/toolbar_drawparams_icon.h"
-#include "resource/toolbar_savedepth_icon.h"
-#include "resource/toolbar_zoomin_icon.h"
-#include "resource/toolbar_zoomout_icon.h"
-#include "resource/toolbar_quit_icon.h"
+#include <yafaray_c_api.h>
 
 // GUI Font
 #if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
@@ -71,36 +55,8 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	QCoreApplication::setApplicationName("YafaRay Qt Gui");
 
 	QSettings set;
-
 	ask_unsaved_ = set.value("qtGui/askSave", true).toBool();
 
-	QPixmap yaf_icon;
-	QPixmap zbuff_icon;
-	QPixmap alpha_icon;
-	QPixmap cancel_icon;
-	QPixmap save_as_icon;
-	QPixmap render_icon;
-	QPixmap show_alpha_icon;
-	QPixmap show_color_icon;
-	QPixmap save_depth_icon;
-	QPixmap draw_params_icon;
-	QPixmap zoom_in_icon;
-	QPixmap zoom_out_icon;
-	QPixmap quit_icon;
-
-	yaf_icon.loadFromData(yafarayicon_global, yafarayicon_size_global);
-	zbuff_icon.loadFromData(z_buf_icon_global, z_buf_icon_size_global);
-	alpha_icon.loadFromData(alpha_icon_global, alpha_icon_size_global);
-	cancel_icon.loadFromData(cancel_icon_global, cancel_icon_size_global);
-	save_as_icon.loadFromData(saveas_icon_global, saveas_icon_size_global);
-	render_icon.loadFromData(render_icon_global, render_icon_size_global);
-	show_alpha_icon.loadFromData(show_alpha_icon_global, show_alpha_icon_size_global);
-	show_color_icon.loadFromData(rgb_icon_global, rgb_icon_size_global);
-	save_depth_icon.loadFromData(save_z_buf_icon_global, save_z_buf_icon_size_global);
-	draw_params_icon.loadFromData(drawparams_icon_global, drawparams_icon_size_global);
-	zoom_in_icon.loadFromData(zoomin_icon_global, zoomin_icon_size_global);
-	zoom_out_icon.loadFromData(zoomout_icon_global, zoomout_icon_size_global);
-	quit_icon.loadFromData(quit_icon_global, quit_icon_size_global);
 
 #if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
 	int fId = QFontDatabase::addApplicationFontFromData(QByteArray((const char *)guifont, guifont_size));
@@ -119,13 +75,14 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	ui_ = std::unique_ptr<Ui>(new Ui());
 	ui_->setup(this);
 
+	QPixmap yaf_icon;
+	yaf_icon.loadFromData(yafarayicon_global, yafarayicon_size_global);
 	setWindowIcon(QIcon(yaf_icon));
 
 #if defined(__APPLE__)
 	m_ui->menubar->setNativeMenuBar(false); //Otherwise the menus don't appear in MacOS for some weird reason
 	m_ui->toolBar->close(); //FIXME: I was unable to make the icons in the tool bar to show in MacOS, really weird... so for now we just hide the toolbar entirely in Mac
 #endif
-
 
 	render_saved_ = false;
 
@@ -155,40 +112,12 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	render_area_pal.setColor(QPalette::Window, Qt::black);
 
 	ui_->renderArea->viewport()->setPalette(render_area_pal);
-
-	ui_->cancelButton->setIcon(QIcon(cancel_icon));
-
-	connect(ui_->cancelButton, SIGNAL(clicked()), this, SLOT(slotCancel()));
 	connect(worker_.get(), SIGNAL(finished()), this, SLOT(slotFinished()));
 
 	// move the animwidget over the render area
 	QRect r = anim_->rect();
 	r.moveCenter(ui_->renderArea->rect().center());
 	anim_->move(r.topLeft());
-
-	// Set toolbar icons
-	ui_->actionCancel->setIcon(QIcon(cancel_icon));
-	ui_->actionSave_As->setIcon(QIcon(save_as_icon));
-	ui_->actionRender->setIcon(QIcon(render_icon));
-	ui_->actionZoom_In->setIcon(QIcon(zoom_in_icon));
-	ui_->actionZoom_Out->setIcon(QIcon(zoom_out_icon));
-	ui_->actionQuit->setIcon(QIcon(quit_icon));
-
-	// actions
-	connect(ui_->actionRender, SIGNAL(triggered(bool)),
-			this, SLOT(slotRender()));
-	connect(ui_->actionCancel, SIGNAL(triggered(bool)),
-			this, SLOT(slotCancel()));
-	connect(ui_->actionSave_As, SIGNAL(triggered(bool)),
-			this, SLOT(slotSaveAs()));
-	connect(ui_->actionQuit, SIGNAL(triggered(bool)),
-			this, SLOT(close()));
-	connect(ui_->actionZoom_In, SIGNAL(triggered(bool)),
-			this, SLOT(zoomIn()));
-	connect(ui_->actionZoom_Out, SIGNAL(triggered(bool)),
-			this, SLOT(zoomOut()));
-	connect(ui_->actionAskSave, SIGNAL(triggered(bool)),
-			this, SLOT(setAskSave(bool)));
 
 	// offset when using border rendering
 	render_->setRenderBorderStart(QPoint(b_start_x, b_start_y));
@@ -197,7 +126,6 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	{
 		this->setWindowTitle(this->windowTitle() + QString(" (") + QString(file_name_.c_str()) + QString(")"));
 	}
-
 
 	// filter the resize events of the render area to center the animation widget
 	ui_->renderArea->installEventFilter(this);
@@ -210,10 +138,8 @@ bool MainWindow::event(QEvent *e)
 	if(e->type() == (QEvent::Type)ProgressUpdate)
 	{
 		auto *p = dynamic_cast<ProgressUpdateEvent *>(e);
-		if(p->min() >= 0)
-			ui_->progressbar->setMinimum(p->min());
-		if(p->max() >= 0)
-			ui_->progressbar->setMaximum(p->max());
+		if(p->min() >= 0) ui_->progressbar->setMinimum(p->min());
+		if(p->max() >= 0) ui_->progressbar->setMaximum(p->max());
 		ui_->progressbar->setValue(p->progress());
 		return true;
 	}
@@ -247,7 +173,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 void MainWindow::slotRender()
 {
-	slotEnableDisable(false);
+	ui_->slotEnableDisable(false);
 	ui_->progressbar->show();
 	time_measure_.start();
 	ui_->yafLabel->setText(tr("Rendering image..."));
@@ -323,7 +249,7 @@ void MainWindow::slotFinished()
 	render_->finishRendering();
 	update();
 
-	slotEnableDisable(true);
+	ui_->slotEnableDisable(true);
 
 /*	if(auto_close_)
 	{
@@ -335,16 +261,6 @@ void MainWindow::slotFinished()
 	ui_->progressbar->hide();
 
 	QApplication::alert(this);
-}
-
-
-void MainWindow::slotEnableDisable(bool enable)
-{
-	ui_->actionRender->setVisible(enable);
-	ui_->cancelButton->setVisible(!enable);
-	ui_->actionCancel->setVisible(!enable);
-	ui_->actionZoom_In->setEnabled(enable);
-	ui_->actionZoom_Out->setEnabled(enable);
 }
 
 void MainWindow::setAskSave(bool checked)

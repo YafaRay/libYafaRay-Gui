@@ -25,6 +25,7 @@ target_sources(libyafaray4_gui_qt
 		renderwidget.cc
 		worker.cc
 		mywindow.cc
+		ui.cc
 		#Adding directly all include files with classes containing "Q_OBJECT" for Qt MOC to generate proper code and linking virtual parent Qt classes correctly
 		${PROJECT_SOURCE_DIR}/include/gui/animworking.h
 		${PROJECT_SOURCE_DIR}/include/gui/renderwidget.h #For Qt MOC to generate proper code
