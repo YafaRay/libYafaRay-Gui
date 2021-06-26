@@ -180,6 +180,7 @@ void MainWindow::slotRender()
 	time_measure_.start();
 	ui_->label_->setText(tr("Rendering image..."));
 	render_->startRendering();
+	if(yafaray_interface_) yafaray_render(yafaray_interface_, nullptr, nullptr, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 	render_saved_ = false;
 	worker_->start();
 }
