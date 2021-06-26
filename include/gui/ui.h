@@ -40,35 +40,40 @@ BEGIN_YAFARAY_GUI_QT
 class Ui final
 {
 	public:
-		void setup(QMainWindow *WindowBase);
-		void connectActionSlots(QMainWindow *WindowBase);
+		void setup(QMainWindow *window_base);
 		void slotEnableDisable(bool enable = true);
 
-		QScrollArea *renderArea;
-		QAction *actionAskSave;
-		QProgressBar *progressbar;
-		QLabel *yafLabel;
+		QScrollArea *render_area_;
+		QAction *action_ask_save_;
+		QProgressBar *progress_bar_;
+		QLabel *label_;
 
 	private:
-		void setToolBarIcons();
+		void setButtonsIcons();
+		void setupActions(QMainWindow *window_base);
+		void setupMenuBar(QMainWindow *window_base);
+		void setupToolBar(QMainWindow *window_base);
+		void setupLabel(QMainWindow *window_base);
+		void setupProgressBar(QMainWindow *window_base);
+		void setupRenderArea(QMainWindow *window_base);
 
-		QAction *actionQuit;
-		QAction *actionSave_As;
-		QAction *actionZoom_In;
-		QAction *actionZoom_Out;
-		QAction *actionRender;
-		QAction *actionCancel;
-		QWidget *centralwidget;
-		QGridLayout *gridLayout;
-		QGridLayout *yafarayLayout;
-		QWidget *scrollAreaWidgetContents;
-		QPushButton *cancelButton;
-		QMenuBar *menubar;
-		QMenu *menuFile;
-		QMenu *menuImage;
-		QMenu *menuRender_Options;
-		QMenu *menuOptions;
-		QToolBar *toolBar;
+		QAction *action_quit_;
+		QAction *action_save_as_;
+		QAction *action_zoom_in_;
+		QAction *action_zoom_out_;
+		QAction *action_render_;
+		QAction *action_cancel_;
+		QWidget *central_widget_;
+		QGridLayout *grid_layout_;
+		QGridLayout *yafaray_layout_;
+		QWidget *scroll_area_widget_contents_;
+		QPushButton *cancel_button_;
+		QMenuBar *menubar_;
+		QMenu *menu_file_;
+		QMenu *menu_image_;
+		QMenu *menu_render_options_;
+		QMenu *menu_options_;
+		QToolBar *tool_bar_;
 };
 
 END_YAFARAY_GUI_QT

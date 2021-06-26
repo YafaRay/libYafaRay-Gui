@@ -86,37 +86,37 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 
 	render_saved_ = false;
 
-	ui_->actionAskSave->setChecked(ask_unsaved_);
+	ui_->action_ask_save_->setChecked(ask_unsaved_);
 
 /*	yafaray4::ParamMap *p = yafaray_interface_->getRenderParameters();
 	p->getParam("z_channel", use_zbuf_);*/
 
-	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(ui_->renderArea));
+	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(ui_->render_area_));
 //FIXME	output_ = std::unique_ptr<QtOutput>(new QtOutput(render_.get()));
 	worker_ = std::unique_ptr<Worker>(new Worker(yafaray_interface_, this, output_.get()));
 
 //FIXME	output_->setRenderSize(QSize(resx, resy));
 
 	// animation widget
-	anim_ = std::unique_ptr<AnimWorking>(new AnimWorking(ui_->renderArea));
+	anim_ = std::unique_ptr<AnimWorking>(new AnimWorking(ui_->render_area_));
 	anim_->resize(200, 87);
 
 	this->move(20, 20);
 
-	ui_->renderArea->setWidgetResizable(false);
-	ui_->renderArea->resize(resx, resy);
-	ui_->renderArea->setWidget(render_.get());
+	ui_->render_area_->setWidgetResizable(false);
+	ui_->render_area_->resize(resx, resy);
+	ui_->render_area_->setWidget(render_.get());
 
 	QPalette render_area_pal;
-	render_area_pal = ui_->renderArea->viewport()->palette();
+	render_area_pal = ui_->render_area_->viewport()->palette();
 	render_area_pal.setColor(QPalette::Window, Qt::black);
 
-	ui_->renderArea->viewport()->setPalette(render_area_pal);
+	ui_->render_area_->viewport()->setPalette(render_area_pal);
 	connect(worker_.get(), SIGNAL(finished()), this, SLOT(slotFinished()));
 
 	// move the animwidget over the render area
 	QRect r = anim_->rect();
-	r.moveCenter(ui_->renderArea->rect().center());
+	r.moveCenter(ui_->render_area_->rect().center());
 	anim_->move(r.topLeft());
 
 	// offset when using border rendering
@@ -128,7 +128,7 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	}
 
 	// filter the resize events of the render area to center the animation widget
-	ui_->renderArea->installEventFilter(this);
+	ui_->render_area_->installEventFilter(this);
 }
 
 MainWindow::~MainWindow() = default;
@@ -138,9 +138,9 @@ bool MainWindow::event(QEvent *e)
 	if(e->type() == (QEvent::Type)ProgressUpdate)
 	{
 		auto *p = dynamic_cast<ProgressUpdateEvent *>(e);
-		if(p->min() >= 0) ui_->progressbar->setMinimum(p->min());
-		if(p->max() >= 0) ui_->progressbar->setMaximum(p->max());
-		ui_->progressbar->setValue(p->progress());
+		if(p->min() >= 0) ui_->progress_bar_->setMinimum(p->min());
+		if(p->max() >= 0) ui_->progress_bar_->setMaximum(p->max());
+		ui_->progress_bar_->setValue(p->progress());
 		return true;
 	}
 
@@ -148,7 +148,7 @@ bool MainWindow::event(QEvent *e)
 	{
 		auto *p = dynamic_cast<ProgressUpdateTagEvent *>(e);
 		if(p->tag().contains("Rendering")) anim_->hide();
-		ui_->yafLabel->setText(p->tag());
+		ui_->label_->setText(p->tag());
 		return true;
 	}
 
@@ -174,9 +174,9 @@ void MainWindow::closeEvent(QCloseEvent *e)
 void MainWindow::slotRender()
 {
 	ui_->slotEnableDisable(false);
-	ui_->progressbar->show();
+	ui_->progress_bar_->show();
 	time_measure_.start();
-	ui_->yafLabel->setText(tr("Rendering image..."));
+	ui_->label_->setText(tr("Rendering image..."));
 	render_->startRendering();
 	render_saved_ = false;
 	worker_->start();
@@ -243,7 +243,7 @@ void MainWindow::slotFinished()
 	time_str.append(QString(" %1").arg(suffix));
 
 	rt.append(QString("Render time: %1 [%2s.]").arg(time_str).arg(time_sec, 5));
-	ui_->yafLabel->setText(rt);
+	ui_->label_->setText(rt);
 	yafaray_printInfo(yafaray_interface_, "Render completed!");
 
 	render_->finishRendering();
@@ -258,7 +258,7 @@ void MainWindow::slotFinished()
 		return;
 	}*/
 
-	ui_->progressbar->hide();
+	ui_->progress_bar_->hide();
 
 	QApplication::alert(this);
 }
@@ -353,7 +353,7 @@ bool MainWindow::saveDlg()
 		QString savemesg;
 		savemesg.append("Render ");
 		savemesg.append("saved.");
-		ui_->yafLabel->setText(savemesg);
+		ui_->label_->setText(savemesg);
 	}
 
 	return render_saved_;
@@ -399,7 +399,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 	{
 		// move the animwidget over the render area
 		QRect r = anim_->rect();
-		r.moveCenter(ui_->renderArea->rect().center());
+		r.moveCenter(ui_->render_area_->rect().center());
 		anim_->move(r.topLeft());
 	}
 	return QMainWindow::eventFilter(obj, event);
@@ -422,14 +422,14 @@ void MainWindow::adjustWindow()
 	int w = std::min(res_x_ + 10, scr_geom.width() - 60);
 	int h = std::min(res_y_ + 10, scr_geom.height() - 160);
 
-	ui_->renderArea->setMaximumSize(w, h);
-	ui_->renderArea->setMinimumSize(w, h);
+	ui_->render_area_->setMaximumSize(w, h);
+	ui_->render_area_->setMinimumSize(w, h);
 
 	adjustSize();
 	resize(minimumSize());
 
-	ui_->renderArea->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-	ui_->renderArea->setMinimumSize(0, 0);
+	ui_->render_area_->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+	ui_->render_area_->setMinimumSize(0, 0);
 }
 
 END_YAFARAY_GUI_QT
