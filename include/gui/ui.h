@@ -68,10 +68,6 @@ class Ui
 
 inline void Ui::setup(QMainWindow *WindowBase)
 {
-	WindowBase->setObjectName("WindowBase");
-	WindowBase->resize(1028, 597);
-	WindowBase->setWindowTitle("YafaRay's Rendering Output");
-
 	actionQuit = new QAction(WindowBase);
 	actionQuit->setObjectName("actionQuit");
 	actionQuit->setText("Quit");
@@ -112,76 +108,6 @@ inline void Ui::setup(QMainWindow *WindowBase)
 	actionAskSave->setText("Ask to save before closing");
 	actionAskSave->setToolTip("Enable/disable ask before closing dialog");
 
-	centralwidget = new QWidget(WindowBase);
-	centralwidget->setObjectName("centralwidget");
-
-	gridLayout = new QGridLayout(centralwidget);
-	gridLayout->setSpacing(0);
-	gridLayout->setObjectName("gridLayout");
-	gridLayout->setContentsMargins(0, 0, 0, 0);
-
-	yafarayLayout = new QGridLayout();
-	yafarayLayout->setSpacing(2);
-	yafarayLayout->setObjectName("yafarayLayout");
-	yafarayLayout->setContentsMargins(2, 2, 2, 2);
-
-	renderArea = new QScrollArea(centralwidget);
-	renderArea->setObjectName("renderArea");
-	renderArea->setFrameShadow(QFrame::Plain);
-	renderArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	renderArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	renderArea->setWidgetResizable(true);
-	renderArea->setAlignment(Qt::AlignCenter);
-
-	scrollAreaWidgetContents = new QWidget();
-	scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-	scrollAreaWidgetContents->setGeometry(QRect(0, 0, 1022, 491));
-
-	renderArea->setWidget(scrollAreaWidgetContents);
-	yafarayLayout->addWidget(renderArea, 0, 0, 1, 2);
-
-	progressbar = new QProgressBar(centralwidget);
-	progressbar->setObjectName("progressbar");
-	QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-	sizePolicy.setHorizontalStretch(0);
-	sizePolicy.setVerticalStretch(0);
-	sizePolicy.setHeightForWidth(progressbar->sizePolicy().hasHeightForWidth());
-	progressbar->setSizePolicy(sizePolicy);
-	progressbar->setMinimumSize(QSize(0, 13));
-	progressbar->setMaximumSize(QSize(16777215, 13));
-	QFont font;
-	font.setPointSize(8);
-	progressbar->setFont(font);
-	progressbar->setValue(0);
-	progressbar->setAlignment(Qt::AlignCenter);
-	progressbar->setTextVisible(true);
-	progressbar->setOrientation(Qt::Horizontal);
-
-	yafarayLayout->addWidget(progressbar, 1, 0, 1, 1);
-
-	cancelButton = new QPushButton(centralwidget);
-	cancelButton->setObjectName("cancelButton");
-	cancelButton->setText("Cancel");
-
-	yafarayLayout->addWidget(cancelButton, 1, 1, 1, 1);
-
-	yafLabel = new QLabel(centralwidget);
-	yafLabel->setObjectName("yafLabel");
-	yafLabel->setText("Rendering...");
-	QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	sizePolicy1.setHorizontalStretch(0);
-	sizePolicy1.setVerticalStretch(0);
-	sizePolicy1.setHeightForWidth(yafLabel->sizePolicy().hasHeightForWidth());
-	yafLabel->setSizePolicy(sizePolicy1);
-	yafLabel->setTextFormat(Qt::AutoText);
-	yafLabel->setMargin(0);
-	yafLabel->setIndent(4);
-	yafLabel->setTextInteractionFlags(Qt::NoTextInteraction);
-
-	yafarayLayout->addWidget(yafLabel, 2, 0, 1, 2);
-	gridLayout->addLayout(yafarayLayout, 0, 0, 1, 1);
-	WindowBase->setCentralWidget(centralwidget);
-
 	menubar = new QMenuBar(WindowBase);
 	menubar->setObjectName("menubar");
 	menubar->setGeometry(QRect(0, 0, 1028, 22));
@@ -202,8 +128,6 @@ inline void Ui::setup(QMainWindow *WindowBase)
 	menuOptions->setObjectName("menuOptions");
 	menuOptions->setTitle("Options");
 
-	WindowBase->setMenuBar(menubar);
-
 	toolBar = new QToolBar(WindowBase);
 	toolBar->setObjectName("toolBar");
 	toolBar->setMinimumSize(QSize(0, 0));
@@ -213,8 +137,6 @@ inline void Ui::setup(QMainWindow *WindowBase)
 	toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	toolBar->setFloatable(false);
 	toolBar->setWindowTitle("toolBar");
-
-	WindowBase->addToolBar(Qt::TopToolBarArea, toolBar);
 
 	menubar->addAction(menuFile->menuAction());
 	menubar->addAction(menuImage->menuAction());
@@ -243,6 +165,77 @@ inline void Ui::setup(QMainWindow *WindowBase)
 	toolBar->addSeparator();
 	toolBar->addSeparator();
 	toolBar->addAction(actionQuit);
+
+	centralwidget = new QWidget(WindowBase);
+	centralwidget->setObjectName("centralwidget");
+
+	cancelButton = new QPushButton(centralwidget);
+	cancelButton->setObjectName("cancelButton");
+	cancelButton->setText("Cancel");
+
+	yafLabel = new QLabel(centralwidget);
+	yafLabel->setObjectName("yafLabel");
+	yafLabel->setText("Rendering...");
+	QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	sizePolicy1.setHorizontalStretch(0);
+	sizePolicy1.setVerticalStretch(0);
+	sizePolicy1.setHeightForWidth(yafLabel->sizePolicy().hasHeightForWidth());
+	yafLabel->setSizePolicy(sizePolicy1);
+	yafLabel->setTextFormat(Qt::AutoText);
+	yafLabel->setMargin(0);
+	yafLabel->setIndent(4);
+	yafLabel->setTextInteractionFlags(Qt::NoTextInteraction);
+
+	progressbar = new QProgressBar(centralwidget);
+	progressbar->setObjectName("progressbar");
+	QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(progressbar->sizePolicy().hasHeightForWidth());
+	progressbar->setSizePolicy(sizePolicy);
+	progressbar->setMinimumSize(QSize(0, 13));
+	progressbar->setMaximumSize(QSize(16777215, 13));
+	QFont font;
+	font.setPointSize(8);
+	progressbar->setFont(font);
+	progressbar->setValue(0);
+	progressbar->setAlignment(Qt::AlignCenter);
+	progressbar->setTextVisible(true);
+	progressbar->setOrientation(Qt::Horizontal);
+
+	renderArea = new QScrollArea(centralwidget);
+	renderArea->setObjectName("renderArea");
+	renderArea->setFrameShadow(QFrame::Plain);
+	renderArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	renderArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	renderArea->setWidgetResizable(true);
+	renderArea->setAlignment(Qt::AlignCenter);
+	scrollAreaWidgetContents = new QWidget();
+	scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
+	scrollAreaWidgetContents->setGeometry(QRect(0, 0, 1022, 491));
+	renderArea->setWidget(scrollAreaWidgetContents);
+
+	yafarayLayout = new QGridLayout();
+	yafarayLayout->setSpacing(2);
+	yafarayLayout->setObjectName("yafarayLayout");
+	yafarayLayout->setContentsMargins(2, 2, 2, 2);
+	yafarayLayout->addWidget(renderArea, 0, 0, 1, 2);
+	yafarayLayout->addWidget(progressbar, 1, 0, 1, 1);
+	yafarayLayout->addWidget(cancelButton, 1, 1, 1, 1);
+	yafarayLayout->addWidget(yafLabel, 2, 0, 1, 2);
+
+	gridLayout = new QGridLayout(centralwidget);
+	gridLayout->setSpacing(0);
+	gridLayout->setObjectName("gridLayout");
+	gridLayout->setContentsMargins(0, 0, 0, 0);
+	gridLayout->addLayout(yafarayLayout, 0, 0, 1, 1);
+
+	WindowBase->setObjectName("WindowBase");
+	WindowBase->resize(1028, 597);
+	WindowBase->setWindowTitle("YafaRay's Rendering Output");
+	WindowBase->setCentralWidget(centralwidget);
+	WindowBase->setMenuBar(menubar);
+	WindowBase->addToolBar(Qt::TopToolBarArea, toolBar);
 
 	QMetaObject::connectSlotsByName(WindowBase);
 }
