@@ -1,8 +1,6 @@
+#pragma once
 /****************************************************************************
- *      mywindow.h: main window of the yafray UI
  *      This is part of the libYafaRay-Gui-Qt package
- *      Copyright (C) 2008 Gustavo Pichorim Boiko
- *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -19,18 +17,19 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-#ifndef YAFARAY_MYWINDOW_H
-#define YAFARAY_MYWINDOW_H
+#ifndef LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H
+#define LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H
 
 #include "common/yafaray_gui_qt_common.h"
-#include "gui/animworking.h"
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 #include <QTime>
-#include <string>
 #include <memory>
 
 typedef struct yafaray_Interface yafaray_Interface_t;
+class QScrollArea;
+class QProgressBar;
+class QLabel;
+class QPushButton;
 
 BEGIN_YAFARAY_GUI_QT
 
@@ -38,17 +37,22 @@ class AnimWorking;
 class QtOutput;
 class RenderWidget;
 class Worker;
-class Ui;
 
-class MainWindow final : public QMainWindow
+class QtMainWindow final : public QMainWindow
 {
-		Q_OBJECT
+	Q_OBJECT
 
 	public:
-		MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish);
-		~MainWindow() override;
-		bool event(QEvent *e) override;
+		QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish);
+		~QtMainWindow() override;
 		void adjustWindow();
+		void setup(QMainWindow *window_base);
+		void slotEnableDisable(bool enable = true);
+
+		QScrollArea *render_area_;
+		QAction *action_ask_save_;
+		QProgressBar *progress_bar_;
+		QLabel *label_;
 
 	public slots:
 		void slotRender();
@@ -61,14 +65,30 @@ class MainWindow final : public QMainWindow
 		void zoomOut();
 
 	private:
+		bool event(QEvent *e) override;
 		bool eventFilter(QObject *obj, QEvent *event) override;
 		void keyPressEvent(QKeyEvent *event) override;
 		void closeEvent(QCloseEvent *e) override;
 		bool closeUnsaved();
 		bool openDlg();
 		bool saveDlg();
+		void setButtonsIcons();
+		void setupActions(QMainWindow *window_base);
+		QMenuBar *setupMenuBar(QMainWindow *window_base);
+		QToolBar *setupToolBar(QMainWindow *window_base);
+		static QLabel *setupLabel(QWidget *widget_base);
+		static QProgressBar *setupProgressBar(QWidget *widget_base);
+		static QScrollArea *setupRenderArea(QWidget *widget_base);
 
-		std::unique_ptr<Ui> ui_;
+		QAction *action_quit_;
+		QAction *action_open_;
+		QAction *action_save_as_;
+		QAction *action_zoom_in_;
+		QAction *action_zoom_out_;
+		QAction *action_render_;
+		QAction *action_cancel_;
+		QPushButton *cancel_button_;
+
 		std::unique_ptr<RenderWidget> render_;
 		std::unique_ptr<QtOutput> output_;
 		std::unique_ptr<Worker> worker_;
@@ -86,4 +106,4 @@ class MainWindow final : public QMainWindow
 
 END_YAFARAY_GUI_QT
 
-#endif
+#endif //LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H

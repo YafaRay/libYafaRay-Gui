@@ -1,3 +1,4 @@
+#pragma once
 /****************************************************************************
  *      renderwidget.h: the widget for displaying the render output
  *      This is part of the libYafaRay-Gui-Qt package

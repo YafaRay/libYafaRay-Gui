@@ -1,3 +1,4 @@
+#pragma once
 /****************************************************************************
  *      qtoutput.h: a Qt color output for yafray
  *      This is part of the libYafaRay-Gui-Qt package

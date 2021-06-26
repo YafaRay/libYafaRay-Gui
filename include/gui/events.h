@@ -1,3 +1,4 @@
+#pragma once
 /****************************************************************************
  *      events.h: custom events to enable thread communication to the UI
  *      This is part of the libYafaRay-Gui-Qt package

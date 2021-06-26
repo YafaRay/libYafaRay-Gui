@@ -1,3 +1,4 @@
+#pragma once
 /****************************************************************************
  *      progressbar.h: A progress updater for the yafray GUI
  *      This is part of the libYafaRay-Gui-Qt package
@@ -26,19 +27,19 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-class MainWindow;
+class QtMainWindow;
 
 class QtProgress final
 {
 	public:
-		QtProgress(MainWindow *window);
+		QtProgress(QtMainWindow *window);
 		~QtProgress() = default;
 		void init(int total_steps);
 		void update(int steps = 1);
 		void setTag(const char *tag);
 		void done();
 	private:
-		MainWindow *win_ = nullptr;
+		QtMainWindow *win_ = nullptr;
 		int current_step_ = 0;
 		int total_steps_ = 0;
 };

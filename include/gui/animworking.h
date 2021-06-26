@@ -1,3 +1,4 @@
+#pragma once
 /****************************************************************************
  *      animworking.h: a widget to show something is being processed
  *      This is part of the libYafaRay-Gui-Qt package

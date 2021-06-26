@@ -21,12 +21,12 @@
 
 #include "gui/qtprogress.h"
 #include "gui/events.h"
-#include "gui/mywindow.h"
+#include "gui/qt_main_window.h"
 #include <QCoreApplication>
 
 BEGIN_YAFARAY_GUI_QT
 
-QtProgress::QtProgress(MainWindow *window) : win_(window)
+QtProgress::QtProgress(QtMainWindow *window) : win_(window)
 {
 }
 

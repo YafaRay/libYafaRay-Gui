@@ -18,7 +18,7 @@
 
 #include "public_api/yafaray_gui_qt_c_api.h"
 #include "common/version_build_info.h"
-#include "gui/mywindow.h"
+#include "gui/qt_main_window.h"
 #include <QApplication>
 
 static QApplication *app_global = nullptr;
@@ -40,7 +40,7 @@ void yafaray_gui_qt_init()
 
 int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish)
 {
-	yafaray_gui_qt::MainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, auto_save, close_after_finish);
+	yafaray_gui_qt::QtMainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, auto_save, close_after_finish);
 	w.show();
 	w.adjustWindow();
 	//FIXME AUTORENDER w.slotRender();
