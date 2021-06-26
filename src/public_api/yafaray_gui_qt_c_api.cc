@@ -21,30 +21,15 @@
 #include "gui/qt_main_window.h"
 #include <QApplication>
 
-static QApplication *app_global = nullptr;
-
-void yafaray_gui_qt_init()
+int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool close_after_finish)
 {
-	static int argc = 0;
-
-	if(!QApplication::instance())
-	{
-#if defined(__APPLE__)
-		QApplication::instance()->setAttribute(Qt::AA_MacPluginApplication);
-		QApplication::instance()->setAttribute(Qt::AA_DontUseNativeMenuBar);
-#endif
-		app_global = new QApplication(argc, nullptr);
-	}
-	else app_global = dynamic_cast<QApplication *>(QApplication::instance());
-}
-
-int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish)
-{
-	yafaray_gui_qt::QtMainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, auto_save, close_after_finish);
+	int argc = 0;
+	auto app = new QApplication(argc, nullptr, 0);
+	yafaray_gui_qt::QtMainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, close_after_finish);
 	w.show();
 	w.adjustWindow();
 	//FIXME AUTORENDER w.slotRender();
-	return app_global->exec();
+	return QApplication::exec();
 }
 
 void yafaray_gui_qt_getVersionString(char *dest_string, unsigned int dest_string_size)

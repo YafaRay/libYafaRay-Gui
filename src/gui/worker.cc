@@ -21,12 +21,11 @@
 
 #include "gui/qt_main_window.h"
 #include "gui/worker.h"
-#include "gui/qtoutput.h"
 
 BEGIN_YAFARAY_GUI_QT
 
-Worker::Worker(::yafaray_Interface_t *yafaray_interface, QtMainWindow *win, QtOutput *output)
-	: QThread(), yafaray_interface_(yafaray_interface), output_(output), win_(win)
+Worker::Worker(::yafaray_Interface_t *yafaray_interface, QtMainWindow *win)
+	: QThread(), yafaray_interface_(yafaray_interface), win_(win)
 {
 }
 

@@ -135,11 +135,6 @@ AnimWorking::AnimWorking(QWidget *parent) : QWidget(parent)
 	timer_act_frame_ = 0;
 }
 
-AnimWorking::~AnimWorking()
-{
-	sprites_.clear();
-}
-
 void AnimWorking::paintEvent(QPaintEvent *e)
 {
 	if(timer_id_ < 0)

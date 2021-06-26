@@ -30,11 +30,11 @@ class QScrollArea;
 class QProgressBar;
 class QLabel;
 class QPushButton;
+class QTimer;
 
 BEGIN_YAFARAY_GUI_QT
 
 class AnimWorking;
-class QtOutput;
 class RenderWidget;
 class Worker;
 
@@ -43,7 +43,7 @@ class QtMainWindow final : public QMainWindow
 	Q_OBJECT
 
 	public:
-		QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool auto_save, bool close_after_finish);
+		QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish);
 		~QtMainWindow() override;
 		void adjustWindow();
 		void setup(QMainWindow *window_base);
@@ -80,28 +80,27 @@ class QtMainWindow final : public QMainWindow
 		static QProgressBar *setupProgressBar(QWidget *widget_base);
 		static QScrollArea *setupRenderArea(QWidget *widget_base);
 
-		QAction *action_quit_;
-		QAction *action_open_;
-		QAction *action_save_as_;
-		QAction *action_zoom_in_;
-		QAction *action_zoom_out_;
-		QAction *action_render_;
-		QAction *action_cancel_;
-		QPushButton *cancel_button_;
+		QAction *action_quit_ = nullptr;
+		QAction *action_open_ = nullptr;
+		QAction *action_save_as_ = nullptr;
+		QAction *action_zoom_in_ = nullptr;
+		QAction *action_zoom_out_ = nullptr;
+		QAction *action_render_ = nullptr;
+		QAction *action_cancel_ = nullptr;
+		QPushButton *cancel_button_ = nullptr;
 
 		std::unique_ptr<RenderWidget> render_;
-		std::unique_ptr<QtOutput> output_;
 		std::unique_ptr<Worker> worker_;
-		yafaray_Interface_t *yafaray_interface_;
+		yafaray_Interface_t *yafaray_interface_ = nullptr;
 		QString last_path_;
-		int res_x_, res_y_, b_x_, b_y_;
-		std::string file_name_;
-		bool auto_close_;	// if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
-		bool auto_save_;	// if true, rendering gets saved to fileName after finish but GUI stays opened
-		QTime time_measure_;		// time measure for the render
+		int res_x_ = 0, res_y_ = 0, b_x_ = 0, b_y_ = 0;
+		bool auto_close_ = false; // if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
+		QTime time_measure_; // time measure for the render
+		QTimer *timer_ = nullptr;
 		std::unique_ptr<AnimWorking> anim_;
-		bool render_saved_;
-		bool ask_unsaved_;
+		bool render_saved_ = false;
+		bool ask_unsaved_ = false;
+		bool render_cancelled_ = false;
 };
 
 END_YAFARAY_GUI_QT

@@ -2,7 +2,6 @@
 
 LIBYAFARAYXML_4.0.0 {
     global:
-        yafaray_gui_qt_init;
         yafaray_gui_qt_createRenderWidget;
         yafaray_gui_qt_ParseFile;
         yafaray_gui_qt_ParseMemory;

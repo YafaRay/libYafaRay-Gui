@@ -20,11 +20,8 @@ target_sources(libyafaray4_gui_qt
 	PRIVATE
 		animworking.cc
 		events.cc
-#		qtoutput.cc
-		qtprogress.cc
 		renderwidget.cc
 		worker.cc
-#		mywindow.cc
 		qt_main_window.cc
 		#Adding directly all include files with classes containing "Q_OBJECT" for Qt MOC to generate proper code and linking virtual parent Qt classes correctly
 		${PROJECT_SOURCE_DIR}/include/gui/animworking.h

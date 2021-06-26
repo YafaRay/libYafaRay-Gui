@@ -35,7 +35,6 @@ class AnimWorking final : public QWidget
 
 	public:
 		explicit AnimWorking(QWidget *parent = nullptr);
-		~AnimWorking() override;
 
 	private:
 		void paintEvent(QPaintEvent *e) override;
