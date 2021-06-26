@@ -50,18 +50,13 @@ void Ui::setup(QMainWindow *window_base)
 	progress_bar_ = setupProgressBar(central_widget);
 	render_area_ = setupRenderArea(central_widget);
 
-	auto yafaray_layout = new QGridLayout();
-	yafaray_layout->setSpacing(2);
-	yafaray_layout->setContentsMargins(2, 2, 2, 2);
-	yafaray_layout->addWidget(render_area_, 0, 0, 1, 2);
-	yafaray_layout->addWidget(progress_bar_, 1, 0, 1, 1);
-	yafaray_layout->addWidget(cancel_button_, 1, 1, 1, 1);
-	yafaray_layout->addWidget(label_, 2, 0, 1, 2);
-
-	auto grid_layout = new QGridLayout(central_widget);
-	grid_layout->setSpacing(0);
-	grid_layout->setContentsMargins(0, 0, 0, 0);
-	grid_layout->addLayout(yafaray_layout, 0, 0, 1, 1);
+	auto layout = new QGridLayout(central_widget);
+	layout->setSpacing(2);
+	layout->setContentsMargins(2, 2, 2, 2);
+	layout->addWidget(render_area_, 0, 0, 1, 2);
+	layout->addWidget(progress_bar_, 1, 0, 1, 1);
+	layout->addWidget(cancel_button_, 1, 1, 1, 1);
+	layout->addWidget(label_, 2, 0, 1, 2);
 
 	window_base->setWindowTitle("YafaRay's Rendering Output");
 	window_base->setCentralWidget(central_widget);
