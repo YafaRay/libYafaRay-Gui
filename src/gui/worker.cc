@@ -31,7 +31,7 @@ Worker::Worker(::yafaray_Interface_t *yafaray_interface, QtMainWindow *win)
 
 void Worker::run()
 {
-	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, win_->label_, YAFARAY_DISPLAY_CONSOLE_NORMAL);
+	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, win_, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 }
 
 END_YAFARAY_GUI_QT
