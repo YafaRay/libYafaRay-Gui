@@ -28,7 +28,7 @@ int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, in
 	yafaray_gui_qt::QtMainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, close_after_finish);
 	w.show();
 	w.adjustWindow();
-	//FIXME AUTORENDER w.slotRender();
+	w.slotRender(); //Automatic rendering
 	return QApplication::exec();
 }
 
