@@ -140,7 +140,10 @@ QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int
 	render_area_->installEventFilter(this);
 }
 
-QtMainWindow::~QtMainWindow() = default;
+QtMainWindow::~QtMainWindow()
+{
+	yafaray_setLoggingCallback(yafaray_interface_, nullptr, nullptr);
+}
 
 
 void QtMainWindow::setup(QMainWindow *window_base)
