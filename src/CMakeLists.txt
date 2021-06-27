@@ -9,7 +9,6 @@ target_link_libraries(libyafaray4_gui_qt PRIVATE LibYafaRay::libyafaray4 Qt5::Wi
 
 if(YAFARAY_GUI_QT_WITH_XML)
 	list(APPEND YAFARAY_GUI_QT_CUSTOM_DEFINITIONS "YAFARAY_GUI_QT_WITH_XML")
-	find_package(LibXml2 2.9.1 REQUIRED)
 	find_package(LibYafaRay_Xml 4.0.0 REQUIRED)
 	target_link_libraries(libyafaray4_gui_qt PRIVATE LibYafaRay_Xml::libyafaray4_xml)
 endif()

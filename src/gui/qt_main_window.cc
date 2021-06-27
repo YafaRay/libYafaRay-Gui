@@ -467,7 +467,7 @@ bool QtMainWindow::openDlg()
 {
 #ifdef YAFARAY_GUI_QT_WITH_XML
 	const QString xml_file_path = QFileDialog::getOpenFileName(this, tr("Load YafaRay XML file"), last_path_, "*.xml");
-	return yafaray_xml_Parse(yafaray_interface_, xml_file_path.toStdString().c_str());
+	return yafaray_xml_ParseFile(yafaray_interface_, xml_file_path.toStdString().c_str());
 #else
 	yafaray_printError(yafaray_interface_, "libYafaRay-Gui-Qt is built without XML support, cannot open the file");
 	return false;
