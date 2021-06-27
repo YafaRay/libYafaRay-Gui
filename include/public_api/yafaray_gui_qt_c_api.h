@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, bool close_after_finish);
+	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish);
 	YAFARAY_GUI_QT_C_API_EXPORT void yafaray_gui_qt_getVersionString(char *dest_string, unsigned int dest_string_size);
 	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionMajor();
 	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionMinor();

@@ -41,20 +41,14 @@
 #include "resource/yafarayicon.h"
 
 #include <QSettings>
-//#include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGridLayout>
-//#include <QtWidgets/QLabel>
-//#include <QtWidgets/QMenu>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QProgressBar>
-#include <QtWidgets/QPushButton>
-//#include <QtWidgets/QScrollArea>
-#include <QtWidgets/QToolBar>
+#include <QAction>
+#include <QApplication>
+#include <QGridLayout>
+#include <QMenuBar>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QToolBar>
 #include <QDesktopWidget>
-#include <QTimer>
-//#include <QtWidgets/QWidget>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QKeyEvent>
@@ -66,15 +60,17 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), auto_close_(close_after_finish)
+QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), output_(resx, resy), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), auto_close_(close_after_finish)
 {
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
-	QCoreApplication::setApplicationName("YafaRay Qt Gui");
+	QCoreApplication::setApplicationName("LibYafaRay-Gui-Qt");
 
-	timer_ = new QTimer(this);
-	timer_->setInterval(200);
-	//connect(timer_, SIGNAL(timeout()), this, SLOT(()));
+	/* Creating callback output */
+	yafaray_setLoggingCallback(yafaray_interface, Output::loggerCallback, (void *) &output_);
+	yafaray_paramsSetString(yafaray_interface, "type", "callback_output");
+	yafaray_createOutput(yafaray_interface, "test_callback_output", YAFARAY_BOOL_TRUE, Output::putPixelCallback, Output::flushAreaCallback, Output::flushCallback, (void *) &output_);
+	yafaray_paramsClearAll(yafaray_interface);
 
 	QSettings set;
 	ask_unsaved_ = set.value("qtGui/askSave", true).toBool();
@@ -337,15 +333,6 @@ void QtMainWindow::setButtonsIcons()
 	cancel_button_->setIcon(QIcon(cancel_icon));
 }
 
-void QtMainWindow::slotEnableDisable(bool enable)
-{
-	action_render_->setVisible(enable);
-	cancel_button_->setVisible(!enable);
-	action_cancel_->setVisible(!enable);
-	action_zoom_in_->setEnabled(enable);
-	action_zoom_out_->setEnabled(enable);
-}
-
 bool QtMainWindow::event(QEvent *e)
 {
 	if(e->type() == (QEvent::Type)ProgressUpdate)
@@ -385,12 +372,15 @@ void QtMainWindow::closeEvent(QCloseEvent *e)
 
 void QtMainWindow::slotRender()
 {
-	slotEnableDisable(false);
+	action_render_->setVisible(false);
+	action_zoom_in_->setEnabled(false);
+	action_zoom_out_->setEnabled(false);
+	cancel_button_->setVisible(true);
+	action_cancel_->setVisible(true);
+
 	progress_bar_->show();
 	time_measure_.start();
-	label_->setText(tr("Rendering image..."));
 	render_->startRendering();
-	if(yafaray_interface_) yafaray_render(yafaray_interface_, nullptr, nullptr, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 	render_saved_ = false;
 	worker_->start();
 }
@@ -440,7 +430,11 @@ void QtMainWindow::slotFinished()
 	render_->finishRendering();
 	update();
 
-	slotEnableDisable(true);
+	action_render_->setVisible(true);
+	action_zoom_in_->setEnabled(true);
+	action_zoom_out_->setEnabled(true);
+	cancel_button_->setVisible(false);
+	action_cancel_->setVisible(false);
 
 	if(auto_close_)
 	{
@@ -510,6 +504,11 @@ void QtMainWindow::slotCancel()
 {
 	yafaray_cancel(yafaray_interface_);
 	worker_->wait();
+	action_render_->setVisible(true);
+	action_zoom_in_->setEnabled(true);
+	action_zoom_out_->setEnabled(true);
+	cancel_button_->setVisible(false);
+	action_cancel_->setVisible(false);
 }
 
 void QtMainWindow::keyPressEvent(QKeyEvent *event)

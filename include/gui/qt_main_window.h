@@ -21,6 +21,7 @@
 #define LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H
 
 #include "common/yafaray_gui_qt_common.h"
+#include "gui/output.h"
 #include <QtWidgets/QMainWindow>
 #include <QTime>
 #include <memory>
@@ -47,12 +48,11 @@ class QtMainWindow final : public QMainWindow
 		~QtMainWindow() override;
 		void adjustWindow();
 		void setup(QMainWindow *window_base);
-		void slotEnableDisable(bool enable = true);
 
-		QScrollArea *render_area_;
-		QAction *action_ask_save_;
-		QProgressBar *progress_bar_;
-		QLabel *label_;
+		QScrollArea *render_area_ = nullptr;
+		QAction *action_ask_save_ = nullptr;
+		QProgressBar *progress_bar_ = nullptr;
+		QLabel *label_ = nullptr;
 
 	public slots:
 		void slotRender();
@@ -92,6 +92,7 @@ class QtMainWindow final : public QMainWindow
 		std::unique_ptr<RenderWidget> render_;
 		std::unique_ptr<Worker> worker_;
 		yafaray_Interface_t *yafaray_interface_ = nullptr;
+		Output output_;
 		QString last_path_;
 		int res_x_ = 0, res_y_ = 0, b_x_ = 0, b_y_ = 0;
 		bool auto_close_ = false; // if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
