@@ -90,7 +90,7 @@ QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int
 #endif
 #endif
 
-	setup(this);
+	setup();
 
 	QPixmap yaf_icon;
 	yaf_icon.loadFromData(yafarayicon_global, yafarayicon_size_global);
@@ -146,17 +146,17 @@ QtMainWindow::~QtMainWindow()
 }
 
 
-void QtMainWindow::setup(QMainWindow *window_base)
+void QtMainWindow::setup()
 {
-	setupActions(window_base);
-	auto menu_bar = setupMenuBar(window_base);
-	auto tool_bar = setupToolBar(window_base);
+	setupActions();
+	auto menu_bar = setupMenuBar();
+	auto tool_bar = setupToolBar();
 
-	auto central_widget = new QWidget(window_base);
+	auto central_widget = new QWidget();
 
 	cancel_button_ = new QPushButton(central_widget);
 	cancel_button_->setText("Cancel");
-	QAbstractButton::connect(cancel_button_, SIGNAL(clicked()), window_base, SLOT(slotCancel()));
+	QAbstractButton::connect(cancel_button_, SIGNAL(clicked()), this, SLOT(slotCancel()));
 
 	label_ = setupLabel(central_widget);
 	progress_bar_ = setupProgressBar(central_widget);
@@ -170,67 +170,67 @@ void QtMainWindow::setup(QMainWindow *window_base)
 	layout->addWidget(cancel_button_, 1, 1, 1, 1);
 	layout->addWidget(label_, 2, 0, 1, 2);
 
-	window_base->setWindowTitle("YafaRay's Rendering Output");
-	window_base->setCentralWidget(central_widget);
-	window_base->setMenuBar(menu_bar);
-	window_base->addToolBar(Qt::TopToolBarArea, tool_bar);
+	setWindowTitle("YafaRay's Rendering Output");
+	setCentralWidget(central_widget);
+	setMenuBar(menu_bar);
+	addToolBar(Qt::TopToolBarArea, tool_bar);
 
 	setButtonsIcons();
-	QMetaObject::connectSlotsByName(window_base);
+	//QMetaObject::connectSlotsByName(this);
 }
 
-void QtMainWindow::setupActions(QMainWindow *window_base)
+void QtMainWindow::setupActions()
 {
-	action_quit_ = new QAction(window_base);
+	action_quit_ = new QAction(this);
 	action_quit_->setText("Quit");
 	action_quit_->setToolTip("Quit YafaRay");
 	action_quit_->setShortcut(QKeySequence("Ctrl+Q"));
-	QAbstractButton::connect(action_quit_, SIGNAL(triggered(bool)), window_base, SLOT(close()));
+	QAbstractButton::connect(action_quit_, SIGNAL(triggered(bool)), this, SLOT(close()));
 
-	action_open_ = new QAction(window_base);
+	action_open_ = new QAction(this);
 	action_open_->setText("Open");
 	action_open_->setToolTip("Open a YafaRay XML file");
 	action_open_->setShortcut(QKeySequence("Ctrl+O"));
-	QAbstractButton::connect(action_open_, SIGNAL(triggered(bool)), window_base, SLOT(slotOpen()));
+	QAbstractButton::connect(action_open_, SIGNAL(triggered(bool)), this, SLOT(slotOpen()));
 
-	action_save_as_ = new QAction(window_base);
+	action_save_as_ = new QAction(this);
 	action_save_as_->setText("Save As...");
 	action_save_as_->setToolTip("Save the render");
 	action_save_as_->setShortcut(QKeySequence("Ctrl+S"));
-	QAbstractButton::connect(action_save_as_, SIGNAL(triggered(bool)), window_base, SLOT(slotSaveAs()));
+	QAbstractButton::connect(action_save_as_, SIGNAL(triggered(bool)), this, SLOT(slotSaveAs()));
 
-	action_zoom_in_ = new QAction(window_base);
+	action_zoom_in_ = new QAction(this);
 	action_zoom_in_->setText("Zoom In");
 	action_zoom_in_->setShortcut(QKeySequence("+"));
-	QAbstractButton::connect(action_zoom_in_, SIGNAL(triggered(bool)), window_base, SLOT(zoomIn()));
+	QAbstractButton::connect(action_zoom_in_, SIGNAL(triggered(bool)), this, SLOT(zoomIn()));
 
-	action_zoom_out_ = new QAction(window_base);
+	action_zoom_out_ = new QAction(this);
 	action_zoom_out_->setText("Zoom Out");
 	action_zoom_out_->setShortcut(QKeySequence("-"));
-	QAbstractButton::connect(action_zoom_out_, SIGNAL(triggered(bool)), window_base, SLOT(zoomOut()));
+	QAbstractButton::connect(action_zoom_out_, SIGNAL(triggered(bool)), this, SLOT(zoomOut()));
 
-	action_render_ = new QAction(window_base);
+	action_render_ = new QAction(this);
 	action_render_->setText("Render");
 	action_render_->setToolTip("Render the loaded scene");
 	action_render_->setShortcut(QKeySequence("Ctrl+R"));
-	QAbstractButton::connect(action_render_, SIGNAL(triggered(bool)), window_base, SLOT(slotRender()));
+	QAbstractButton::connect(action_render_, SIGNAL(triggered(bool)), this, SLOT(slotRender()));
 
-	action_cancel_ = new QAction(window_base);
+	action_cancel_ = new QAction(this);
 	action_cancel_->setText("Cancel");
 	action_cancel_->setToolTip("Cancel current rendering process");
 	action_cancel_->setShortcut(QKeySequence("Ctrl+Shift+C"));
-	QAbstractButton::connect(action_cancel_, SIGNAL(triggered(bool)), window_base, SLOT(slotCancel()));
+	QAbstractButton::connect(action_cancel_, SIGNAL(triggered(bool)), this, SLOT(slotCancel()));
 
-	action_ask_save_ = new QAction(window_base);
+	action_ask_save_ = new QAction(this);
 	action_ask_save_->setCheckable(true);
 	action_ask_save_->setText("Ask to save before closing");
 	action_ask_save_->setToolTip("Enable/disable ask before closing dialog");
-	QAbstractButton::connect(action_ask_save_, SIGNAL(triggered(bool)), window_base, SLOT(setAskSave(bool)));
+	QAbstractButton::connect(action_ask_save_, SIGNAL(triggered(bool)), this, SLOT(setAskSave(bool)));
 }
 
-QMenuBar *QtMainWindow::setupMenuBar(QMainWindow *window_base)
+QMenuBar *QtMainWindow::setupMenuBar()
 {
-	auto menu_bar = new QMenuBar(window_base);
+	auto menu_bar = new QMenuBar(this);
 
 	auto menu_file = new QMenu(menu_bar);
 	menu_file->setTitle("File");
@@ -266,9 +266,9 @@ QMenuBar *QtMainWindow::setupMenuBar(QMainWindow *window_base)
 	return menu_bar;
 }
 
-QToolBar *QtMainWindow::setupToolBar(QMainWindow *window_base)
+QToolBar *QtMainWindow::setupToolBar()
 {
-	auto tool_bar = new QToolBar(window_base);
+	auto tool_bar = new QToolBar();
 	tool_bar->setFloatable(false);
 #ifdef YAFARAY_GUI_QT_WITH_XML
 	tool_bar->addAction(action_open_);
@@ -346,16 +346,14 @@ bool QtMainWindow::event(QEvent *e)
 		progress_bar_->setValue(p->progress());
 		return true;
 	}
-
-	if(e->type() == (QEvent::Type)ProgressUpdateTag)
+	else if(e->type() == (QEvent::Type)ProgressUpdateTag)
 	{
 		auto *p = dynamic_cast<ProgressUpdateTagEvent *>(e);
 		if(p->tag().contains("Rendering")) anim_->hide();
 		label_->setText(p->tag());
 		return true;
 	}
-
-	return false;
+	else return QMainWindow::event(e);
 }
 
 void QtMainWindow::closeEvent(QCloseEvent *e)
@@ -529,7 +527,7 @@ bool QtMainWindow::eventFilter(QObject *obj, QEvent *event)
 		anim_->move(r.topLeft());
 		return true;
 	}
-	return false;
+	else return QMainWindow::eventFilter(obj, event);
 }
 
 void QtMainWindow::zoomOut()

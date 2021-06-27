@@ -31,7 +31,6 @@ class QScrollArea;
 class QProgressBar;
 class QLabel;
 class QPushButton;
-class QTimer;
 
 BEGIN_YAFARAY_GUI_QT
 
@@ -47,7 +46,7 @@ class QtMainWindow final : public QMainWindow
 		QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish);
 		~QtMainWindow() override;
 		void adjustWindow();
-		void setup(QMainWindow *window_base);
+		void setup();
 
 		QScrollArea *render_area_ = nullptr;
 		QAction *action_ask_save_ = nullptr;
@@ -73,9 +72,9 @@ class QtMainWindow final : public QMainWindow
 		bool openDlg();
 		bool saveDlg();
 		void setButtonsIcons();
-		void setupActions(QMainWindow *window_base);
-		QMenuBar *setupMenuBar(QMainWindow *window_base);
-		QToolBar *setupToolBar(QMainWindow *window_base);
+		void setupActions();
+		QMenuBar *setupMenuBar();
+		QToolBar *setupToolBar();
 		static QLabel *setupLabel(QWidget *widget_base);
 		static QProgressBar *setupProgressBar(QWidget *widget_base);
 		static QScrollArea *setupRenderArea(QWidget *widget_base);
@@ -97,7 +96,6 @@ class QtMainWindow final : public QMainWindow
 		int res_x_ = 0, res_y_ = 0, b_x_ = 0, b_y_ = 0;
 		bool auto_close_ = false; // if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
 		QTime time_measure_; // time measure for the render
-		QTimer *timer_ = nullptr;
 		std::unique_ptr<AnimWorking> anim_;
 		bool render_saved_ = false;
 		bool ask_unsaved_ = false;
