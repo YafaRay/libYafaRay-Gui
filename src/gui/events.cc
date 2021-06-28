@@ -28,8 +28,13 @@ GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
 {
 }
 
-GuiAreaHighlightEvent::GuiAreaHighlightEvent(const QRect &rect)
-	: QEvent((QEvent::Type)GuiAreaHighlight), rect_(rect)
+PutPixelEvent::PutPixelEvent(const QPoint &point, const QColor &color)
+		: QEvent((QEvent::Type)PutPixel), point_(point), color_(color)
+{
+}
+
+AreaHighlightEvent::AreaHighlightEvent(int area_number, const QRect &rect)
+	: QEvent((QEvent::Type)AreaHighlight), area_number_(area_number), rect_(rect)
 {
 }
 

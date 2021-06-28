@@ -24,6 +24,7 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPoint>
 #include "gui/renderwidget.h"
 #include "gui/events.h"
 #include <iostream>
@@ -133,7 +134,6 @@ void RenderWidget::zoomIn(QPoint m_pos)
 void RenderWidget::zoomOut(QPoint m_pos)
 {
 	if(scale_factor_ < 0.2) return;
-
 	zoom(0.8, m_pos);
 }
 
@@ -160,14 +160,24 @@ bool RenderWidget::event(QEvent *event)
 			p.drawImage(ge->getRect(), *active_buffer_, ge->getRect());
 			buffer_mutex_.unlock();
 			update(ge->getRect());
-
 		}
-
 		return true;
 	}
-	else if(event->type() == (QEvent::Type)GuiAreaHighlight && rendering_)
+	else if(event->type() == (QEvent::Type)PutPixel)
 	{
-		auto ge = (GuiAreaHighlightEvent *)event;
+		auto ge = (PutPixelEvent *)event;
+
+		ge->accept();
+		//buffer_mutex_.lock();
+		const auto coords = ge->getCoords();
+		setPixel(coords.x(), coords.y(), ge->getColor());
+		//buffer_mutex_.unlock();
+		update();
+		return true;
+	}
+	else if(event->type() == (QEvent::Type)AreaHighlight && rendering_)
+	{
+		auto ge = (AreaHighlightEvent *)event;
 		buffer_mutex_.lock();
 		QPainter p(&pixmap_);
 

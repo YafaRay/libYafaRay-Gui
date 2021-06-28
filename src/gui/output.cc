@@ -32,7 +32,18 @@ void Output::putPixelCallback(const char *view_name, const char *layer_name, int
 	if(!render_widget) return;
 	//RgbaFloat rgba(r, g, b, a);
 	//output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
-	if(strcmp(layer_name, "combined") == 0) render_widget->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
+	//if(strcmp(layer_name, "combined") == 0) render_widget->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
+
+	if(strcmp(layer_name, "combined") == 0)
+	{
+		const QColor color_ldr {
+				std::min(static_cast<int>(r * 255.f), 255),
+				std::min(static_cast<int>(g * 255.f), 255),
+				std::min(static_cast<int>(b * 255.f), 255),
+				std::min(static_cast<int>(a * 255.f), 255),
+		};
+		QCoreApplication::postEvent(render_widget, new PutPixelEvent(QPoint(x, y), color_ldr)); //FIXME VIEWS AND LAYERS
+	}
 }
 
 void Output::flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
@@ -51,9 +62,9 @@ void Output::flushCallback(const char *view_name, void *callback_user_data)
 
 void Output::highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
-	printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
-	//auto render_widget = (RenderWidget *) callback_user_data;
-	//if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+	//printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
+	auto render_widget = (RenderWidget *) callback_user_data;
+	if(render_widget) QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
 }
 
 void Output::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)

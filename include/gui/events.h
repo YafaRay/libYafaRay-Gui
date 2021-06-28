@@ -27,13 +27,15 @@
 #include <QEvent>
 #include <QRect>
 #include <QString>
+#include <QColor>
 
 BEGIN_YAFARAY_GUI_QT
 
 enum CustomEvents
 {
 	GuiUpdate = QEvent::User,
-	GuiAreaHighlight,
+	PutPixel,
+	AreaHighlight,
 	ProgressUpdate,
 	ProgressUpdateTag
 };
@@ -52,13 +54,27 @@ class GuiUpdateEvent final : public QEvent
 		bool full_update_;
 };
 
-class GuiAreaHighlightEvent final  : public QEvent
+class PutPixelEvent final  : public QEvent
 {
 	public:
-		explicit GuiAreaHighlightEvent(const QRect &rect);
-		QRect getRect() const { return rect_; }
+		explicit PutPixelEvent(const QPoint &point, const QColor &color);
+		QPoint getCoords() const { return point_; }
+		QColor getColor() const { return color_; }
 
 	private:
+		QPoint point_;
+		QColor color_;
+};
+
+class AreaHighlightEvent final  : public QEvent
+{
+	public:
+		explicit AreaHighlightEvent(int area_number, const QRect &rect);
+		QRect getRect() const { return rect_; }
+		int getAreaNumber() const { return area_number_; }
+
+	private:
+		int area_number_ = 0;
 		QRect rect_;
 };
 
