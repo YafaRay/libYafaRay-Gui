@@ -163,7 +163,7 @@ int main()
 	/* Creating image output */
 	yafaray_paramsSetString(yi, "type", "image_output");
 	yafaray_paramsSetString(yi, "image_path", "./test01-output1.tga");
-	yafaray_createOutput(yi, "output1_tga", YAFARAY_BOOL_TRUE, nullptr, nullptr, nullptr, nullptr);
+	yafaray_createOutput(yi, "output1_tga", YAFARAY_BOOL_TRUE);
 	yafaray_paramsClearAll(yi);
 
 	/* Creating surface integrator */

@@ -42,6 +42,7 @@ class Output final
 		static void putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_user_data);
 		static void flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data);
 		static void flushCallback(const char *view_name, void *callback_user_data);
+		static void highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data);
 		static void monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data);
 		static void loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data);
 

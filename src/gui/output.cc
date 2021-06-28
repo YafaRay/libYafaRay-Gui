@@ -49,6 +49,13 @@ void Output::flushCallback(const char *view_name, void *callback_user_data)
 	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(), true));
 }
 
+void Output::highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+{
+	printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
+	//auto render_widget = (RenderWidget *) callback_user_data;
+	//if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+}
+
 void Output::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
 {
 	auto main_window = static_cast<MainWindow *>(callback_user_data);

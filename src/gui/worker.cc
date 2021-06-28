@@ -32,12 +32,20 @@ Worker::Worker(::yafaray_Interface_t *yafaray_interface, MainWindow *main_window
 
 void Worker::run()
 {
-	main_window_->render_->setup(QSize(640, 480));
-	/* Creating callback output */
+	const int output_width = yafaray_getSceneFilmWidth(yafaray_interface_);
+	const int output_height = yafaray_getSceneFilmHeight(yafaray_interface_);
+	main_window_->render_->setup(QSize(output_width, output_height));
+
+	yafaray_setInteractive(yafaray_interface_, YAFARAY_BOOL_TRUE);
 	yafaray_setLoggingCallback(yafaray_interface_, Output::loggerCallback, (void *) &main_window_->output_);
 	yafaray_paramsSetString(yafaray_interface_, "type", "callback_output");
-	yafaray_createOutput(yafaray_interface_, "test_callback_output", YAFARAY_BOOL_TRUE, Output::putPixelCallback, Output::flushAreaCallback, Output::flushCallback, (void *) main_window_->render_.get());
-	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_NORMAL);
+	yafaray_createOutput(yafaray_interface_, "test_callback_output", YAFARAY_BOOL_TRUE);
+
+	yafaray_setOutputPutPixelCallback(yafaray_interface_, "test_callback_output", Output::putPixelCallback, (void *) main_window_->render_.get());
+	yafaray_setOutputFlushAreaCallback(yafaray_interface_, "test_callback_output", Output::flushAreaCallback, (void *) main_window_->render_.get());
+	yafaray_setOutputFlushCallback(yafaray_interface_, "test_callback_output", Output::flushCallback, (void *) main_window_->render_.get());
+	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", Output::highlightCallback, (void *) main_window_->render_.get());
+	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
 }
 
 END_YAFARAY_GUI_QT
