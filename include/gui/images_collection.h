@@ -27,7 +27,7 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-class Rgba;
+class RgbaFloat;
 class Image;
 
 class ImagesCollection final
@@ -36,8 +36,8 @@ class ImagesCollection final
 		ImagesCollection(unsigned int width, unsigned int height) : images_width_(width), images_height_(height) { }
 		unsigned int getWidth() const { return images_width_; }
 		unsigned int getHeight() const { return images_height_; }
-		void setColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y, const Rgba &rgba);
-		Rgba getColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y) const;
+		void setColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y, const RgbaFloat &rgba);
+		RgbaFloat getColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y) const;
 
 	private:
 		std::map<std::string, std::shared_ptr<Image>> *findView(const std::string &view_name);

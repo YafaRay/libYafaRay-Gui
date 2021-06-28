@@ -57,7 +57,7 @@ const Image *ImagesCollection::findLayer(const std::string &view_name, const std
 	else return nullptr;
 }
 
-void ImagesCollection::setColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y, const Rgba &rgba)
+void ImagesCollection::setColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y, const RgbaFloat &rgba)
 {
 	std::map<std::string, std::shared_ptr<Image>> *layers = findView(view_name);
 	if(!layers)
@@ -76,7 +76,7 @@ void ImagesCollection::setColor(const std::string &view_name, const std::string 
 	image->setColor(x, y, rgba);
 }
 
-Rgba ImagesCollection::getColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y) const
+RgbaFloat ImagesCollection::getColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y) const
 {
 	const Image *image = findLayer(view_name, layer_name);
 	if(!image) return { };

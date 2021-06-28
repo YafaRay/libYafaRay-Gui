@@ -25,12 +25,17 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-struct Rgba
+class RgbaFloat
 {
-	unsigned char r_ = 0;
-	unsigned char g_ = 0;
-	unsigned char b_ = 0;
-	unsigned char a_ = 0;
+	public:
+		RgbaFloat() = default;
+		RgbaFloat(float r, float g, float b, float a = 1.f) : r_(r), g_(g), b_(b), a_(a) { }
+
+	private:
+		float r_ = 0.f;
+		float g_ = 0.f;
+		float b_ = 0.f;
+		float a_ = 0.f;
 };
 
 struct ImagesCollection;
@@ -41,13 +46,13 @@ class Image final
 		Image() = default;
 		Image(unsigned int width, unsigned int height) : width_(width), height_(height) { setSize(width, height); }
 		void setSize(unsigned int width, unsigned int height) { width_ = width; height_ = height; data_.resize(width * height); }
-		void setColor(unsigned int x, unsigned int y, const Rgba &rgba) { if(x < width_ && y < height_) data_[y * width_ + x] = rgba; }
-		Rgba getColor(unsigned int x, unsigned int y) const { if(x < width_ && y < height_) return data_[y * width_ + x]; else return {}; }
+		void setColor(unsigned int x, unsigned int y, const RgbaFloat &rgba) { if(x < width_ && y < height_) data_[y * width_ + x] = rgba; }
+		RgbaFloat getColor(unsigned int x, unsigned int y) const { if(x < width_ && y < height_) return data_[y * width_ + x]; else return {}; }
 
 	private:
 		unsigned int width_ = 0;
 		unsigned int height_ = 0;
-		std::vector<Rgba> data_;
+		std::vector<RgbaFloat> data_;
 };
 
 END_YAFARAY_GUI_QT

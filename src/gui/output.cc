@@ -32,11 +32,7 @@ void Output::putPixelCallback(const char *view_name, const char *layer_name, int
 {
 	auto output = static_cast<Output *>(callback_user_data);
 	if(!output) return;
-	Rgba rgba;
-	rgba.r_ = (unsigned char) (r * 255.f);
-	rgba.g_ = (unsigned char) (g * 255.f);
-	rgba.b_ = (unsigned char) (b * 255.f);
-	rgba.a_ = (unsigned char) (a * 255.f);
+	RgbaFloat rgba(r, g, b, a);
 	output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
 }
 
