@@ -38,7 +38,7 @@ RenderWidget::RenderWidget(QScrollArea *parent): QLabel((QWidget *)parent)
 {
 	border_start_ = QPoint(0, 0);
 	rendering_ = true;
-	scale_factor_ = 1.0;
+	scale_factor_ = 1.f;
 	panning_ = false;
 	pan_pos_ = QPoint(0, 0);
 	owner_ = parent;
@@ -48,12 +48,6 @@ RenderWidget::RenderWidget(QScrollArea *parent): QLabel((QWidget *)parent)
 	setScaledContents(true);
 }
 
-RenderWidget::~RenderWidget()
-{
-	color_buffer_ = QImage();
-	alpha_channel_ = QImage();
-}
-
 void RenderWidget::setup(const QSize &s)
 {
 	image_size_ = s;
@@ -61,66 +55,52 @@ void RenderWidget::setup(const QSize &s)
 	initBuffers();
 
 	QPalette palette;
-	palette.setColor(QPalette::Background, QColor(0, 0, 0));
+	palette.setColor(QPalette::Background, QColor(0, 0, 0, 0));
 	setPalette(palette);
 }
 
 void RenderWidget::initBuffers()
 {
-	color_buffer_ = QImage(image_size_, QImage::Format_RGB32);
-	color_buffer_.fill(0);
-
-	alpha_channel_ = QImage(image_size_, QImage::Format_RGB32);
-	alpha_channel_.fill(0);
+	color_buffer_ = QImage(image_size_, QImage::Format_ARGB32);
+	color_buffer_.fill(QColor(0, 0, 0, 0));
 
 	resize(image_size_);
 
 	active_buffer_ = &color_buffer_;
 
-	pix_ = QPixmap::fromImage(*active_buffer_);
-	setPixmap(pix_);
+	pixmap_ = QPixmap::fromImage(*active_buffer_);
+	setPixmap(pixmap_);
 }
 
 void RenderWidget::startRendering()
 {
 	rendering_ = true;
-	scale_factor_ = 1.0;
+	scale_factor_ = 1.f;
 	initBuffers();
 }
 
 void RenderWidget::finishRendering()
 {
 	rendering_ = false;
-	pix_ = QPixmap::fromImage(*active_buffer_);
-	setPixmap(pix_);
+	pixmap_ = QPixmap::fromImage(*active_buffer_);
+	setPixmap(pixmap_);
 	update();
 }
 
-void RenderWidget::setPixel(int x, int y, QRgb color, QRgb alpha)
+void RenderWidget::setPixel(int x, int y, const QColor &color)
 {
-	int ix = x + border_start_.x();
-	int iy = y + border_start_.y();
+	const int ix = x + border_start_.x();
+	const int iy = y + border_start_.y();
 
-	color_buffer_.setPixel(ix, iy, color);
-	alpha_channel_.setPixel(ix, iy, alpha);
+	color_buffer_.setPixelColor(ix, iy, color);
 }
 
 void RenderWidget::paintColorBuffer()
 {
 	buffer_mutex_.lock();
-	pix_ = QPixmap::fromImage(color_buffer_);
-	setPixmap(pix_);
+	pixmap_ = QPixmap::fromImage(color_buffer_);
+	setPixmap(pixmap_);
 	active_buffer_ = &color_buffer_;
-	buffer_mutex_.unlock();
-	if(!rendering_) zoom(1.f, QPoint(0, 0));
-}
-
-void RenderWidget::paintAlpha()
-{
-	buffer_mutex_.lock();
-	pix_ = QPixmap::fromImage(alpha_channel_);
-	setPixmap(pix_);
-	active_buffer_ = &alpha_channel_;
 	buffer_mutex_.unlock();
 	if(!rendering_) zoom(1.f, QPoint(0, 0));
 }
@@ -131,7 +111,7 @@ void RenderWidget::zoom(float f, QPoint m_pos)
 
 	QSize new_size = scale_factor_ * active_buffer_->size();
 	resize(new_size);
-	pix_ = QPixmap::fromImage(active_buffer_->scaled(new_size));
+	pixmap_ = QPixmap::fromImage(active_buffer_->scaled(new_size));
 	update(owner_->viewport()->geometry());
 
 	QPoint m = (m_pos * f) - m_pos;
@@ -161,14 +141,14 @@ bool RenderWidget::event(QEvent *event)
 {
 	if(event->type() == (QEvent::Type)GuiUpdate && rendering_)
 	{
-		GuiUpdateEvent *ge = (GuiUpdateEvent *)event;
+		auto ge = (GuiUpdateEvent *)event;
 
 		ge->accept();
 
 		if(ge->isFullUpdate())
 		{
 			buffer_mutex_.lock();
-			QPainter p(&pix_);
+			QPainter p(&pixmap_);
 			p.drawImage(QPoint(0, 0), *active_buffer_);
 			buffer_mutex_.unlock();
 			update();
@@ -176,7 +156,7 @@ bool RenderWidget::event(QEvent *event)
 		else
 		{
 			buffer_mutex_.lock();
-			QPainter p(&pix_);
+			QPainter p(&pixmap_);
 			p.drawImage(ge->getRect(), *active_buffer_, ge->getRect());
 			buffer_mutex_.unlock();
 			update(ge->getRect());
@@ -187,9 +167,9 @@ bool RenderWidget::event(QEvent *event)
 	}
 	else if(event->type() == (QEvent::Type)GuiAreaHighlight && rendering_)
 	{
-		GuiAreaHighlightEvent *ge = (GuiAreaHighlightEvent *)event;
+		auto ge = (GuiAreaHighlightEvent *)event;
 		buffer_mutex_.lock();
-		QPainter p(&pix_);
+		QPainter p(&pixmap_);
 
 		ge->accept();
 
@@ -231,7 +211,7 @@ void RenderWidget::paintEvent(QPaintEvent *event)
 	QRect r = event->rect();
 	QPainter painter(this);
 	painter.setClipRegion(event->region());
-	painter.drawPixmap(r, pix_, r);
+	painter.drawPixmap(r, pixmap_, r);
 }
 
 void RenderWidget::wheelEvent(QWheelEvent *event)
