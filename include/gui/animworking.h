@@ -37,8 +37,8 @@ class AnimWorking final : public QWidget
 		explicit AnimWorking(QWidget *parent = nullptr);
 
 	private:
-		void paintEvent(QPaintEvent *e) override;
-		void timerEvent(QTimerEvent *e) override;
+		void paintEvent(QPaintEvent *event) override;
+		void timerEvent(QTimerEvent *event) override;
 
 		std::vector<QPixmap> sprites_;
 		size_t timer_act_frame_ = 0;

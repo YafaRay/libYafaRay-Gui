@@ -1,6 +1,6 @@
 ###############################################################################
 #    This is a rough list of the contributors to YafaRay and is still in      #
-#      progress, so if you know someone is missing please let us know         #
+#      getCurrentSteps, so if you know someone is missing please let us know         #
 ###############################################################################
 
 Developers for Yafray (up to version 0.0.9):

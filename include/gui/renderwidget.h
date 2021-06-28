@@ -39,7 +39,7 @@ class RenderWidget final : public QLabel
 		Q_OBJECT
 
 	public:
-		explicit RenderWidget(QScrollArea *parent = nullptr, bool use_zbuffer = false);
+		explicit RenderWidget(QScrollArea *parent = nullptr);
 		~RenderWidget() override;
 		void setup(const QSize &s);
 		void setRenderBorderStart(const QPoint &start) { border_start_ = start; }
@@ -51,18 +51,17 @@ class RenderWidget final : public QLabel
 		void paintAlpha();
 		void zoomIn(QPoint m_pos);
 		void zoomOut(QPoint m_pos);
-		bool event(QEvent *e) override;
+		bool event(QEvent *event) override;
 
 	private:
 		void initBuffers();
 		void zoom(float f, QPoint m_pos);
-		void paintEvent(QPaintEvent *e) override;
-		void wheelEvent(QWheelEvent *evt) override;
-		void mousePressEvent(QMouseEvent *e) override;
-		void mouseReleaseEvent(QMouseEvent *e) override;
-		void mouseMoveEvent(QMouseEvent *e) override;
+		void paintEvent(QPaintEvent *event) override;
+		void wheelEvent(QWheelEvent *event) override;
+		void mousePressEvent(QMouseEvent *event) override;
+		void mouseReleaseEvent(QMouseEvent *event) override;
+		void mouseMoveEvent(QMouseEvent *event) override;
 
-		bool use_zbuf_;
 		bool rendering_;
 		bool panning_;
 
@@ -72,16 +71,16 @@ class RenderWidget final : public QLabel
 
 		QPoint pan_pos_;
 		QPoint bar_pos_;
-		QScrollArea *owner_;
-		QScrollBar *h_bar_;
-		QScrollBar *v_bar_;
+		QScrollArea *owner_ = nullptr;
+		QScrollBar *h_bar_ = nullptr;
+		QScrollBar *v_bar_ = nullptr;
 
 		QPixmap pix_;
 		QMutex buffer_mutex_;
 
 		QImage color_buffer_;
 		QImage alpha_channel_;
-		QImage *active_buffer_;
+		QImage *active_buffer_ = nullptr;
 };
 
 END_YAFARAY_GUI_QT

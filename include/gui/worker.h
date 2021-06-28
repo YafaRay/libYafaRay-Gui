@@ -29,19 +29,19 @@ typedef struct yafaray_Interface yafaray_Interface_t;
 
 BEGIN_YAFARAY_GUI_QT
 
-class QtMainWindow;
+class MainWindow;
 
 class Worker final : public QThread
 {
 	Q_OBJECT
 
 	public:
-		Worker(yafaray_Interface_t *yafaray_interface, QtMainWindow *w);
+		Worker(yafaray_Interface_t *yafaray_interface, MainWindow *main_window);
 		void run() override;
 
 	private:
 		yafaray_Interface_t *yafaray_interface_ = nullptr;
-		QtMainWindow *win_ = nullptr;
+		MainWindow *main_window_ = nullptr;
 		bool valid_ = false;
 };
 

@@ -24,22 +24,22 @@
 BEGIN_YAFARAY_GUI_QT
 
 GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent((QEvent::Type)GuiUpdate), m_rect_(rect), m_full_(full_update)
+	: QEvent((QEvent::Type)GuiUpdate), rect_(rect), full_update_(full_update)
 {
 }
 
-GuiAreaHighliteEvent::GuiAreaHighliteEvent(const QRect &rect)
-	: QEvent((QEvent::Type)GuiAreaHighlite), m_rect_(rect)
+GuiAreaHighlightEvent::GuiAreaHighlightEvent(const QRect &rect)
+	: QEvent((QEvent::Type)GuiAreaHighlight), rect_(rect)
 {
 }
 
-ProgressUpdateEvent::ProgressUpdateEvent(int progress, int min, int max)
-	: QEvent((QEvent::Type)ProgressUpdate), m_progress_(progress), m_min_(min), m_max_(max)
+ProgressUpdateEvent::ProgressUpdateEvent(int current_steps, int min_steps, int max_steps)
+	: QEvent((QEvent::Type)ProgressUpdate), current_steps_(current_steps), min_steps_(min_steps), max_steps_(max_steps)
 {
 }
 
 ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
-	: QEvent((QEvent::Type)ProgressUpdateTag), m_tag_(tag)
+	: QEvent((QEvent::Type)ProgressUpdateTag), tag_(tag)
 {
 }
 

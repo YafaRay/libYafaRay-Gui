@@ -19,19 +19,19 @@
  */
 
 
-#include "gui/qt_main_window.h"
+#include "gui/main_window.h"
 #include "gui/worker.h"
 
 BEGIN_YAFARAY_GUI_QT
 
-Worker::Worker(::yafaray_Interface_t *yafaray_interface, QtMainWindow *win)
-	: QThread(), yafaray_interface_(yafaray_interface), win_(win)
+Worker::Worker(::yafaray_Interface_t *yafaray_interface, MainWindow *main_window)
+	: QThread(), yafaray_interface_(yafaray_interface), main_window_(main_window)
 {
 }
 
 void Worker::run()
 {
-	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, win_, YAFARAY_DISPLAY_CONSOLE_NORMAL);
+	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 }
 
 END_YAFARAY_GUI_QT

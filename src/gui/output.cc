@@ -19,11 +19,8 @@
 #include "gui/output.h"
 #include "gui/images_collection.h"
 #include "gui/image.h"
-#include "gui/qt_main_window.h"
+#include "gui/main_window.h"
 #include "gui/events.h"
-#include <cstring>
-#include <QLabel>
-#include <QProgressBar>
 #include <QCoreApplication>
 
 BEGIN_YAFARAY_GUI_QT
@@ -48,10 +45,10 @@ void Output::flushCallback(const char *view_name, void *callback_user_data)
 
 void Output::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
 {
-	auto qt_main_window = static_cast<QtMainWindow *>(callback_user_data);
-	if(!qt_main_window) return;
-	if(qt_main_window->label_) QCoreApplication::postEvent(qt_main_window, new ProgressUpdateTagEvent(tag));
-	if(qt_main_window->progress_bar_) QCoreApplication::postEvent(qt_main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
+	auto main_window = static_cast<MainWindow *>(callback_user_data);
+	if(!main_window) return;
+	if(main_window->label_) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(tag));
+	if(main_window->progress_bar_) QCoreApplication::postEvent(main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
 }
 
 void Output::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data)

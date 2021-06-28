@@ -135,7 +135,7 @@ AnimWorking::AnimWorking(QWidget *parent) : QWidget(parent)
 	timer_act_frame_ = 0;
 }
 
-void AnimWorking::paintEvent(QPaintEvent *e)
+void AnimWorking::paintEvent(QPaintEvent *event)
 {
 	if(timer_id_ < 0)
 		timer_id_ = startTimer(40);
@@ -144,7 +144,7 @@ void AnimWorking::paintEvent(QPaintEvent *e)
 	p.drawPixmap(0, 0, sprites_[timer_act_frame_]);
 }
 
-void AnimWorking::timerEvent(QTimerEvent *e)
+void AnimWorking::timerEvent(QTimerEvent *event)
 {
 	if(timer_act_frame_ < timer_top_frame_ - 1) timer_act_frame_++;
 	else timer_act_frame_ = 0;

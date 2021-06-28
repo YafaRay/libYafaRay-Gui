@@ -18,14 +18,14 @@
 
 #include "public_api/yafaray_gui_qt_c_api.h"
 #include "common/version_build_info.h"
-#include "gui/qt_main_window.h"
+#include "gui/main_window.h"
 #include <QApplication>
 
 int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish)
 {
 	int argc = 0;
 	auto app = new QApplication(argc, nullptr, 0);
-	yafaray_gui_qt::QtMainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
+	yafaray_gui_qt::MainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
 	w.show();
 	w.adjustWindow();
 	//if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();

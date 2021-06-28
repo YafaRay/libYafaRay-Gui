@@ -33,54 +33,57 @@ BEGIN_YAFARAY_GUI_QT
 enum CustomEvents
 {
 	GuiUpdate = QEvent::User,
-	GuiAreaHighlite,
+	GuiAreaHighlight,
 	ProgressUpdate,
 	ProgressUpdateTag
 };
 
 // this event is just to trigger an update in a widget from
 // outside the main thread
-class GuiUpdateEvent : public QEvent
+class GuiUpdateEvent final : public QEvent
 {
 	public:
 		explicit GuiUpdateEvent(const QRect &rect, bool full_update = false);
-		QRect rect() const { return m_rect_; }
-		bool fullUpdate() const { return m_full_; }
+		QRect getRect() const { return rect_; }
+		bool isFullUpdate() const { return full_update_; }
+
 	private:
-		QRect m_rect_;
-		bool m_full_;
+		QRect rect_;
+		bool full_update_;
 };
 
-class GuiAreaHighliteEvent : public QEvent
+class GuiAreaHighlightEvent final  : public QEvent
 {
 	public:
-		explicit GuiAreaHighliteEvent(const QRect &rect);
-		QRect rect() const { return m_rect_; }
+		explicit GuiAreaHighlightEvent(const QRect &rect);
+		QRect getRect() const { return rect_; }
+
 	private:
-		QRect m_rect_;
+		QRect rect_;
 };
 
-class ProgressUpdateEvent : public QEvent
+class ProgressUpdateEvent final  : public QEvent
 {
 	public:
-		explicit ProgressUpdateEvent(int progress, int min = -1, int max = -1);
-		int progress() const { return m_progress_; }
-		int min() const { return m_min_; }
-		int max() const { return m_max_; }
+		explicit ProgressUpdateEvent(int current_steps, int min_steps = 0, int max_steps = 100);
+		int getCurrentSteps() const { return current_steps_; }
+		int getMinSteps() const { return min_steps_; }
+		int getMaxSteps() const { return max_steps_; }
+
 	private:
-		int m_progress_;
-		int m_min_;
-		int m_max_;
+		int current_steps_;
+		int min_steps_;
+		int max_steps_;
 };
 
-class ProgressUpdateTagEvent : public QEvent
+class ProgressUpdateTagEvent final  : public QEvent
 {
 	public:
 		explicit ProgressUpdateTagEvent(const char *tag);
-		const QString &tag() const { return m_tag_; }
-		QString &tag() { return m_tag_; }
+		const QString &getTag() const { return tag_; }
+
 	private:
-		QString m_tag_;
+		QString tag_;
 };
 
 END_YAFARAY_GUI_QT

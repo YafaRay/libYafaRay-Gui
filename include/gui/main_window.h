@@ -17,8 +17,8 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H
-#define LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H
+#ifndef LIBYAFARAY_GUI_QT_MAIN_WINDOW_H
+#define LIBYAFARAY_GUI_QT_MAIN_WINDOW_H
 
 #include "common/yafaray_gui_qt_common.h"
 #include "gui/output.h"
@@ -38,13 +38,13 @@ class AnimWorking;
 class RenderWidget;
 class Worker;
 
-class QtMainWindow final : public QMainWindow
+class MainWindow final : public QMainWindow
 {
 	Q_OBJECT
 
 	public:
-		QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish);
-		~QtMainWindow() override;
+		MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish);
+		~MainWindow() override;
 		void adjustWindow();
 		void setup();
 
@@ -64,10 +64,10 @@ class QtMainWindow final : public QMainWindow
 		void zoomOut();
 
 	private:
-		bool event(QEvent *e) override;
+		bool event(QEvent *event) override;
 		bool eventFilter(QObject *obj, QEvent *event) override;
 		void keyPressEvent(QKeyEvent *event) override;
-		void closeEvent(QCloseEvent *e) override;
+		void closeEvent(QCloseEvent *event) override;
 		bool closeUnsaved();
 		bool openDlg();
 		bool saveDlg();
@@ -104,4 +104,4 @@ class QtMainWindow final : public QMainWindow
 
 END_YAFARAY_GUI_QT
 
-#endif //LIBYAFARAY_GUI_QT_QT_MAIN_WINDOW_H
+#endif //LIBYAFARAY_GUI_QT_MAIN_WINDOW_H

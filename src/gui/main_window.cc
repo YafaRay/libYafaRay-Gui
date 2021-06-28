@@ -16,7 +16,7 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/qt_main_window.h"
+#include "gui/main_window.h"
 #include "gui/renderwidget.h"
 #include "gui/events.h"
 #include "gui/animworking.h"
@@ -60,7 +60,7 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), output_(resx, resy), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), auto_close_(close_after_finish)
+MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), output_(resx, resy), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), auto_close_(close_after_finish)
 {
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -140,13 +140,13 @@ QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int resx, int
 	render_area_->installEventFilter(this);
 }
 
-QtMainWindow::~QtMainWindow()
+MainWindow::~MainWindow()
 {
 	yafaray_setLoggingCallback(yafaray_interface_, nullptr, nullptr);
 }
 
 
-void QtMainWindow::setup()
+void MainWindow::setup()
 {
 	setupActions();
 	auto menu_bar = setupMenuBar();
@@ -179,7 +179,7 @@ void QtMainWindow::setup()
 	//QMetaObject::connectSlotsByName(this);
 }
 
-void QtMainWindow::setupActions()
+void MainWindow::setupActions()
 {
 	action_quit_ = new QAction(this);
 	action_quit_->setText("Quit");
@@ -228,7 +228,7 @@ void QtMainWindow::setupActions()
 	QAbstractButton::connect(action_ask_save_, SIGNAL(triggered(bool)), this, SLOT(setAskSave(bool)));
 }
 
-QMenuBar *QtMainWindow::setupMenuBar()
+QMenuBar *MainWindow::setupMenuBar()
 {
 	auto menu_bar = new QMenuBar(this);
 
@@ -266,7 +266,7 @@ QMenuBar *QtMainWindow::setupMenuBar()
 	return menu_bar;
 }
 
-QToolBar *QtMainWindow::setupToolBar()
+QToolBar *MainWindow::setupToolBar()
 {
 	auto tool_bar = new QToolBar();
 	tool_bar->setFloatable(false);
@@ -280,14 +280,14 @@ QToolBar *QtMainWindow::setupToolBar()
 	return tool_bar;
 }
 
-QLabel *QtMainWindow::setupLabel(QWidget *widget_base)
+QLabel *MainWindow::setupLabel(QWidget *widget_base)
 {
 	auto label = new QLabel(widget_base);
 	label->setText("Status: idle");
 	return label;
 }
 
-QProgressBar *QtMainWindow::setupProgressBar(QWidget *widget_base)
+QProgressBar *MainWindow::setupProgressBar(QWidget *widget_base)
 {
 	auto progress_bar = new QProgressBar(widget_base);
 	QFont font;
@@ -300,7 +300,7 @@ QProgressBar *QtMainWindow::setupProgressBar(QWidget *widget_base)
 	return progress_bar;
 }
 
-QScrollArea *QtMainWindow::setupRenderArea(QWidget *widget_base)
+QScrollArea *MainWindow::setupRenderArea(QWidget *widget_base)
 {
 	auto render_area = new QScrollArea(widget_base);
 	auto scroll_area_widget_contents = new QWidget();
@@ -308,7 +308,7 @@ QScrollArea *QtMainWindow::setupRenderArea(QWidget *widget_base)
 	return render_area;
 }
 
-void QtMainWindow::setButtonsIcons()
+void MainWindow::setButtonsIcons()
 {
 	QPixmap cancel_icon;
 	QPixmap open_icon;
@@ -336,42 +336,42 @@ void QtMainWindow::setButtonsIcons()
 	cancel_button_->setIcon(QIcon(cancel_icon));
 }
 
-bool QtMainWindow::event(QEvent *e)
+bool MainWindow::event(QEvent *event)
 {
-	if(e->type() == (QEvent::Type)ProgressUpdate)
+	if(event->type() == (QEvent::Type)ProgressUpdate)
 	{
-		auto *p = dynamic_cast<ProgressUpdateEvent *>(e);
-		if(p->min() >= 0) progress_bar_->setMinimum(p->min());
-		if(p->max() >= 0) progress_bar_->setMaximum(p->max());
-		progress_bar_->setValue(p->progress());
+		auto *p = dynamic_cast<ProgressUpdateEvent *>(event);
+		if(p->getMinSteps() >= 0) progress_bar_->setMinimum(p->getMinSteps());
+		if(p->getMaxSteps() >= 0) progress_bar_->setMaximum(p->getMaxSteps());
+		progress_bar_->setValue(p->getCurrentSteps());
 		return true;
 	}
-	else if(e->type() == (QEvent::Type)ProgressUpdateTag)
+	else if(event->type() == (QEvent::Type)ProgressUpdateTag)
 	{
-		auto *p = dynamic_cast<ProgressUpdateTagEvent *>(e);
-		if(p->tag().contains("Rendering")) anim_->hide();
-		label_->setText(p->tag());
+		auto *p = dynamic_cast<ProgressUpdateTagEvent *>(event);
+		if(p->getTag().contains("Rendering")) anim_->hide();
+		label_->setText(p->getTag());
 		return true;
 	}
-	else return QMainWindow::event(e);
+	else return QMainWindow::event(event);
 }
 
-void QtMainWindow::closeEvent(QCloseEvent *e)
+void MainWindow::closeEvent(QCloseEvent *event)
 {
 	if(!closeUnsaved())
 	{
-		e->ignore();
+		event->ignore();
 	}
 	else
 	{
 		slotCancel();
 		if(render_cancelled_) QApplication::exit(1); //check if a render was stopped and exit with the appropriate code
-		e->accept();
+		event->accept();
 	}
 
 }
 
-void QtMainWindow::slotRender()
+void MainWindow::slotRender()
 {
 	action_render_->setVisible(false);
 	action_zoom_in_->setEnabled(false);
@@ -386,7 +386,7 @@ void QtMainWindow::slotRender()
 	worker_->start();
 }
 
-void QtMainWindow::slotFinished()
+void MainWindow::slotFinished()
 {
 	int render_time = time_measure_.elapsed();
 	const float time_sec = static_cast<float>(render_time) / 1000.f;
@@ -447,24 +447,24 @@ void QtMainWindow::slotFinished()
 	QApplication::alert(this);
 }
 
-void QtMainWindow::setAskSave(bool checked)
+void MainWindow::setAskSave(bool checked)
 {
 	QSettings set;
 	ask_unsaved_ = checked;
 	set.setValue("qtGui/askSave", ask_unsaved_);
 }
 
-void QtMainWindow::slotOpen()
+void MainWindow::slotOpen()
 {
 	openDlg();
 }
 
-void QtMainWindow::slotSaveAs()
+void MainWindow::slotSaveAs()
 {
 	saveDlg();
 }
 
-bool QtMainWindow::openDlg()
+bool MainWindow::openDlg()
 {
 #ifdef YAFARAY_GUI_QT_WITH_XML
 	const QString xml_file_path = QFileDialog::getOpenFileName(this, tr("Load YafaRay XML file"), last_path_, "*.xml");
@@ -475,7 +475,7 @@ bool QtMainWindow::openDlg()
 #endif
 }
 
-bool QtMainWindow::saveDlg()
+bool MainWindow::saveDlg()
 {
 	if(last_path_.isNull()) last_path_ = QDir::currentPath();
 	QFileDialog::getSaveFileName(this, tr("YafaRay Save Image"), last_path_, nullptr, nullptr);
@@ -483,7 +483,7 @@ bool QtMainWindow::saveDlg()
 	return render_saved_;
 }
 
-bool QtMainWindow::closeUnsaved()
+bool MainWindow::closeUnsaved()
 {
 	if(!render_saved_ && !render_->isRendering() && ask_unsaved_)
 	{
@@ -501,7 +501,7 @@ bool QtMainWindow::closeUnsaved()
 	return true;
 }
 
-void QtMainWindow::slotCancel()
+void MainWindow::slotCancel()
 {
 	yafaray_cancel(yafaray_interface_);
 	worker_->wait();
@@ -512,12 +512,12 @@ void QtMainWindow::slotCancel()
 	action_cancel_->setVisible(false);
 }
 
-void QtMainWindow::keyPressEvent(QKeyEvent *event)
+void MainWindow::keyPressEvent(QKeyEvent *event)
 {
 	if(event->key() == Qt::Key_Escape) close();
 }
 
-bool QtMainWindow::eventFilter(QObject *obj, QEvent *event)
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
 	if(event->type() == QEvent::Resize)
 	{
@@ -530,17 +530,17 @@ bool QtMainWindow::eventFilter(QObject *obj, QEvent *event)
 	else return QMainWindow::eventFilter(obj, event);
 }
 
-void QtMainWindow::zoomOut()
+void MainWindow::zoomOut()
 {
 	render_->zoomOut(QPoint(0, 0));
 }
 
-void QtMainWindow::zoomIn()
+void MainWindow::zoomIn()
 {
 	render_->zoomIn(QPoint(0, 0));
 }
 
-void QtMainWindow::adjustWindow()
+void MainWindow::adjustWindow()
 {
 	const QRect scr_geom = QApplication::desktop()->availableGeometry();
 	const int w = std::min(res_x_ + 10, scr_geom.width() - 60);

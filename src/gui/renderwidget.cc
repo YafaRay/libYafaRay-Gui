@@ -34,7 +34,7 @@ BEGIN_YAFARAY_GUI_QT
 /	RenderWidget implementation
 /=====================================*/
 
-RenderWidget::RenderWidget(QScrollArea *parent, bool use_zbuffer): QLabel((QWidget *)parent), use_zbuf_(use_zbuffer)
+RenderWidget::RenderWidget(QScrollArea *parent): QLabel((QWidget *)parent)
 {
 	border_start_ = QPoint(0, 0);
 	rendering_ = true;
@@ -157,15 +157,15 @@ void RenderWidget::zoomOut(QPoint m_pos)
 	zoom(0.8, m_pos);
 }
 
-bool RenderWidget::event(QEvent *e)
+bool RenderWidget::event(QEvent *event)
 {
-	if(e->type() == (QEvent::Type)GuiUpdate && rendering_)
+	if(event->type() == (QEvent::Type)GuiUpdate && rendering_)
 	{
-		GuiUpdateEvent *ge = (GuiUpdateEvent *)e;
+		GuiUpdateEvent *ge = (GuiUpdateEvent *)event;
 
 		ge->accept();
 
-		if(ge->fullUpdate())
+		if(ge->isFullUpdate())
 		{
 			buffer_mutex_.lock();
 			QPainter p(&pix_);
@@ -177,27 +177,27 @@ bool RenderWidget::event(QEvent *e)
 		{
 			buffer_mutex_.lock();
 			QPainter p(&pix_);
-			p.drawImage(ge->rect(), *active_buffer_, ge->rect());
+			p.drawImage(ge->getRect(), *active_buffer_, ge->getRect());
 			buffer_mutex_.unlock();
-			update(ge->rect());
+			update(ge->getRect());
 
 		}
 
 		return true;
 	}
-	else if(e->type() == (QEvent::Type)GuiAreaHighlite && rendering_)
+	else if(event->type() == (QEvent::Type)GuiAreaHighlight && rendering_)
 	{
-		GuiAreaHighliteEvent *ge = (GuiAreaHighliteEvent *)e;
+		GuiAreaHighlightEvent *ge = (GuiAreaHighlightEvent *)event;
 		buffer_mutex_.lock();
 		QPainter p(&pix_);
 
 		ge->accept();
 
-		int line_l = std::min(4, std::min(ge->rect().height() - 1, ge->rect().width() - 1));
-		QPoint tr(ge->rect().topRight());
-		QPoint tl(ge->rect().topLeft());
-		QPoint br(ge->rect().bottomRight());
-		QPoint bl(ge->rect().bottomLeft());
+		int line_l = std::min(4, std::min(ge->getRect().height() - 1, ge->getRect().width() - 1));
+		QPoint tr(ge->getRect().topRight());
+		QPoint tl(ge->getRect().topLeft());
+		QPoint br(ge->getRect().bottomRight());
+		QPoint bl(ge->getRect().bottomLeft());
 
 		p.setPen(QColor(160, 0, 0));
 
@@ -218,75 +218,75 @@ bool RenderWidget::event(QEvent *e)
 		p.drawLine(br, QPoint(br.x(), br.y() - line_l));
 
 		buffer_mutex_.unlock();
-		update(ge->rect());
+		update(ge->getRect());
 
 		return true;
 	}
 
-	return QLabel::event(e);
+	return QLabel::event(event);
 }
 
-void RenderWidget::paintEvent(QPaintEvent *e)
+void RenderWidget::paintEvent(QPaintEvent *event)
 {
-	QRect r = e->rect();
+	QRect r = event->rect();
 	QPainter painter(this);
-	painter.setClipRegion(e->region());
+	painter.setClipRegion(event->region());
 	painter.drawPixmap(r, pix_, r);
 }
 
-void RenderWidget::wheelEvent(QWheelEvent *e)
+void RenderWidget::wheelEvent(QWheelEvent *event)
 {
-	e->accept();
+	event->accept();
 
-	if(!rendering_ && !panning_ && (e->modifiers() & Qt::ControlModifier))
+	if(!rendering_ && !panning_ && (event->modifiers() & Qt::ControlModifier))
 	{
-		if(e->delta() > 0) zoomIn(e->pos());
-		else zoomOut(e->pos());
+		if(event->delta() > 0) zoomIn(event->pos());
+		else zoomOut(event->pos());
 	}
 }
 
-void RenderWidget::mousePressEvent(QMouseEvent *e)
+void RenderWidget::mousePressEvent(QMouseEvent *event)
 {
-	if(e->button() == Qt::MidButton)
+	if(event->button() == Qt::MidButton)
 	{
 		setCursor(Qt::SizeAllCursor);
 		panning_ = true;
-		pan_pos_ = e->globalPos();
+		pan_pos_ = event->globalPos();
 		bar_pos_ = QPoint(h_bar_->value(), v_bar_->value());
-		e->accept();
+		event->accept();
 	}
 	else
 	{
-		e->ignore();
+		event->ignore();
 	}
 }
 
-void RenderWidget::mouseReleaseEvent(QMouseEvent *e)
+void RenderWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	if(e->button() == Qt::MidButton)
+	if(event->button() == Qt::MidButton)
 	{
 		setCursor(Qt::ArrowCursor);
 		panning_ = false;
-		e->accept();
+		event->accept();
 	}
 	else
 	{
-		e->ignore();
+		event->ignore();
 	}
 }
 
-void RenderWidget::mouseMoveEvent(QMouseEvent *e)
+void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	if(panning_)
 	{
-		QPoint dpos = bar_pos_ + (pan_pos_ - e->globalPos());
+		QPoint dpos = bar_pos_ + (pan_pos_ - event->globalPos());
 		h_bar_->setValue(dpos.x());
 		v_bar_->setValue(dpos.y());
-		e->accept();
+		event->accept();
 	}
 	else
 	{
-		e->ignore();
+		event->ignore();
 	}
 }
 
