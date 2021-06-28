@@ -48,10 +48,12 @@ class MainWindow final : public QMainWindow
 		void adjustWindow();
 		void setup();
 
+		std::unique_ptr<RenderWidget> render_;
 		QScrollArea *render_area_ = nullptr;
 		QAction *action_ask_save_ = nullptr;
 		QProgressBar *progress_bar_ = nullptr;
 		QLabel *label_ = nullptr;
+		Output output_;
 
 	public slots:
 		void slotRender();
@@ -88,10 +90,8 @@ class MainWindow final : public QMainWindow
 		QAction *action_cancel_ = nullptr;
 		QPushButton *cancel_button_ = nullptr;
 
-		std::unique_ptr<RenderWidget> render_;
 		std::unique_ptr<Worker> worker_;
 		yafaray_Interface_t *yafaray_interface_ = nullptr;
-		Output output_;
 		QString last_path_;
 		int res_x_ = 0, res_y_ = 0, b_x_ = 0, b_y_ = 0;
 		bool auto_close_ = false; // if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)

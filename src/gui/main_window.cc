@@ -65,11 +65,6 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
 	QCoreApplication::setApplicationName("LibYafaRay-Gui-Qt");
-
-	/* Creating callback output */
-	yafaray_setLoggingCallback(yafaray_interface, Output::loggerCallback, (void *) &output_);
-	yafaray_paramsSetString(yafaray_interface, "type", "callback_output");
-	yafaray_createOutput(yafaray_interface, "test_callback_output", YAFARAY_BOOL_TRUE, Output::putPixelCallback, Output::flushAreaCallback, Output::flushCallback, (void *) &output_);
 	yafaray_paramsClearAll(yafaray_interface);
 
 	QSettings set;
@@ -115,10 +110,10 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	anim_ = std::unique_ptr<AnimWorking>(new AnimWorking(render_area_));
 	anim_->resize(200, 87);
 
-	//this->move(20, 20);
+	this->move(20, 20);
 
-	//render_area_->setWidgetResizable(false);
-	//render_area_->resize(resx, resy);
+	render_area_->setWidgetResizable(false);
+	render_area_->resize(resx, resy);
 	render_area_->setWidget(render_.get());
 
 	QPalette render_area_pal;
@@ -176,7 +171,7 @@ void MainWindow::setup()
 	addToolBar(Qt::TopToolBarArea, tool_bar);
 
 	setButtonsIcons();
-	//QMetaObject::connectSlotsByName(this);
+	//QMetaObject::connectSlotsByName(this); //FIXME: what's the purpose of this line?
 }
 
 void MainWindow::setupActions()

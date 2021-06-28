@@ -21,6 +21,7 @@
 
 #include "gui/main_window.h"
 #include "gui/worker.h"
+#include "gui/renderwidget.h"
 
 BEGIN_YAFARAY_GUI_QT
 
@@ -31,6 +32,11 @@ Worker::Worker(::yafaray_Interface_t *yafaray_interface, MainWindow *main_window
 
 void Worker::run()
 {
+	main_window_->render_->setup(QSize(640, 480));
+	/* Creating callback output */
+	yafaray_setLoggingCallback(yafaray_interface_, Output::loggerCallback, (void *) &main_window_->output_);
+	yafaray_paramsSetString(yafaray_interface_, "type", "callback_output");
+	yafaray_createOutput(yafaray_interface_, "test_callback_output", YAFARAY_BOOL_TRUE, Output::putPixelCallback, Output::flushAreaCallback, Output::flushCallback, (void *) main_window_->render_.get());
 	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 }
 

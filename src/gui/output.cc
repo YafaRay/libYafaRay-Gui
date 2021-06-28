@@ -21,26 +21,32 @@
 #include "gui/image.h"
 #include "gui/main_window.h"
 #include "gui/events.h"
+#include "gui/renderwidget.h"
 #include <QCoreApplication>
 
 BEGIN_YAFARAY_GUI_QT
 
 void Output::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_user_data)
 {
-	auto output = static_cast<Output *>(callback_user_data);
-	if(!output) return;
-	RgbaFloat rgba(r, g, b, a);
-	output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
+	auto render_widget = static_cast<RenderWidget *>(callback_user_data);
+	if(!render_widget) return;
+	//RgbaFloat rgba(r, g, b, a);
+	//output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
+	if(strcmp(layer_name, "combined") == 0) render_widget->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
 }
 
 void Output::flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
-	printf("**** flushAreaCallback view_name='%s', x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, x_0, y_0, x_1, y_1, callback_user_data);
+	//printf("**** flushAreaCallback view_name='%s', x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, x_0, y_0, x_1, y_1, callback_user_data);
+	auto render_widget = (RenderWidget *) callback_user_data;
+	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
 }
 
 void Output::flushCallback(const char *view_name, void *callback_user_data)
 {
-	printf("**** flushCallback view_name='%s', callback_user_data=%p\n", view_name, callback_user_data);
+	//printf("**** flushCallback view_name='%s', callback_user_data=%p\n", view_name, callback_user_data);
+	auto render_widget = (RenderWidget *) callback_user_data;
+	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(), true));
 }
 
 void Output::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
