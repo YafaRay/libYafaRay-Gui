@@ -27,7 +27,6 @@
 #include <QPoint>
 #include "gui/renderwidget.h"
 #include "gui/events.h"
-#include <iostream>
 
 BEGIN_YAFARAY_GUI_QT
 
@@ -35,7 +34,7 @@ BEGIN_YAFARAY_GUI_QT
 /	RenderWidget implementation
 /=====================================*/
 
-RenderWidget::RenderWidget(QScrollArea *parent): QLabel((QWidget *)parent)
+RenderWidget::RenderWidget(QScrollArea *parent): QLabel(static_cast<QWidget *>(parent))
 {
 	border_start_ = QPoint(0, 0);
 	rendering_ = true;
@@ -52,9 +51,7 @@ RenderWidget::RenderWidget(QScrollArea *parent): QLabel((QWidget *)parent)
 void RenderWidget::setup(const QSize &s)
 {
 	image_size_ = s;
-
 	initBuffers();
-
 	QPalette palette;
 	palette.setColor(QPalette::Background, QColor(0, 0, 0, 0));
 	setPalette(palette);
@@ -64,11 +61,8 @@ void RenderWidget::initBuffers()
 {
 	color_buffer_ = QImage(image_size_, QImage::Format_ARGB32);
 	color_buffer_.fill(QColor(0, 0, 0, 0));
-
 	resize(image_size_);
-
 	active_buffer_ = &color_buffer_;
-
 	pixmap_ = QPixmap::fromImage(*active_buffer_);
 	setPixmap(pixmap_);
 }
@@ -92,7 +86,6 @@ void RenderWidget::setPixel(int x, int y, const QColor &color)
 {
 	const int ix = x + border_start_.x();
 	const int iy = y + border_start_.y();
-
 	color_buffer_.setPixelColor(ix, iy, color);
 }
 
@@ -109,42 +102,35 @@ void RenderWidget::paintColorBuffer()
 void RenderWidget::zoom(float f, QPoint m_pos)
 {
 	scale_factor_ *= f;
-
-	QSize new_size = scale_factor_ * active_buffer_->size();
+	const QSize new_size = scale_factor_ * active_buffer_->size();
 	resize(new_size);
 	pixmap_ = QPixmap::fromImage(active_buffer_->scaled(new_size));
 	update(owner_->viewport()->geometry());
-
-	QPoint m = (m_pos * f) - m_pos;
-
-	int dh = h_bar_->value() + (m.x());
-	int dv = v_bar_->value() + (m.y());
-
+	const QPoint m = (m_pos * f) - m_pos;
+	const int dh = h_bar_->value() + (m.x());
+	const int dv = v_bar_->value() + (m.y());
 	h_bar_->setValue(dh);
 	v_bar_->setValue(dv);
 }
 
 void RenderWidget::zoomIn(QPoint m_pos)
 {
-	if(scale_factor_ > 5.0) return;
-
-	zoom(1.25, m_pos);
+	if(scale_factor_ > 5.f) return;
+	zoom(1.25f, m_pos);
 }
 
 void RenderWidget::zoomOut(QPoint m_pos)
 {
-	if(scale_factor_ < 0.2) return;
-	zoom(0.8, m_pos);
+	if(scale_factor_ < 0.2f) return;
+	zoom(0.8f, m_pos);
 }
 
 bool RenderWidget::event(QEvent *event)
 {
-	if(event->type() == (QEvent::Type)GuiUpdate && rendering_)
+	if(event->type() == static_cast<QEvent::Type>(GuiUpdate) && rendering_)
 	{
-		auto ge = (GuiUpdateEvent *)event;
-
+		const auto ge = static_cast<GuiUpdateEvent *>(event);
 		ge->accept();
-
 		if(ge->isFullUpdate())
 		{
 			buffer_mutex_.lock();
@@ -163,10 +149,9 @@ bool RenderWidget::event(QEvent *event)
 		}
 		return true;
 	}
-	else if(event->type() == (QEvent::Type)PutPixel)
+	else if(event->type() == static_cast<QEvent::Type>(PutPixel))
 	{
-		auto ge = (PutPixelEvent *)event;
-
+		const auto ge = static_cast<PutPixelEvent *>(event);
 		ge->accept();
 		//buffer_mutex_.lock();
 		const auto coords = ge->getCoords();
@@ -175,50 +160,40 @@ bool RenderWidget::event(QEvent *event)
 		update();
 		return true;
 	}
-	else if(event->type() == (QEvent::Type)AreaHighlight && rendering_)
+	else if(event->type() == static_cast<QEvent::Type>(AreaHighlight) && rendering_)
 	{
-		auto ge = (AreaHighlightEvent *)event;
+		const auto ge = static_cast<AreaHighlightEvent *>(event);
 		buffer_mutex_.lock();
 		QPainter p(&pixmap_);
-
 		ge->accept();
-
-		int line_l = std::min(4, std::min(ge->getRect().height() - 1, ge->getRect().width() - 1));
-		QPoint tr(ge->getRect().topRight());
-		QPoint tl(ge->getRect().topLeft());
-		QPoint br(ge->getRect().bottomRight());
-		QPoint bl(ge->getRect().bottomLeft());
-
+		const int line_l = std::min(4, std::min(ge->getRect().height() - 1, ge->getRect().width() - 1));
+		const QPoint tr(ge->getRect().topRight());
+		const QPoint tl(ge->getRect().topLeft());
+		const QPoint br(ge->getRect().bottomRight());
+		const QPoint bl(ge->getRect().bottomLeft());
 		p.setPen(QColor(160, 0, 0));
-
 		//top-left corner
 		p.drawLine(tl, QPoint(tl.x() + line_l, tl.y()));
 		p.drawLine(tl, QPoint(tl.x(), tl.y() + line_l));
-
 		//top-right corner
 		p.drawLine(tr, QPoint(tr.x() - line_l, tr.y()));
 		p.drawLine(tr, QPoint(tr.x(), tr.y() + line_l));
-
 		//bottom-left corner
 		p.drawLine(bl, QPoint(bl.x() + line_l, bl.y()));
 		p.drawLine(bl, QPoint(bl.x(), bl.y() - line_l));
-
 		//bottom-right corner
 		p.drawLine(br, QPoint(br.x() - line_l, br.y()));
 		p.drawLine(br, QPoint(br.x(), br.y() - line_l));
-
 		buffer_mutex_.unlock();
 		update(ge->getRect());
-
 		return true;
 	}
-
 	return QLabel::event(event);
 }
 
 void RenderWidget::paintEvent(QPaintEvent *event)
 {
-	QRect r = event->rect();
+	const QRect r = event->rect();
 	QPainter painter(this);
 	painter.setClipRegion(event->region());
 	painter.drawPixmap(r, pixmap_, r);
@@ -227,7 +202,6 @@ void RenderWidget::paintEvent(QPaintEvent *event)
 void RenderWidget::wheelEvent(QWheelEvent *event)
 {
 	event->accept();
-
 	if(!rendering_ && !panning_ && (event->modifiers() & Qt::ControlModifier))
 	{
 		if(event->delta() > 0) zoomIn(event->pos());
@@ -269,7 +243,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	if(panning_)
 	{
-		QPoint dpos = bar_pos_ + (pan_pos_ - event->globalPos());
+		const QPoint dpos = bar_pos_ + (pan_pos_ - event->globalPos());
 		h_bar_->setValue(dpos.x());
 		v_bar_->setValue(dpos.y());
 		event->accept();

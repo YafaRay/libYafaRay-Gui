@@ -62,8 +62,8 @@ class MainWindow final : public QMainWindow
 		void slotSaveAs();
 		void slotCancel();
 		void setAskSave(bool checked);
-		void zoomIn();
-		void zoomOut();
+		void zoomIn() const;
+		void zoomOut() const;
 
 	private:
 		bool event(QEvent *event) override;

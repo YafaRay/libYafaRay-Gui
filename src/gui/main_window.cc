@@ -333,17 +333,17 @@ void MainWindow::setButtonsIcons()
 
 bool MainWindow::event(QEvent *event)
 {
-	if(event->type() == (QEvent::Type)ProgressUpdate)
+	if(event->type() == static_cast<QEvent::Type>(ProgressUpdate))
 	{
-		auto *p = dynamic_cast<ProgressUpdateEvent *>(event);
+		const auto *p = static_cast<ProgressUpdateEvent *>(event);
 		if(p->getMinSteps() >= 0) progress_bar_->setMinimum(p->getMinSteps());
 		if(p->getMaxSteps() >= 0) progress_bar_->setMaximum(p->getMaxSteps());
 		progress_bar_->setValue(p->getCurrentSteps());
 		return true;
 	}
-	else if(event->type() == (QEvent::Type)ProgressUpdateTag)
+	else if(event->type() == static_cast<QEvent::Type>(ProgressUpdateTag))
 	{
-		auto *p = dynamic_cast<ProgressUpdateTagEvent *>(event);
+		const auto *p = static_cast<ProgressUpdateTagEvent *>(event);
 		if(p->getTag().contains("Rendering")) anim_->hide();
 		label_->setText(p->getTag());
 		return true;
@@ -525,12 +525,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 	else return QMainWindow::eventFilter(obj, event);
 }
 
-void MainWindow::zoomOut()
+void MainWindow::zoomOut() const
 {
 	render_->zoomOut(QPoint(0, 0));
 }
 
-void MainWindow::zoomIn()
+void MainWindow::zoomIn() const
 {
 	render_->zoomIn(QPoint(0, 0));
 }

@@ -24,27 +24,27 @@
 BEGIN_YAFARAY_GUI_QT
 
 GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent((QEvent::Type)GuiUpdate), rect_(rect), full_update_(full_update)
+	: QEvent(static_cast<QEvent::Type>(GuiUpdate)), rect_(rect), full_update_(full_update)
 {
 }
 
 PutPixelEvent::PutPixelEvent(const QPoint &point, const QColor &color)
-		: QEvent((QEvent::Type)PutPixel), point_(point), color_(color)
+		: QEvent(static_cast<QEvent::Type>(PutPixel)), point_(point), color_(color)
 {
 }
 
 AreaHighlightEvent::AreaHighlightEvent(int area_number, const QRect &rect)
-	: QEvent((QEvent::Type)AreaHighlight), area_number_(area_number), rect_(rect)
+	: QEvent(static_cast<QEvent::Type>(AreaHighlight)), area_number_(area_number), rect_(rect)
 {
 }
 
 ProgressUpdateEvent::ProgressUpdateEvent(int current_steps, int min_steps, int max_steps)
-	: QEvent((QEvent::Type)ProgressUpdate), current_steps_(current_steps), min_steps_(min_steps), max_steps_(max_steps)
+	: QEvent(static_cast<QEvent::Type>(ProgressUpdate)), current_steps_(current_steps), min_steps_(min_steps), max_steps_(max_steps)
 {
 }
 
 ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
-	: QEvent((QEvent::Type)ProgressUpdateTag), tag_(tag)
+	: QEvent(static_cast<QEvent::Type>(ProgressUpdateTag)), tag_(tag)
 {
 }
 
