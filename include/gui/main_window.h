@@ -43,13 +43,13 @@ class MainWindow final : public QMainWindow
 	Q_OBJECT
 
 	public:
-		MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish);
+		MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish);
 		~MainWindow() override;
 		void adjustWindow();
 		void setup();
 
-		std::unique_ptr<RenderWidget> render_;
-		QScrollArea *render_area_ = nullptr;
+		std::unique_ptr<RenderWidget> render_widget_;
+		QScrollArea *scroll_area_ = nullptr;
 		QAction *action_ask_save_ = nullptr;
 		QProgressBar *progress_bar_ = nullptr;
 		QLabel *label_ = nullptr;
@@ -93,10 +93,10 @@ class MainWindow final : public QMainWindow
 		std::unique_ptr<Worker> worker_;
 		yafaray_Interface_t *yafaray_interface_ = nullptr;
 		QString last_path_;
-		int res_x_ = 0, res_y_ = 0, b_x_ = 0, b_y_ = 0;
+		int width_ = 0, height_ = 0, border_start_x_ = 0, border_start_y_ = 0;
 		bool auto_close_ = false; // if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
 		QTime time_measure_; // time measure for the render
-		std::unique_ptr<AnimWorking> anim_;
+		std::unique_ptr<AnimWorking> anim_working_;
 		bool render_saved_ = false;
 		bool ask_unsaved_ = false;
 		bool render_cancelled_ = false;

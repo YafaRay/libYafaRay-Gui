@@ -21,11 +21,11 @@
 #include "gui/main_window.h"
 #include <QApplication>
 
-int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int xsize, int ysize, int b_start_x, int b_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish)
+int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish)
 {
 	int argc = 0;
 	auto app = new QApplication(argc, nullptr, 0);
-	yafaray_gui_qt::MainWindow w(yafaray_interface, xsize, ysize, b_start_x, b_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
+	yafaray_gui_qt::MainWindow w(yafaray_interface, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
 	w.show();
 	w.adjustWindow();
 	//if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();

@@ -34,23 +34,14 @@ BEGIN_YAFARAY_GUI_QT
 /	RenderWidget implementation
 /=====================================*/
 
-RenderWidget::RenderWidget(QScrollArea *parent): QLabel(static_cast<QWidget *>(parent))
+RenderWidget::RenderWidget(QScrollArea *parent): QLabel(static_cast<QWidget *>(parent)), parent_(parent), h_bar_(parent_->horizontalScrollBar()), v_bar_(parent_->verticalScrollBar())
 {
-	border_start_ = QPoint(0, 0);
-	rendering_ = true;
-	scale_factor_ = 1.f;
-	panning_ = false;
-	pan_pos_ = QPoint(0, 0);
-	owner_ = parent;
-	h_bar_ = owner_->horizontalScrollBar();
-	v_bar_ = owner_->verticalScrollBar();
-	bar_pos_ = QPoint(0, 0);
 	setScaledContents(true);
 }
 
-void RenderWidget::setup(const QSize &s)
+void RenderWidget::setup(const QSize &size)
 {
-	image_size_ = s;
+	image_size_ = size;
 	initBuffers();
 	QPalette palette;
 	palette.setColor(QPalette::Background, QColor(0, 0, 0, 0));
@@ -99,30 +90,30 @@ void RenderWidget::paintColorBuffer()
 	if(!rendering_) zoom(1.f, QPoint(0, 0));
 }
 
-void RenderWidget::zoom(float f, QPoint m_pos)
+void RenderWidget::zoom(float zoom_factor, QPoint center)
 {
-	scale_factor_ *= f;
+	scale_factor_ *= zoom_factor;
 	const QSize new_size = scale_factor_ * active_buffer_->size();
 	resize(new_size);
 	pixmap_ = QPixmap::fromImage(active_buffer_->scaled(new_size));
-	update(owner_->viewport()->geometry());
-	const QPoint m = (m_pos * f) - m_pos;
+	update(parent_->viewport()->geometry());
+	const QPoint m = (center * zoom_factor) - center;
 	const int dh = h_bar_->value() + (m.x());
 	const int dv = v_bar_->value() + (m.y());
 	h_bar_->setValue(dh);
 	v_bar_->setValue(dv);
 }
 
-void RenderWidget::zoomIn(QPoint m_pos)
+void RenderWidget::zoomIn(QPoint center)
 {
 	if(scale_factor_ > 5.f) return;
-	zoom(1.25f, m_pos);
+	zoom(1.25f, center);
 }
 
-void RenderWidget::zoomOut(QPoint m_pos)
+void RenderWidget::zoomOut(QPoint center)
 {
 	if(scale_factor_ < 0.2f) return;
-	zoom(0.8f, m_pos);
+	zoom(0.8f, center);
 }
 
 bool RenderWidget::event(QEvent *event)

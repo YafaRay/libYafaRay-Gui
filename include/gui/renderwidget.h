@@ -40,36 +40,36 @@ class RenderWidget final : public QLabel
 
 	public:
 		explicit RenderWidget(QScrollArea *parent = nullptr);
-		void setup(const QSize &s);
+		void setup(const QSize &size);
 		void setRenderBorderStart(const QPoint &start) { border_start_ = start; }
 		void startRendering();
 		bool isRendering() const { return rendering_; }
 		void finishRendering();
 		void setPixel(int x, int y, const QColor &color);
 		void paintColorBuffer();
-		void zoomIn(QPoint m_pos);
-		void zoomOut(QPoint m_pos);
+		void zoomIn(QPoint center);
+		void zoomOut(QPoint center);
 		bool event(QEvent *event) override;
 
 	private:
 		void initBuffers();
-		void zoom(float f, QPoint m_pos);
+		void zoom(float zoom_factor, QPoint center);
 		void paintEvent(QPaintEvent *event) override;
 		void wheelEvent(QWheelEvent *event) override;
 		void mousePressEvent(QMouseEvent *event) override;
 		void mouseReleaseEvent(QMouseEvent *event) override;
 		void mouseMoveEvent(QMouseEvent *event) override;
 
-		bool rendering_;
-		bool panning_;
+		bool rendering_ = true;
+		bool panning_ = false;
 
 		QPoint border_start_;
 		QSize image_size_;
-		float scale_factor_;
+		float scale_factor_ = 1.f;
 
 		QPoint pan_pos_;
 		QPoint bar_pos_;
-		QScrollArea *owner_ = nullptr;
+		QScrollArea *parent_ = nullptr;
 		QScrollBar *h_bar_ = nullptr;
 		QScrollBar *v_bar_ = nullptr;
 

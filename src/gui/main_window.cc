@@ -60,7 +60,7 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int resy, int b_start_x, int b_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), output_(resx, resy), res_x_(resx), res_y_(resy), b_x_(b_start_x), b_y_(b_start_y), auto_close_(close_after_finish)
+MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), output_(width, height), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
 {
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -97,32 +97,29 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	render_saved_ = false;
 	action_ask_save_->setChecked(ask_unsaved_);
 
-/*	yafaray4::ParamMap *p = yafaray_interface_->getRenderParameters();
-	p->getParam("z_channel", use_zbuf_);*/
-
-	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(render_area_));
+	render_widget_ = std::unique_ptr<RenderWidget>(new RenderWidget(scroll_area_));
 	worker_ = std::unique_ptr<Worker>(new Worker(yafaray_interface_, this));
 	// animation widget
-	anim_ = std::unique_ptr<AnimWorking>(new AnimWorking(render_area_));
-	anim_->resize(200, 87);
+	anim_working_ = std::unique_ptr<AnimWorking>(new AnimWorking(scroll_area_));
+	anim_working_->resize(200, 87);
 	this->move(20, 20);
-	render_area_->setWidgetResizable(false);
-	render_area_->resize(resx, resy);
-	render_area_->setWidget(render_.get());
-	QPalette render_area_palette = render_area_->viewport()->palette();
-	render_area_palette.setColor(QPalette::Window, Qt::black);
-	render_area_->viewport()->setPalette(render_area_palette);
+	scroll_area_->setWidgetResizable(false);
+	scroll_area_->resize(width, height);
+	scroll_area_->setWidget(render_widget_.get());
+	QPalette palette = scroll_area_->viewport()->palette();
+	palette.setColor(QPalette::Window, Qt::black);
+	scroll_area_->viewport()->setPalette(palette);
 	connect(worker_.get(), SIGNAL(finished()), this, SLOT(slotFinished()));
 
 	// move the animwidget over the render area
-	QRect r = anim_->rect();
-	r.moveCenter(render_area_->rect().center());
-	anim_->move(r.topLeft());
+	QRect r = anim_working_->rect();
+	r.moveCenter(scroll_area_->rect().center());
+	anim_working_->move(r.topLeft());
 
 	// offset when using border rendering
-	render_->setRenderBorderStart(QPoint(b_start_x, b_start_y));
+	render_widget_->setRenderBorderStart(QPoint(border_start_x, border_start_y));
 	// filter the resize events of the render area to center the animation widget
-	render_area_->installEventFilter(this);
+	scroll_area_->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -144,12 +141,12 @@ void MainWindow::setup()
 
 	label_ = setupLabel(central_widget);
 	progress_bar_ = setupProgressBar(central_widget);
-	render_area_ = setupRenderArea(central_widget);
+	scroll_area_ = setupRenderArea(central_widget);
 
 	auto layout = new QGridLayout(central_widget);
 	layout->setSpacing(2);
 	layout->setContentsMargins(2, 2, 2, 2);
-	layout->addWidget(render_area_, 0, 0, 1, 2);
+	layout->addWidget(scroll_area_, 0, 0, 1, 2);
 	layout->addWidget(progress_bar_, 1, 0, 1, 1);
 	layout->addWidget(cancel_button_, 1, 1, 1, 1);
 	layout->addWidget(label_, 2, 0, 1, 2);
@@ -160,7 +157,6 @@ void MainWindow::setup()
 	addToolBar(Qt::TopToolBarArea, tool_bar);
 
 	setButtonsIcons();
-	//QMetaObject::connectSlotsByName(this); //FIXME: what's the purpose of this line?
 }
 
 void MainWindow::setupActions()
@@ -260,6 +256,9 @@ QToolBar *MainWindow::setupToolBar()
 	tool_bar->addAction(action_save_as_);
 	tool_bar->addAction(action_render_);
 	tool_bar->addSeparator();
+	tool_bar->addAction(action_zoom_in_);
+	tool_bar->addAction(action_zoom_out_);
+	tool_bar->addSeparator();
 	tool_bar->addAction(action_cancel_);
 	return tool_bar;
 }
@@ -333,7 +332,7 @@ bool MainWindow::event(QEvent *event)
 	else if(event->type() == static_cast<QEvent::Type>(ProgressUpdateTag))
 	{
 		const auto p = static_cast<ProgressUpdateTagEvent *>(event);
-		if(p->getTag().contains("Rendering")) anim_->hide();
+		if(p->getTag().contains("Rendering")) anim_working_->hide();
 		label_->setText(p->getTag());
 		return true;
 	}
@@ -365,7 +364,7 @@ void MainWindow::slotRender()
 
 	progress_bar_->show();
 	time_measure_.start();
-	render_->startRendering();
+	render_widget_->startRendering();
 	render_saved_ = false;
 	worker_->start();
 }
@@ -410,7 +409,7 @@ void MainWindow::slotFinished()
 	label_->setText(rt);
 	yafaray_printInfo(yafaray_interface_, "Render completed!");
 
-	render_->finishRendering();
+	render_widget_->finishRendering();
 	update();
 	action_render_->setVisible(true);
 	action_zoom_in_->setEnabled(true);
@@ -465,7 +464,7 @@ bool MainWindow::saveDlg()
 
 bool MainWindow::closeUnsaved()
 {
-	if(!render_saved_ && !render_->isRendering() && ask_unsaved_)
+	if(!render_saved_ && !render_widget_->isRendering() && ask_unsaved_)
 	{
 		QMessageBox msg_box(QMessageBox::Question, "YafaRay Question", "The render hasn't been saved, if you close, it will be lost.", QMessageBox::NoButton, this);
 		msg_box.setInformativeText("Do you want to save your render before closing?");
@@ -501,9 +500,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 	if(event->type() == QEvent::Resize)
 	{
 		// move the anim widget over the render area
-		QRect r = anim_->rect();
-		r.moveCenter(render_area_->rect().center());
-		anim_->move(r.topLeft());
+		QRect r = anim_working_->rect();
+		r.moveCenter(scroll_area_->rect().center());
+		anim_working_->move(r.topLeft());
 		return true;
 	}
 	else return QMainWindow::eventFilter(obj, event);
@@ -511,25 +510,25 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::zoomOut() const
 {
-	render_->zoomOut(QPoint(0, 0));
+	render_widget_->zoomOut(QPoint(0, 0));
 }
 
 void MainWindow::zoomIn() const
 {
-	render_->zoomIn(QPoint(0, 0));
+	render_widget_->zoomIn(QPoint(0, 0));
 }
 
 void MainWindow::adjustWindow()
 {
-	const QRect scr_geom = QApplication::desktop()->availableGeometry();
-	const int w = std::min(res_x_ + 10, scr_geom.width() - 60);
-	const int h = std::min(res_y_ + 10, scr_geom.height() - 160);
-	render_area_->setMaximumSize(w, h);
-	render_area_->setMinimumSize(w, h);
+	const QRect available_geometry = QApplication::desktop()->availableGeometry();
+	const int width = std::min(width_ + 10, available_geometry.width() - 60);
+	const int height = std::min(height_ + 10, available_geometry.height() - 160);
+	scroll_area_->setMaximumSize(width, height);
+	scroll_area_->setMinimumSize(width, height);
 	adjustSize();
 	resize(minimumSize());
-	render_area_->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-	render_area_->setMinimumSize(0, 0);
+	scroll_area_->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+	scroll_area_->setMinimumSize(0, 0);
 }
 
 END_YAFARAY_GUI_QT
