@@ -66,10 +66,8 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 	QCoreApplication::setOrganizationDomain("yafaray.org");
 	QCoreApplication::setApplicationName("LibYafaRay-Gui-Qt");
 	yafaray_paramsClearAll(yafaray_interface);
-
 	QSettings set;
 	ask_unsaved_ = set.value("qtGui/askSave", true).toBool();
-
 
 #if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
 	int fId = QFontDatabase::addApplicationFontFromData(QByteArray((const char *)guifont_global, guifont_size_global));
@@ -97,7 +95,6 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 #endif
 
 	render_saved_ = false;
-
 	action_ask_save_->setChecked(ask_unsaved_);
 
 /*	yafaray4::ParamMap *p = yafaray_interface_->getRenderParameters();
@@ -105,22 +102,16 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 
 	render_ = std::unique_ptr<RenderWidget>(new RenderWidget(render_area_));
 	worker_ = std::unique_ptr<Worker>(new Worker(yafaray_interface_, this));
-
 	// animation widget
 	anim_ = std::unique_ptr<AnimWorking>(new AnimWorking(render_area_));
 	anim_->resize(200, 87);
-
 	this->move(20, 20);
-
 	render_area_->setWidgetResizable(false);
 	render_area_->resize(resx, resy);
 	render_area_->setWidget(render_.get());
-
-	QPalette render_area_pal;
-	render_area_pal = render_area_->viewport()->palette();
-	render_area_pal.setColor(QPalette::Window, Qt::black);
-
-	render_area_->viewport()->setPalette(render_area_pal);
+	QPalette render_area_palette = render_area_->viewport()->palette();
+	render_area_palette.setColor(QPalette::Window, Qt::black);
+	render_area_->viewport()->setPalette(render_area_palette);
 	connect(worker_.get(), SIGNAL(finished()), this, SLOT(slotFinished()));
 
 	// move the animwidget over the render area
@@ -130,7 +121,6 @@ MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int resx, int res
 
 	// offset when using border rendering
 	render_->setRenderBorderStart(QPoint(b_start_x, b_start_y));
-
 	// filter the resize events of the render area to center the animation widget
 	render_area_->installEventFilter(this);
 }
@@ -146,7 +136,6 @@ void MainWindow::setup()
 	setupActions();
 	auto menu_bar = setupMenuBar();
 	auto tool_bar = setupToolBar();
-
 	auto central_widget = new QWidget();
 
 	cancel_button_ = new QPushButton(central_widget);
@@ -335,7 +324,7 @@ bool MainWindow::event(QEvent *event)
 {
 	if(event->type() == static_cast<QEvent::Type>(ProgressUpdate))
 	{
-		const auto *p = static_cast<ProgressUpdateEvent *>(event);
+		const auto p = static_cast<ProgressUpdateEvent *>(event);
 		if(p->getMinSteps() >= 0) progress_bar_->setMinimum(p->getMinSteps());
 		if(p->getMaxSteps() >= 0) progress_bar_->setMaximum(p->getMaxSteps());
 		progress_bar_->setValue(p->getCurrentSteps());
@@ -343,7 +332,7 @@ bool MainWindow::event(QEvent *event)
 	}
 	else if(event->type() == static_cast<QEvent::Type>(ProgressUpdateTag))
 	{
-		const auto *p = static_cast<ProgressUpdateTagEvent *>(event);
+		const auto p = static_cast<ProgressUpdateTagEvent *>(event);
 		if(p->getTag().contains("Rendering")) anim_->hide();
 		label_->setText(p->getTag());
 		return true;
@@ -407,7 +396,6 @@ void MainWindow::slotFinished()
 	{
 		if(h > 0) time_str.append(QString("%1:").arg(m, 2, 10, fill));
 		else time_str.append(QString("%1:").arg(m));
-
 		if(suffix == "") suffix = "m.";
 	}
 
@@ -415,7 +403,6 @@ void MainWindow::slotFinished()
 	else time_str.append(QString("%1.%2").arg(s, 2, 10, fill).arg(ms, 2, 10, fill));
 
 	if(suffix == "") suffix = "s.";
-
 	time_str.append(QString(" %1").arg(suffix));
 
 	QString rt;
@@ -425,13 +412,11 @@ void MainWindow::slotFinished()
 
 	render_->finishRendering();
 	update();
-
 	action_render_->setVisible(true);
 	action_zoom_in_->setEnabled(true);
 	action_zoom_out_->setEnabled(true);
 	cancel_button_->setVisible(false);
 	action_cancel_->setVisible(false);
-
 	if(auto_close_)
 	{
 		if(render_cancelled_) QApplication::exit(1);
@@ -483,11 +468,10 @@ bool MainWindow::closeUnsaved()
 	if(!render_saved_ && !render_->isRendering() && ask_unsaved_)
 	{
 		QMessageBox msg_box(QMessageBox::Question, "YafaRay Question", "The render hasn't been saved, if you close, it will be lost.", QMessageBox::NoButton, this);
-
 		msg_box.setInformativeText("Do you want to save your render before closing?");
 		QPushButton *discard = msg_box.addButton("Close without Saving", QMessageBox::DestructiveRole);
-		QPushButton *save = msg_box.addButton("Save", QMessageBox::AcceptRole);
-		QPushButton *cancel = msg_box.addButton("Cancel", QMessageBox::RejectRole);
+		const QPushButton *save = msg_box.addButton("Save", QMessageBox::AcceptRole);
+		const QPushButton *cancel = msg_box.addButton("Cancel", QMessageBox::RejectRole);
 		msg_box.setDefaultButton(discard);
 		msg_box.exec();
 		if(msg_box.clickedButton() == save) return saveDlg();
