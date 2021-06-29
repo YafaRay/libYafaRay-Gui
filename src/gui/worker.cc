@@ -46,6 +46,7 @@ void Worker::run()
 	yafaray_setOutputFlushCallback(yafaray_interface_, "test_callback_output", Output::flushCallback, (void *) main_window_->render_widget_.get());
 	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", Output::highlightCallback, (void *) main_window_->render_widget_.get());
 	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
+	yafaray_removeOutput(yafaray_interface_, "test_callback_output");
 }
 
 END_YAFARAY_GUI_QT
