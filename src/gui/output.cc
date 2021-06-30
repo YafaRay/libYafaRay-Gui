@@ -37,10 +37,10 @@ void Output::putPixelCallback(const char *view_name, const char *layer_name, int
 	if(strcmp(layer_name, "combined") == 0)
 	{
 		const QColor color_ldr {
-				std::min(static_cast<int>(r * 255.f), 255),
-				std::min(static_cast<int>(g * 255.f), 255),
-				std::min(static_cast<int>(b * 255.f), 255),
-				std::min(static_cast<int>(a * 255.f), 255),
+				std::max(0, std::min(static_cast<int>(r * 255.f), 255)),
+				std::max(0, std::min(static_cast<int>(g * 255.f), 255)),
+				std::max(0, std::min(static_cast<int>(b * 255.f), 255)),
+				std::max(0, std::min(static_cast<int>(a * 255.f), 255)),
 		};
 		QCoreApplication::postEvent(render_widget, new PutPixelEvent(QPoint(x, y), color_ldr)); //FIXME VIEWS AND LAYERS
 	}

@@ -34,6 +34,10 @@ void Worker::run()
 {
 	const int output_width = yafaray_getSceneFilmWidth(yafaray_interface_);
 	const int output_height = yafaray_getSceneFilmHeight(yafaray_interface_);
+	char *views_table = yafaray_getViewsTable(yafaray_interface_);
+	char *layers_table = yafaray_getLayersTable(yafaray_interface_);
+	yafaray_printVerbose(yafaray_interface_, views_table);
+	yafaray_printVerbose(yafaray_interface_, layers_table);
 	main_window_->render_widget_->setup(QSize(output_width, output_height));
 
 	yafaray_setInteractive(yafaray_interface_, YAFARAY_BOOL_TRUE);
@@ -47,6 +51,8 @@ void Worker::run()
 	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", Output::highlightCallback, (void *) main_window_->render_widget_.get());
 	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
 	yafaray_removeOutput(yafaray_interface_, "test_callback_output");
+	yafaray_deallocateCharPointer(layers_table);
+	yafaray_deallocateCharPointer(views_table);
 }
 
 END_YAFARAY_GUI_QT
