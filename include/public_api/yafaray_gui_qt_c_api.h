@@ -29,10 +29,12 @@ extern "C" {
 #endif
 
 	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish);
-	YAFARAY_GUI_QT_C_API_EXPORT void yafaray_gui_qt_getVersionString(char *dest_string, unsigned int dest_string_size);
 	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionMajor();
 	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionMinor();
 	YAFARAY_GUI_QT_C_API_EXPORT int yafaray_gui_qt_getVersionPatch();
+	/* The following functions return a text string where memory is allocated by libYafaRay itself. Do not free the char* directly with free, use "yafaray_gui_qt_deallocateCharPointer" to free them instead to ensure proper deallocation. */
+	YAFARAY_GUI_QT_C_API_EXPORT char *yafaray_gui_qt_getVersionString();
+	YAFARAY_GUI_QT_C_API_EXPORT void yafaray_gui_qt_deallocateCharPointer(char *string_pointer_to_deallocate);
 
 #ifdef __cplusplus
 }

@@ -20,6 +20,7 @@
 #include "common/version_build_info.h"
 #include "gui/main_window.h"
 #include <QApplication>
+#include <cstring>
 
 int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish)
 {
@@ -32,15 +33,24 @@ int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, in
 	return QApplication::exec();
 }
 
-void yafaray_gui_qt_getVersionString(char *dest_string, unsigned int dest_string_size)
-{
-	if(!dest_string || dest_string_size == 0) return;
-	const std::string version_string = yafaray_gui_qt::buildinfo::getVersionString();
-	const unsigned int copy_length = std::min(dest_string_size - 1, static_cast<unsigned int>(version_string.size()));
-	strncpy(dest_string, version_string.c_str(), copy_length);
-	*(dest_string + copy_length) = 0x00; //Make sure that the destination string gets null terminated
-}
-
 int yafaray_gui_qt_getVersionMajor() { return yafaray_gui_qt::buildinfo::getVersionMajor(); }
 int yafaray_gui_qt_getVersionMinor() { return yafaray_gui_qt::buildinfo::getVersionMinor(); }
 int yafaray_gui_qt_getVersionPatch() { return yafaray_gui_qt::buildinfo::getVersionPatch(); }
+
+char *createCString(const std::string &std_string)
+{
+	const size_t string_size = std_string.size();
+	char *c_string = new char[string_size + 1];
+	std::strcpy(c_string, std_string.c_str());
+	return c_string;
+}
+
+char *yafaray_gui_qt_getVersionString()
+{
+	return createCString(yafaray_gui_qt::buildinfo::getVersionString());
+}
+
+void yafaray_gui_qt_deallocateCharPointer(char *string_pointer_to_deallocate)
+{
+	delete[] string_pointer_to_deallocate;
+}

@@ -22,12 +22,7 @@
 
 int main()
 {
-	const int version_string_size = 100;
-	char *version_c_string = (char *) malloc(version_string_size * sizeof(char));
-	yafaray_gui_qt_getVersionString(version_c_string, version_string_size);
-	const std::string version_string {version_c_string};
-	free(version_c_string);
-
+	char *version_string = yafaray_gui_qt_getVersionString();
 	/* Basic libYafaRay C API usage example, rendering a cube with a TGA texture */
 
 	/* YafaRay standard rendering interface */
@@ -35,8 +30,8 @@ int main()
 	yafaray_setConsoleLogColorsEnabled(yi, YAFARAY_BOOL_TRUE);
 	yafaray_setConsoleVerbosityLevel(yi, YAFARAY_LOG_LEVEL_DEBUG);
 	yafaray_setInteractive(yi, YAFARAY_BOOL_TRUE);
-	yafaray_printInfo(yi, ("***** Test client 'test01' for libYafaRay-Gui-Qt *****" + version_string).c_str());
-	yafaray_printInfo(yi, ("Using libYafaRay version (" + std::to_string(yafaray_getVersionMajor()) + "." + std::to_string(yafaray_getVersionMinor()) + "." + std::to_string(yafaray_getVersionPatch())).c_str());
+	yafaray_printInfo(yi, "***** Test client 'test01' for libYafaRay-Gui-Qt *****");
+	yafaray_printInfo(yi, ("Using libYafaRay version (" + std::to_string(yafaray_getVersionMajor()) + "." + std::to_string(yafaray_getVersionMinor()) + "." + std::to_string(yafaray_getVersionPatch()) + ") and libYafaRay-Gui-Qt version " + std::string(version_string)).c_str());
 
 	/* Creating scene */
 	yafaray_paramsSetString(yi, "type", "yafaray");
@@ -205,5 +200,6 @@ int main()
 	yafaray_gui_qt_createRenderWidget(yi, 640, 480, 0, 0, YAFARAY_BOOL_TRUE, YAFARAY_BOOL_FALSE);
 	/* Destroying YafaRay interface. Scene and all objects inside are automatically destroyed */
 	yafaray_destroyInterface(yi);
+	yafaray_gui_qt_deallocateCharPointer(version_string);
 	return 0;
 }
