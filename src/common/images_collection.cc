@@ -16,10 +16,10 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/images_collection.h"
+#include "common/images_collection.h"
 
 #include <memory>
-#include "gui/image.h"
+#include "common/image.h"
 
 BEGIN_YAFARAY_GUI_QT
 

@@ -16,9 +16,9 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/output.h"
-#include "gui/images_collection.h"
-#include "gui/image.h"
+#include "common/output.h"
+#include "common/images_collection.h"
+#include "common/image.h"
 #include "gui/main_window.h"
 #include "gui/events.h"
 #include "gui/renderwidget.h"
@@ -73,17 +73,6 @@ void Output::monitorCallback(int steps_total, int steps_done, const char *tag, v
 	if(!main_window) return;
 	if(main_window->label_) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(tag));
 	if(main_window->progress_bar_) QCoreApplication::postEvent(main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
-}
-
-void Output::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data)
-{
-	LogEntry log_entry;
-	log_entry.log_level_ = log_level;
-	log_entry.datetime_ = datetime;
-	log_entry.time_of_day_ = time_of_day;
-	log_entry.description_ = description;
-	auto output = static_cast<Output *>(callback_user_data);
-	if(output) output->log_.emplace_back(log_entry);
 }
 
 END_YAFARAY_GUI_QT

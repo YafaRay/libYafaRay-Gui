@@ -60,12 +60,14 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), output_(width, height), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
+MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
 {
+	yafaray_setLoggingCallback(yafaray_interface_, Log::loggerCallback, static_cast<void *>(&log_));
+
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
 	QCoreApplication::setApplicationName("LibYafaRay-Gui-Qt");
-	yafaray_paramsClearAll(yafaray_interface);
+
 	QSettings set;
 	ask_unsaved_ = set.value("qtGui/askSave", true).toBool();
 

@@ -21,7 +21,7 @@
 #define LIBYAFARAY_GUI_QT_MAIN_WINDOW_H
 
 #include "common/yafaray_gui_qt_common.h"
-#include "gui/output.h"
+#include "common/log.h"
 #include <QtWidgets/QMainWindow>
 #include <QTime>
 #include <memory>
@@ -53,7 +53,7 @@ class MainWindow final : public QMainWindow
 		QAction *action_ask_save_ = nullptr;
 		QProgressBar *progress_bar_ = nullptr;
 		QLabel *label_ = nullptr;
-		Output output_;
+		Log log_;
 
 	public slots:
 		void slotRender();
