@@ -48,7 +48,6 @@ class Log final
 	public:
 		void append(const LogEntry &log_entry) { data_.emplace_back(log_entry); }
 		std::vector<LogEntry> getLog() const { return data_; }
-		static void loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data);
 
 	private:
 		std::vector<LogEntry> data_;

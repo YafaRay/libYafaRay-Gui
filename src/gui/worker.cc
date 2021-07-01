@@ -45,11 +45,11 @@ void Worker::run()
 	yafaray_paramsSetString(yafaray_interface_, "type", "callback_output");
 	yafaray_createOutput(yafaray_interface_, "test_callback_output", YAFARAY_BOOL_TRUE);
 
-	yafaray_setOutputPutPixelCallback(yafaray_interface_, "test_callback_output", Output::putPixelCallback, static_cast<void *>(main_window_->render_widget_.get()));
-	yafaray_setOutputFlushAreaCallback(yafaray_interface_, "test_callback_output", Output::flushAreaCallback, static_cast<void *>(main_window_->render_widget_.get()));
-	yafaray_setOutputFlushCallback(yafaray_interface_, "test_callback_output", Output::flushCallback, static_cast<void *>(main_window_->render_widget_.get()));
-	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", Output::highlightCallback, static_cast<void *>(main_window_->render_widget_.get()));
-	if(yafaray_interface_) yafaray_render(yafaray_interface_, Output::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
+	yafaray_setOutputPutPixelCallback(yafaray_interface_, "test_callback_output", MainWindow::putPixelCallback, static_cast<void *>(main_window_->render_widget_.get()));
+	yafaray_setOutputFlushAreaCallback(yafaray_interface_, "test_callback_output", MainWindow::flushAreaCallback, static_cast<void *>(main_window_->render_widget_.get()));
+	yafaray_setOutputFlushCallback(yafaray_interface_, "test_callback_output", MainWindow::flushCallback, static_cast<void *>(main_window_->render_widget_.get()));
+	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", MainWindow::highlightCallback, static_cast<void *>(main_window_->render_widget_.get()));
+	if(yafaray_interface_) yafaray_render(yafaray_interface_, MainWindow::monitorCallback, main_window_, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
 	yafaray_removeOutput(yafaray_interface_, "test_callback_output");
 	yafaray_deallocateCharPointer(layers_table);
 	yafaray_deallocateCharPointer(views_table);

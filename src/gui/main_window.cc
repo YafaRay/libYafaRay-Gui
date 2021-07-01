@@ -62,7 +62,7 @@ BEGIN_YAFARAY_GUI_QT
 
 MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
 {
-	yafaray_setLoggingCallback(yafaray_interface_, Log::loggerCallback, static_cast<void *>(&log_));
+	yafaray_setLoggingCallback(yafaray_interface_, MainWindow::loggerCallback, static_cast<void *>(&log_));
 
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -531,6 +531,63 @@ void MainWindow::adjustWindow()
 	resize(minimumSize());
 	scroll_area_->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 	scroll_area_->setMinimumSize(0, 0);
+}
+
+
+
+void MainWindow::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_user_data)
+{
+	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
+	if(!render_widget) return;
+	//RgbaFloat rgba(r, g, b, a);
+	//output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
+	//if(strcmp(layer_name, "combined") == 0) render_widget->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
+
+	if(strcmp(layer_name, "combined") == 0)
+	{
+		const QColor color_ldr {
+				std::max(0, std::min(static_cast<int>(r * 255.f), 255)),
+				std::max(0, std::min(static_cast<int>(g * 255.f), 255)),
+				std::max(0, std::min(static_cast<int>(b * 255.f), 255)),
+				std::max(0, std::min(static_cast<int>(a * 255.f), 255)),
+		};
+		QCoreApplication::postEvent(render_widget, new PutPixelEvent(QPoint(x, y), color_ldr)); //FIXME VIEWS AND LAYERS
+	}
+}
+
+void MainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+{
+	//printf("**** flushAreaCallback view_name='%s', x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, x_0, y_0, x_1, y_1, callback_user_data);
+	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
+	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+}
+
+void MainWindow::flushCallback(const char *view_name, void *callback_user_data)
+{
+	//printf("**** flushCallback view_name='%s', callback_user_data=%p\n", view_name, callback_user_data);
+	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
+	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(), true));
+}
+
+void MainWindow::highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+{
+	//printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
+	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
+	if(render_widget) QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+}
+
+void MainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
+{
+	const auto main_window = static_cast<MainWindow *>(callback_user_data);
+	if(!main_window) return;
+	if(main_window->label_) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(tag));
+	if(main_window->progress_bar_) QCoreApplication::postEvent(main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
+}
+
+void MainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data)
+{
+	auto log = static_cast<Log *>(callback_user_data);
+	if(log) log->append({log_level, datetime, time_of_day, description});
 }
 
 END_YAFARAY_GUI_QT

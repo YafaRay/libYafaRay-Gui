@@ -19,7 +19,5 @@
 target_sources(libyafaray4_gui_qt
 	PRIVATE
 		version_build_info.cc
-		output.cc
 		images_collection.cc
-		log.cc
 )
