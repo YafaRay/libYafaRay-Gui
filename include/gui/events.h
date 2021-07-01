@@ -24,6 +24,7 @@
 #define YAFARAY_EVENTS_H
 
 #include "common/yafaray_gui_qt_common.h"
+#include "common/log.h"
 #include <QEvent>
 #include <QRect>
 #include <QString>
@@ -37,7 +38,8 @@ enum CustomEvents
 	PutPixel,
 	AreaHighlight,
 	ProgressUpdate,
-	ProgressUpdateTag
+	ProgressUpdateTag,
+	LogAppend,
 };
 
 // this event is just to trigger an update in a widget from
@@ -100,6 +102,16 @@ class ProgressUpdateTagEvent final  : public QEvent
 
 	private:
 		QString tag_;
+};
+
+class LogAppendEvent final  : public QEvent
+{
+	public:
+		explicit LogAppendEvent(const LogEntry &log_entry);
+		const LogEntry &getLogEntry() const { return log_entry_; }
+
+	private:
+		LogEntry log_entry_;
 };
 
 END_YAFARAY_GUI_QT

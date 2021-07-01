@@ -48,4 +48,9 @@ ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
 {
 }
 
+LogAppendEvent::LogAppendEvent(const LogEntry &log_entry)
+		: QEvent(static_cast<QEvent::Type>(LogAppend)), log_entry_(log_entry)
+{
+}
+
 END_YAFARAY_GUI_QT

@@ -338,6 +338,12 @@ bool MainWindow::event(QEvent *event)
 		label_->setText(p->getTag());
 		return true;
 	}
+	else if(event->type() == static_cast<QEvent::Type>(LogAppend))
+	{
+		const auto p = static_cast<LogAppendEvent *>(event);
+		log_.append(p->getLogEntry());
+		return true;
+	}
 	else return QMainWindow::event(event);
 }
 
@@ -568,36 +574,39 @@ void MainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int 
 {
 	//printf("**** flushAreaCallback view_name='%s', x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, x_0, y_0, x_1, y_1, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
-	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+	if(!render_widget) return;
+	QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
 }
 
 void MainWindow::flushCallback(const char *view_name, void *callback_user_data)
 {
 	//printf("**** flushCallback view_name='%s', callback_user_data=%p\n", view_name, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
-	if(render_widget) QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(), true));
+	if(!render_widget) return;
+	QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(), true));
 }
 
 void MainWindow::highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
 	//printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
-	if(render_widget) QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+	if(!render_widget) return;
+	QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
 }
 
 void MainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
 {
 	const auto main_window = static_cast<MainWindow *>(callback_user_data);
 	if(!main_window) return;
-	if(main_window->progress_bar_) QCoreApplication::postEvent(main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
+	QCoreApplication::postEvent(main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
 }
 
 void MainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data)
 {
 	const auto main_window = static_cast<MainWindow *>(callback_user_data);
 	if(!main_window) return;
-	main_window->log_.append({log_level, datetime, time_of_day, description});
-	if(main_window->label_ && (log_level == YAFARAY_LOG_LEVEL_INFO || log_level == YAFARAY_LOG_LEVEL_WARNING || log_level == YAFARAY_LOG_LEVEL_ERROR)) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(description));
+	QCoreApplication::postEvent(main_window, new LogAppendEvent({log_level, datetime, time_of_day, description}));
+	if(log_level == YAFARAY_LOG_LEVEL_INFO || log_level == YAFARAY_LOG_LEVEL_WARNING || log_level == YAFARAY_LOG_LEVEL_ERROR) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(description));
 }
 
 END_YAFARAY_GUI_QT
