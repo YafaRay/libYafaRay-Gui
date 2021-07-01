@@ -29,7 +29,7 @@ int yafaray_gui_qt_createRenderWidget(yafaray_Interface_t *yafaray_interface, in
 	yafaray_gui_qt::MainWindow w(yafaray_interface, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
 	w.show();
 	w.adjustWindow();
-	//if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();
+	if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();
 	return QApplication::exec();
 }
 
