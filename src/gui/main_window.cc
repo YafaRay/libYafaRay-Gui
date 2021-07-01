@@ -62,7 +62,7 @@ BEGIN_YAFARAY_GUI_QT
 
 MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
 {
-	yafaray_setLoggingCallback(yafaray_interface_, MainWindow::loggerCallback, static_cast<void *>(&log_));
+	yafaray_setLoggingCallback(yafaray_interface_, MainWindow::loggerCallback, static_cast<void *>(this));
 
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -358,11 +358,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::slotRender()
 {
-	action_render_->setVisible(false);
+	action_open_->setEnabled(false);
+	action_save_as_->setEnabled(false);
+	action_render_->setEnabled(false);
+/*
 	action_zoom_in_->setEnabled(false);
 	action_zoom_out_->setEnabled(false);
-	cancel_button_->setVisible(true);
-	action_cancel_->setVisible(true);
+*/
+	cancel_button_->setEnabled(true);
+	action_cancel_->setEnabled(true);
 
 	progress_bar_->show();
 	time_measure_.start();
@@ -413,11 +417,13 @@ void MainWindow::slotFinished()
 
 	render_widget_->finishRendering();
 	update();
-	action_render_->setVisible(true);
-	action_zoom_in_->setEnabled(true);
-	action_zoom_out_->setEnabled(true);
-	cancel_button_->setVisible(false);
-	action_cancel_->setVisible(false);
+	action_open_->setEnabled(true);
+	action_save_as_->setEnabled(true);
+	action_render_->setEnabled(true);
+/*	action_zoom_in_->setEnabled(true);
+	action_zoom_out_->setEnabled(true);*/
+	cancel_button_->setEnabled(false);
+	action_cancel_->setEnabled(false);
 	if(auto_close_)
 	{
 		if(render_cancelled_) QApplication::exit(1);
@@ -448,8 +454,17 @@ void MainWindow::slotSaveAs()
 bool MainWindow::openDlg()
 {
 #ifdef YAFARAY_GUI_QT_WITH_XML
-	const QString xml_file_path = QFileDialog::getOpenFileName(this, tr("Load YafaRay XML file"), last_path_, "*.xml");
-	return yafaray_xml_ParseFile(yafaray_interface_, xml_file_path.toStdString().c_str());
+	const std::string xml_file_path = QFileDialog::getOpenFileName(this, tr("Load YafaRay XML file"), last_path_, "*.xml").toStdString();
+	if(xml_file_path.empty()) return false;
+	else
+	{
+		yafaray_clearAll(yafaray_interface_);
+		yafaray_printInfo(yafaray_interface_, ("Clearing interface and scene and loading xml file '" + xml_file_path + "'").c_str());
+		const bool parsing_result_ok = yafaray_xml_ParseFile(yafaray_interface_, xml_file_path.c_str());
+		if(parsing_result_ok) yafaray_printInfo(yafaray_interface_, ("Xml file '" + xml_file_path + "' loaded").c_str());
+		else yafaray_printWarning(yafaray_interface_, ("Xml file '" + xml_file_path + "' could not be loaded. Scene/interface is empty now!").c_str());
+		return parsing_result_ok;
+	}
 #else
 	yafaray_printError(yafaray_interface_, "libYafaRay-Gui-Qt is built without XML support, cannot open the file");
 	return false;
@@ -484,12 +499,8 @@ bool MainWindow::closeUnsaved()
 void MainWindow::slotCancel()
 {
 	yafaray_cancel(yafaray_interface_);
-	worker_->wait();
-	action_render_->setVisible(true);
-	action_zoom_in_->setEnabled(true);
-	action_zoom_out_->setEnabled(true);
-	cancel_button_->setVisible(false);
-	action_cancel_->setVisible(false);
+	cancel_button_->setEnabled(false);
+	action_cancel_->setEnabled(false);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -532,8 +543,6 @@ void MainWindow::adjustWindow()
 	scroll_area_->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 	scroll_area_->setMinimumSize(0, 0);
 }
-
-
 
 void MainWindow::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_user_data)
 {
@@ -580,14 +589,15 @@ void MainWindow::monitorCallback(int steps_total, int steps_done, const char *ta
 {
 	const auto main_window = static_cast<MainWindow *>(callback_user_data);
 	if(!main_window) return;
-	if(main_window->label_) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(tag));
 	if(main_window->progress_bar_) QCoreApplication::postEvent(main_window, new ProgressUpdateEvent(steps_done, 0, steps_total));
 }
 
 void MainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data)
 {
-	auto log = static_cast<Log *>(callback_user_data);
-	if(log) log->append({log_level, datetime, time_of_day, description});
+	const auto main_window = static_cast<MainWindow *>(callback_user_data);
+	if(!main_window) return;
+	main_window->log_.append({log_level, datetime, time_of_day, description});
+	if(main_window->label_ && (log_level == YAFARAY_LOG_LEVEL_INFO || log_level == YAFARAY_LOG_LEVEL_WARNING || log_level == YAFARAY_LOG_LEVEL_ERROR)) QCoreApplication::postEvent(main_window, new ProgressUpdateTagEvent(description));
 }
 
 END_YAFARAY_GUI_QT
