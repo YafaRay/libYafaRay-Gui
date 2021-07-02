@@ -145,10 +145,10 @@ bool RenderWidget::event(QEvent *event)
 	{
 		const auto ge = static_cast<PutPixelEvent *>(event);
 		ge->accept();
-		//buffer_mutex_.lock();
+		buffer_mutex_.lock();
 		const auto coords = ge->getCoords();
 		setPixel(coords.x(), coords.y(), ge->getColor());
-		//buffer_mutex_.unlock();
+		buffer_mutex_.unlock();
 		update();
 		return true;
 	}
@@ -156,6 +156,7 @@ bool RenderWidget::event(QEvent *event)
 	{
 		const auto ge = static_cast<FlushEvent *>(event);
 		ge->accept();
+		buffer_mutex_.lock();
 		const int width = static_cast<int>(output_->images_collection_.getWidth());
 		const int height = static_cast<int>(output_->images_collection_.getHeight());
 		for(int x = 0; x < width; ++x)
@@ -167,6 +168,7 @@ bool RenderWidget::event(QEvent *event)
 				setPixel(x, y, qcol);
 			}
 		}
+		buffer_mutex_.unlock();
 		update();
 		return true;
 	}
@@ -174,6 +176,7 @@ bool RenderWidget::event(QEvent *event)
 	{
 		const auto ge = static_cast<FlushAreaEvent *>(event);
 		ge->accept();
+		buffer_mutex_.lock();
 		int x_0, x_1, y_0, y_1;
 		ge->getRect().getCoords(&x_0, &y_0, &x_1, &y_1);
 		for(int x = x_0; x < x_1; ++x)
@@ -185,6 +188,7 @@ bool RenderWidget::event(QEvent *event)
 				setPixel(x, y, qcol);
 			}
 		}
+		buffer_mutex_.unlock();
 		update();
 		return true;
 	}

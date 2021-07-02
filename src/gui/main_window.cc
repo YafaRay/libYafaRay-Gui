@@ -595,7 +595,7 @@ void MainWindow::highlightCallback(const char *view_name, int area_number, int x
 	//printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
 	if(!render_widget) return;
-	QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+	QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(QPoint(x_0, y_0), QPoint(x_1, y_1))));
 }
 
 void MainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
