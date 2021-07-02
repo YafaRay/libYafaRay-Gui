@@ -30,8 +30,17 @@ class RgbaFloat
 	public:
 		RgbaFloat() = default;
 		RgbaFloat(float r, float g, float b, float a = 1.f) : r_(r), g_(g), b_(b), a_(a) { }
+		float getR() const { return r_; }
+		float getG() const { return g_; }
+		float getB() const { return b_; }
+		float getA() const { return a_; }
+		unsigned char getR8Bit() const { return floatColorTo8Bit(r_); }
+		unsigned char getG8Bit() const { return floatColorTo8Bit(g_); }
+		unsigned char getB8Bit() const { return floatColorTo8Bit(b_); }
+		unsigned char getA8Bit() const { return floatColorTo8Bit(a_); }
 
 	private:
+		static unsigned char floatColorTo8Bit(float color_float) { return static_cast<unsigned char>(std::max(0.f, std::min(color_float, 1.f) * 255.f)); }
 		float r_ = 0.f;
 		float g_ = 0.f;
 		float b_ = 0.f;

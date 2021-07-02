@@ -21,6 +21,7 @@
 #include "gui/events.h"
 #include "gui/animworking.h"
 #include "gui/worker.h"
+#include "common/image.h"
 #include <yafaray_c_api.h>
 #include <yafaray_xml_c_api.h>
 
@@ -552,13 +553,13 @@ void MainWindow::adjustWindow()
 
 void MainWindow::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_user_data)
 {
-	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
-	if(!render_widget) return;
-	//RgbaFloat rgba(r, g, b, a);
-	//output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
-	//if(strcmp(layer_name, "combined") == 0) render_widget->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
+	const auto output = static_cast<Output *>(callback_user_data);
+	if(!output) return;
+	RgbaFloat rgba(r, g, b, a);
+	output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
+	//if(strcmp(layer_name, "combined") == 0) output->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
 
-	if(strcmp(layer_name, "combined") == 0)
+/*	if(strcmp(layer_name, "combined") == 0)
 	{
 		const QColor color_ldr {
 				std::max(0, std::min(static_cast<int>(r * 255.f), 255)),
@@ -567,7 +568,7 @@ void MainWindow::putPixelCallback(const char *view_name, const char *layer_name,
 				std::max(0, std::min(static_cast<int>(a * 255.f), 255)),
 		};
 		QCoreApplication::postEvent(render_widget, new PutPixelEvent(QPoint(x, y), color_ldr)); //FIXME VIEWS AND LAYERS
-	}
+	}*/
 }
 
 void MainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
@@ -575,7 +576,9 @@ void MainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int 
 	//printf("**** flushAreaCallback view_name='%s', x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, x_0, y_0, x_1, y_1, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
 	if(!render_widget) return;
-	QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(x_0, y_0, x_1 - x_0, y_1 - y_0)));
+	const QRect rect { QPoint(x_0, y_0), QPoint(x_1, y_1) };
+	QCoreApplication::postEvent(render_widget, new FlushAreaEvent(0, rect));
+	QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(rect));
 }
 
 void MainWindow::flushCallback(const char *view_name, void *callback_user_data)
@@ -583,6 +586,7 @@ void MainWindow::flushCallback(const char *view_name, void *callback_user_data)
 	//printf("**** flushCallback view_name='%s', callback_user_data=%p\n", view_name, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
 	if(!render_widget) return;
+	QCoreApplication::postEvent(render_widget, new FlushEvent());
 	QCoreApplication::postEvent(render_widget, new GuiUpdateEvent(QRect(), true));
 }
 

@@ -24,6 +24,7 @@
 #define YAFARAY_GUI_QT_RENDERWIDGET_H
 
 #include "common/yafaray_gui_qt_common.h"
+#include "common/output.h"
 #include <QWidget>
 #include <QImage>
 #include <QPixmap>
@@ -50,6 +51,7 @@ class RenderWidget final : public QLabel
 		void zoomIn(QPoint center);
 		void zoomOut(QPoint center);
 		bool event(QEvent *event) override;
+		Output *output_ = nullptr;
 
 	private:
 		void initBuffers();

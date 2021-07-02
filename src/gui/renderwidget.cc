@@ -19,14 +19,15 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "gui/renderwidget.h"
+#include "gui/events.h"
+#include "common/image.h"
 #include <QDebug>
 #include <QApplication>
 #include <QPushButton>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPoint>
-#include "gui/renderwidget.h"
-#include "gui/events.h"
 
 BEGIN_YAFARAY_GUI_QT
 
@@ -151,10 +152,45 @@ bool RenderWidget::event(QEvent *event)
 		update();
 		return true;
 	}
+	else if(event->type() == static_cast<QEvent::Type>(Flush))
+	{
+		const auto ge = static_cast<FlushEvent *>(event);
+		ge->accept();
+		const int width = static_cast<int>(output_->images_collection_.getWidth());
+		const int height = static_cast<int>(output_->images_collection_.getHeight());
+		for(int x = 0; x < width; ++x)
+		{
+			for(int y = 0; y < height; ++y)
+			{
+				const RgbaFloat col = output_->images_collection_.getColor("view_1", "combined", x, y);
+				const QColor qcol { col.getR8Bit(), col.getG8Bit(), col.getB8Bit(), col.getA8Bit() };
+				setPixel(x, y, qcol);
+			}
+		}
+		update();
+		return true;
+	}
+	else if(event->type() == static_cast<QEvent::Type>(FlushArea))
+	{
+		const auto ge = static_cast<FlushAreaEvent *>(event);
+		ge->accept();
+		int x_0, x_1, y_0, y_1;
+		ge->getRect().getCoords(&x_0, &y_0, &x_1, &y_1);
+		for(int x = x_0; x < x_1; ++x)
+		{
+			for(int y = y_0; y < y_1; ++y)
+			{
+				const RgbaFloat col = output_->images_collection_.getColor("view_1", "combined", x, y);
+				const QColor qcol { col.getR8Bit(), col.getG8Bit(), col.getB8Bit(), col.getA8Bit() };
+				setPixel(x, y, qcol);
+			}
+		}
+		update();
+		return true;
+	}
 	else if(event->type() == static_cast<QEvent::Type>(AreaHighlight) && rendering_)
 	{
 		const auto ge = static_cast<AreaHighlightEvent *>(event);
-		buffer_mutex_.lock();
 		QPainter p(&pixmap_);
 		ge->accept();
 		const int line_l = std::min(4, std::min(ge->getRect().height() - 1, ge->getRect().width() - 1));
@@ -175,7 +211,6 @@ bool RenderWidget::event(QEvent *event)
 		//bottom-right corner
 		p.drawLine(br, QPoint(br.x() - line_l, br.y()));
 		p.drawLine(br, QPoint(br.x(), br.y() - line_l));
-		buffer_mutex_.unlock();
 		update(ge->getRect());
 		return true;
 	}

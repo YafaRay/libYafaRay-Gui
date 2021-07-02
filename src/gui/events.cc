@@ -33,6 +33,16 @@ PutPixelEvent::PutPixelEvent(const QPoint &point, const QColor &color)
 {
 }
 
+FlushEvent::FlushEvent()
+		: QEvent(static_cast<QEvent::Type>(Flush))
+{
+}
+
+FlushAreaEvent::FlushAreaEvent(int area_number, const QRect &rect)
+		: QEvent(static_cast<QEvent::Type>(FlushArea)), area_number_(area_number), rect_(rect)
+{
+}
+
 AreaHighlightEvent::AreaHighlightEvent(int area_number, const QRect &rect)
 	: QEvent(static_cast<QEvent::Type>(AreaHighlight)), area_number_(area_number), rect_(rect)
 {

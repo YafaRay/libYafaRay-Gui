@@ -57,9 +57,6 @@ class MainWindow final : public QMainWindow
 		std::unique_ptr<RenderWidget> render_widget_;
 		QScrollArea *scroll_area_ = nullptr;
 		QAction *action_ask_save_ = nullptr;
-		QProgressBar *progress_bar_ = nullptr;
-		QLabel *label_ = nullptr;
-		Log log_;
 
 	public slots:
 		void slotRender();
@@ -95,6 +92,8 @@ class MainWindow final : public QMainWindow
 		QAction *action_render_ = nullptr;
 		QAction *action_cancel_ = nullptr;
 		QPushButton *cancel_button_ = nullptr;
+		QProgressBar *progress_bar_ = nullptr;
+		QLabel *label_ = nullptr;
 
 		std::unique_ptr<Worker> worker_;
 		yafaray_Interface_t *yafaray_interface_ = nullptr;
@@ -106,6 +105,7 @@ class MainWindow final : public QMainWindow
 		bool render_saved_ = false;
 		bool ask_unsaved_ = false;
 		bool render_cancelled_ = false;
+		Log log_;
 };
 
 END_YAFARAY_GUI_QT

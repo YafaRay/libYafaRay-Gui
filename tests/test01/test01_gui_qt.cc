@@ -197,7 +197,7 @@ int main()
 	yafaray_setupRender(yi);
 	yafaray_paramsClearAll(yi);
 	/* Rendering */
-	yafaray_gui_qt_createRenderWidget(yi, 640, 480, 0, 0, YAFARAY_BOOL_TRUE, YAFARAY_BOOL_FALSE);
+	yafaray_gui_qt_createRenderWidget(yi, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
 	/* Destroying YafaRay interface. Scene and all objects inside are automatically destroyed */
 	yafaray_destroyInterface(yi);
 	yafaray_gui_qt_deallocateCharPointer(version_string);

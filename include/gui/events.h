@@ -36,6 +36,8 @@ enum CustomEvents
 {
 	GuiUpdate = QEvent::User,
 	PutPixel,
+	FlushArea,
+	Flush,
 	AreaHighlight,
 	ProgressUpdate,
 	ProgressUpdateTag,
@@ -66,6 +68,26 @@ class PutPixelEvent final  : public QEvent
 	private:
 		QPoint point_;
 		QColor color_;
+};
+
+class FlushEvent final  : public QEvent
+{
+	public:
+		explicit FlushEvent();
+
+	private:
+};
+
+class FlushAreaEvent final  : public QEvent
+{
+	public:
+		explicit FlushAreaEvent(int area_number, const QRect &rect);
+		QRect getRect() const { return rect_; }
+		int getAreaNumber() const { return area_number_; }
+
+	private:
+		int area_number_ = 0;
+		QRect rect_;
 };
 
 class AreaHighlightEvent final  : public QEvent
