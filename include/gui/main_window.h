@@ -22,7 +22,7 @@
 
 #include "common/yafaray_gui_qt_common.h"
 #include "common/log.h"
-#include <QtWidgets/QMainWindow>
+#include <QMainWindow>
 #include <QTime>
 #include <memory>
 
@@ -31,6 +31,7 @@ class QScrollArea;
 class QProgressBar;
 class QLabel;
 class QPushButton;
+class QTextEdit;
 
 BEGIN_YAFARAY_GUI_QT
 
@@ -55,6 +56,7 @@ class MainWindow final : public QMainWindow
 		static void loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data);
 
 		std::unique_ptr<RenderWidget> render_widget_;
+		QTextEdit *log_widget_;
 		QScrollArea *scroll_area_ = nullptr;
 		QAction *action_ask_save_ = nullptr;
 

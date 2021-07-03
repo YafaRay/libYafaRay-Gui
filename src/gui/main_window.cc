@@ -25,6 +25,8 @@
 #include <yafaray_c_api.h>
 #include <yafaray_xml_c_api.h>
 
+#include <QtWidgets>
+
 // Embedded Resources:
 // Images
 #include "resource/toolbar_z_buffer_icon.h"
@@ -40,19 +42,6 @@
 #include "resource/toolbar_zoomout_icon.h"
 #include "resource/toolbar_quit_icon.h"
 #include "resource/yafarayicon.h"
-
-#include <QSettings>
-#include <QAction>
-#include <QApplication>
-#include <QGridLayout>
-#include <QMenuBar>
-#include <QProgressBar>
-#include <QPushButton>
-#include <QToolBar>
-#include <QDesktopWidget>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QKeyEvent>
 // GUI Font
 #if !defined(__APPLE__) && defined(YAFARAY_GUI_QT_EMBEDDED_FONT)
 #include <QFontDatabase>
@@ -63,6 +52,8 @@ BEGIN_YAFARAY_GUI_QT
 
 MainWindow::MainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
 {
+	log_widget_ = new QTextEdit(this);
+	log_widget_->setReadOnly(true);
 	yafaray_setLoggingCallback(yafaray_interface_, MainWindow::loggerCallback, static_cast<void *>(this));
 
 	QCoreApplication::setOrganizationName("YafaRay Team");
@@ -160,6 +151,13 @@ void MainWindow::setup()
 	addToolBar(Qt::TopToolBarArea, tool_bar);
 
 	setButtonsIcons();
+
+	auto dock = new QDockWidget(tr("Log"), this);
+	dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	dock->setWidget(log_widget_);
+	addDockWidget(Qt::BottomDockWidgetArea, dock);
+	menu_bar->addAction(dock->toggleViewAction());
+	tool_bar->addAction(dock->toggleViewAction());
 }
 
 void MainWindow::setupActions()
@@ -342,7 +340,20 @@ bool MainWindow::event(QEvent *event)
 	else if(event->type() == static_cast<QEvent::Type>(LogAppend))
 	{
 		const auto p = static_cast<LogAppendEvent *>(event);
-		log_.append(p->getLogEntry());
+		const LogEntry log_entry = p->getLogEntry();
+		log_.append(log_entry);
+		std::string log_entry_type;
+		switch(log_entry.getLogLevel())
+		{
+			case YAFARAY_LOG_LEVEL_DEBUG: log_entry_type = "DEBUG"; break;
+			case YAFARAY_LOG_LEVEL_VERBOSE: log_entry_type = "VERB"; break;
+			case YAFARAY_LOG_LEVEL_INFO: log_entry_type = "INFO"; break;
+			case YAFARAY_LOG_LEVEL_PARAMS: log_entry_type = "PARM"; break;
+			case YAFARAY_LOG_LEVEL_WARNING: log_entry_type = "WARNING"; break;
+			case YAFARAY_LOG_LEVEL_ERROR: log_entry_type = "ERROR"; break;
+			default: log_entry_type = "LOG"; break;
+		}
+		log_widget_->append(("[" + log_entry.getTimeOfDay() + "] " + log_entry_type + ": " + log_entry.getDescription()).c_str());
 		return true;
 	}
 	else return QMainWindow::event(event);
@@ -368,10 +379,6 @@ void MainWindow::slotRender()
 	action_open_->setEnabled(false);
 	action_save_as_->setEnabled(false);
 	action_render_->setEnabled(false);
-/*
-	action_zoom_in_->setEnabled(false);
-	action_zoom_out_->setEnabled(false);
-*/
 	cancel_button_->setEnabled(true);
 	action_cancel_->setEnabled(true);
 
@@ -379,6 +386,26 @@ void MainWindow::slotRender()
 	time_measure_.start();
 	render_widget_->startRendering();
 	render_saved_ = false;
+	yafaray_setInteractive(yafaray_interface_, YAFARAY_BOOL_TRUE);
+	const int output_width = yafaray_getSceneFilmWidth(yafaray_interface_);
+	const int output_height = yafaray_getSceneFilmHeight(yafaray_interface_);
+	this->render_widget_->output_ = new Output(output_width, output_height);
+	char *views_table = yafaray_getViewsTable(yafaray_interface_);
+	char *layers_table = yafaray_getLayersTable(yafaray_interface_);
+	yafaray_printVerbose(yafaray_interface_, views_table);
+	yafaray_printVerbose(yafaray_interface_, layers_table);
+	yafaray_deallocateCharPointer(layers_table);
+	yafaray_deallocateCharPointer(views_table);
+
+	this->render_widget_->setup(QSize(output_width, output_height));
+
+	yafaray_paramsSetString(yafaray_interface_, "type", "callback_output");
+	yafaray_createOutput(yafaray_interface_, "test_callback_output", YAFARAY_BOOL_TRUE);
+
+	yafaray_setOutputPutPixelCallback(yafaray_interface_, "test_callback_output", MainWindow::putPixelCallback, static_cast<void *>(this->render_widget_->output_));
+	yafaray_setOutputFlushAreaCallback(yafaray_interface_, "test_callback_output", MainWindow::flushAreaCallback, static_cast<void *>(this->render_widget_.get()));
+	yafaray_setOutputFlushCallback(yafaray_interface_, "test_callback_output", MainWindow::flushCallback, static_cast<void *>(this->render_widget_.get()));
+	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", MainWindow::highlightCallback, static_cast<void *>(this->render_widget_.get()));
 	worker_->start();
 }
 
@@ -427,8 +454,6 @@ void MainWindow::slotFinished()
 	action_open_->setEnabled(true);
 	action_save_as_->setEnabled(true);
 	action_render_->setEnabled(true);
-/*	action_zoom_in_->setEnabled(true);
-	action_zoom_out_->setEnabled(true);*/
 	cancel_button_->setEnabled(false);
 	action_cancel_->setEnabled(false);
 	if(auto_close_)
@@ -438,6 +463,11 @@ void MainWindow::slotFinished()
 		return;
 	}
 	progress_bar_->hide();
+
+	yafaray_removeOutput(yafaray_interface_, "test_callback_output");
+	delete this->render_widget_->output_;
+	this->render_widget_->output_ = nullptr;
+
 	QApplication::alert(this);
 }
 
@@ -557,23 +587,10 @@ void MainWindow::putPixelCallback(const char *view_name, const char *layer_name,
 	if(!output) return;
 	RgbaFloat rgba(r, g, b, a);
 	output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
-	//if(strcmp(layer_name, "combined") == 0) output->setPixel(x, y, QColor(r * 255.f, g * 255.f, b * 255.f, a * 255.f)); //FIXME VIEWS AND LAYERS
-
-/*	if(strcmp(layer_name, "combined") == 0)
-	{
-		const QColor color_ldr {
-				std::max(0, std::min(static_cast<int>(r * 255.f), 255)),
-				std::max(0, std::min(static_cast<int>(g * 255.f), 255)),
-				std::max(0, std::min(static_cast<int>(b * 255.f), 255)),
-				std::max(0, std::min(static_cast<int>(a * 255.f), 255)),
-		};
-		QCoreApplication::postEvent(render_widget, new PutPixelEvent(QPoint(x, y), color_ldr)); //FIXME VIEWS AND LAYERS
-	}*/
 }
 
 void MainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
-	//printf("**** flushAreaCallback view_name='%s', x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, x_0, y_0, x_1, y_1, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
 	if(!render_widget) return;
 	const QRect rect { QPoint(x_0, y_0), QPoint(x_1, y_1) };
@@ -583,7 +600,6 @@ void MainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int 
 
 void MainWindow::flushCallback(const char *view_name, void *callback_user_data)
 {
-	//printf("**** flushCallback view_name='%s', callback_user_data=%p\n", view_name, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
 	if(!render_widget) return;
 	QCoreApplication::postEvent(render_widget, new FlushEvent());
@@ -592,7 +608,6 @@ void MainWindow::flushCallback(const char *view_name, void *callback_user_data)
 
 void MainWindow::highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
-	//printf("**** highlightAreaCallback view_name='%s', area_number=%d, x_0=%d, y_0=%d, x_1=%d, y_1=%d, callback_user_data=%p\n", view_name, area_number, x_0, y_0, x_1, y_1, callback_user_data);
 	const auto render_widget = static_cast<RenderWidget *>(callback_user_data);
 	if(!render_widget) return;
 	QCoreApplication::postEvent(render_widget, new AreaHighlightEvent(area_number, QRect(QPoint(x_0, y_0), QPoint(x_1, y_1))));
