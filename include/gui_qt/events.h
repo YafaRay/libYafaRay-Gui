@@ -1,7 +1,7 @@
 #pragma once
 /****************************************************************************
  *      events.h: custom events to enable thread communication to the UI
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *      Copyright (C) 2009 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -23,7 +23,7 @@
 #ifndef YAFARAY_EVENTS_H
 #define YAFARAY_EVENTS_H
 
-#include "common/yafaray_gui_qt_common.h"
+#include "common/yafaray_gui_common.h"
 #include "common/log.h"
 #include <QEvent>
 #include <QRect>
@@ -32,7 +32,7 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-enum CustomEvents
+enum QtCustomEvents
 {
 	GuiUpdate = QEvent::User,
 	PutPixel,
@@ -46,10 +46,10 @@ enum CustomEvents
 
 // this event is just to trigger an update in a widget from
 // outside the main thread
-class GuiUpdateEvent final : public QEvent
+class QtGuiUpdateEvent final : public QEvent
 {
 	public:
-		explicit GuiUpdateEvent(const QRect &rect, bool full_update = false);
+		explicit QtGuiUpdateEvent(const QRect &rect, bool full_update = false);
 		QRect getRect() const { return rect_; }
 		bool isFullUpdate() const { return full_update_; }
 
@@ -58,10 +58,10 @@ class GuiUpdateEvent final : public QEvent
 		bool full_update_;
 };
 
-class PutPixelEvent final  : public QEvent
+class QtPutPixelEvent final  : public QEvent
 {
 	public:
-		explicit PutPixelEvent(const QPoint &point, const QColor &color);
+		explicit QtPutPixelEvent(const QPoint &point, const QColor &color);
 		QPoint getCoords() const { return point_; }
 		QColor getColor() const { return color_; }
 
@@ -70,18 +70,18 @@ class PutPixelEvent final  : public QEvent
 		QColor color_;
 };
 
-class FlushEvent final  : public QEvent
+class QtFlushEvent final  : public QEvent
 {
 	public:
-		explicit FlushEvent();
+		explicit QtFlushEvent();
 
 	private:
 };
 
-class FlushAreaEvent final  : public QEvent
+class QtFlushAreaEvent final  : public QEvent
 {
 	public:
-		explicit FlushAreaEvent(int area_number, const QRect &rect);
+		explicit QtFlushAreaEvent(int area_number, const QRect &rect);
 		QRect getRect() const { return rect_; }
 		int getAreaNumber() const { return area_number_; }
 
@@ -90,10 +90,10 @@ class FlushAreaEvent final  : public QEvent
 		QRect rect_;
 };
 
-class AreaHighlightEvent final  : public QEvent
+class QtAreaHighlightEvent final  : public QEvent
 {
 	public:
-		explicit AreaHighlightEvent(int area_number, const QRect &rect);
+		explicit QtAreaHighlightEvent(int area_number, const QRect &rect);
 		QRect getRect() const { return rect_; }
 		int getAreaNumber() const { return area_number_; }
 
@@ -102,10 +102,10 @@ class AreaHighlightEvent final  : public QEvent
 		QRect rect_;
 };
 
-class ProgressUpdateEvent final  : public QEvent
+class QtProgressUpdateEvent final  : public QEvent
 {
 	public:
-		explicit ProgressUpdateEvent(int current_steps, int min_steps = 0, int max_steps = 100);
+		explicit QtProgressUpdateEvent(int current_steps, int min_steps = 0, int max_steps = 100);
 		int getCurrentSteps() const { return current_steps_; }
 		int getMinSteps() const { return min_steps_; }
 		int getMaxSteps() const { return max_steps_; }
@@ -116,20 +116,20 @@ class ProgressUpdateEvent final  : public QEvent
 		int max_steps_;
 };
 
-class ProgressUpdateTagEvent final  : public QEvent
+class QtProgressUpdateTagEvent final  : public QEvent
 {
 	public:
-		explicit ProgressUpdateTagEvent(const char *tag);
+		explicit QtProgressUpdateTagEvent(const char *tag);
 		const QString &getTag() const { return tag_; }
 
 	private:
 		QString tag_;
 };
 
-class LogAppendEvent final  : public QEvent
+class QtLogAppendEvent final  : public QEvent
 {
 	public:
-		explicit LogAppendEvent(const LogEntry &log_entry);
+		explicit QtLogAppendEvent(const LogEntry &log_entry);
 		const LogEntry &getLogEntry() const { return log_entry_; }
 
 	private:

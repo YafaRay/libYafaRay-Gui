@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -19,31 +19,31 @@
  */
 
 #include "common/version_build_info.h"
-#include "yafaray_gui_qt_version_build_info.h"
+#include "yafaray_gui_version_build_info.h"
 
 BEGIN_YAFARAY_GUI_QT
 
-std::string buildinfo::getVersionString() { return YAFARAY_GUI_QT_VERSION_STRING + getGitLine(false); }
-std::string buildinfo::getVersionDescription() { return YAFARAY_GUI_QT_VERSION_DESCRIPTION; }
-int buildinfo::getVersionMajor() { return YAFARAY_GUI_QT_VERSION_MAJOR; }
-int buildinfo::getVersionMinor() { return YAFARAY_GUI_QT_VERSION_MINOR; }
-int buildinfo::getVersionPatch() { return YAFARAY_GUI_QT_VERSION_PATCH; }
-std::string buildinfo::getVersionPreRelease() { return YAFARAY_GUI_QT_VERSION_PRE_RELEASE; }
-std::string buildinfo::getVersionPreReleaseDescription() { return YAFARAY_GUI_QT_VERSION_PRE_RELEASE_DESCRIPTION; }
-std::string buildinfo::getGitDescribe() { return YAFARAY_GUI_QT_VERSION_GIT; }
-std::string buildinfo::getGitTag() { return YAFARAY_GUI_QT_VERSION_GIT_TAG; }
-std::string buildinfo::getGitBranch() { return YAFARAY_GUI_QT_VERSION_GIT_BRANCH; }
-std::string buildinfo::getGitDirty() { return YAFARAY_GUI_QT_VERSION_GIT_DIRTY; }
-std::string buildinfo::getGitCommit() { return YAFARAY_GUI_QT_VERSION_GIT_COMMIT; }
-std::string buildinfo::getGitCommitDateTime() { return YAFARAY_GUI_QT_VERSION_GIT_COMMIT_DATETIME; }
-std::string buildinfo::getCommitsSinceTag() { return YAFARAY_GUI_QT_VERSION_GIT_COMMITS_SINCE_TAG; }
-std::string buildinfo::getBuildArchitectureBits() { return YAFARAY_GUI_QT_BUILD_ARCHITECTURE_BITS; }
-std::string buildinfo::getBuildCompiler() { return YAFARAY_GUI_QT_BUILD_COMPILER; }
-std::string buildinfo::getBuildCompilerVersion() { return YAFARAY_GUI_QT_BUILD_COMPILER_VERSION; }
-std::string buildinfo::getBuildOs() { return YAFARAY_GUI_QT_BUILD_OS; }
-std::string buildinfo::getBuildType() { return YAFARAY_GUI_QT_BUILD_TYPE; }
-std::string buildinfo::getBuildOptions() { return YAFARAY_GUI_QT_BUILD_OPTIONS; }
-std::string buildinfo::getBuildFlags() { return YAFARAY_GUI_QT_BUILD_FLAGS; }
+std::string buildinfo::getVersionString() { return YAFARAY_GUI_VERSION_STRING + getGitLine(false); }
+std::string buildinfo::getVersionDescription() { return YAFARAY_GUI_VERSION_DESCRIPTION; }
+int buildinfo::getVersionMajor() { return YAFARAY_GUI_VERSION_MAJOR; }
+int buildinfo::getVersionMinor() { return YAFARAY_GUI_VERSION_MINOR; }
+int buildinfo::getVersionPatch() { return YAFARAY_GUI_VERSION_PATCH; }
+std::string buildinfo::getVersionPreRelease() { return YAFARAY_GUI_VERSION_PRE_RELEASE; }
+std::string buildinfo::getVersionPreReleaseDescription() { return YAFARAY_GUI_VERSION_PRE_RELEASE_DESCRIPTION; }
+std::string buildinfo::getGitDescribe() { return YAFARAY_GUI_VERSION_GIT; }
+std::string buildinfo::getGitTag() { return YAFARAY_GUI_VERSION_GIT_TAG; }
+std::string buildinfo::getGitBranch() { return YAFARAY_GUI_VERSION_GIT_BRANCH; }
+std::string buildinfo::getGitDirty() { return YAFARAY_GUI_VERSION_GIT_DIRTY; }
+std::string buildinfo::getGitCommit() { return YAFARAY_GUI_VERSION_GIT_COMMIT; }
+std::string buildinfo::getGitCommitDateTime() { return YAFARAY_GUI_VERSION_GIT_COMMIT_DATETIME; }
+std::string buildinfo::getCommitsSinceTag() { return YAFARAY_GUI_VERSION_GIT_COMMITS_SINCE_TAG; }
+std::string buildinfo::getBuildArchitectureBits() { return YAFARAY_GUI_BUILD_ARCHITECTURE_BITS; }
+std::string buildinfo::getBuildCompiler() { return YAFARAY_GUI_BUILD_COMPILER; }
+std::string buildinfo::getBuildCompilerVersion() { return YAFARAY_GUI_BUILD_COMPILER_VERSION; }
+std::string buildinfo::getBuildOs() { return YAFARAY_GUI_BUILD_OS; }
+std::string buildinfo::getBuildType() { return YAFARAY_GUI_BUILD_TYPE; }
+std::string buildinfo::getBuildOptions() { return YAFARAY_GUI_BUILD_OPTIONS; }
+std::string buildinfo::getBuildFlags() { return YAFARAY_GUI_BUILD_FLAGS; }
 std::string buildinfo::getBuildTypeSuffix()
 {
 	const std::string build_type = getBuildType();

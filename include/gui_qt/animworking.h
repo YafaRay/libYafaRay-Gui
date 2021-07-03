@@ -1,6 +1,8 @@
 #pragma once
 /****************************************************************************
- *      This is part of the libYafaRay-Gui-Qt package
+ *      animworking.h: a widget to show something is being processed
+ *      This is part of the libYafaRay-Gui package
+ *      Copyright (C) 2009 Gustavo Pichorim Boiko
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -17,10 +19,33 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef YAFARAY_GUI_QT_COMMON_H
-#define YAFARAY_GUI_QT_COMMON_H
 
-#define BEGIN_YAFARAY_GUI_QT namespace yafaray_gui_qt {
-#define END_YAFARAY_GUI_QT }
+#ifndef YAFARAY_ANIMWORKING_H
+#define YAFARAY_ANIMWORKING_H
 
-#endif /* YAFARAY_GUI_QT_COMMON_H */
+#include "common/yafaray_gui_common.h"
+#include <QWidget>
+#include <vector>
+
+BEGIN_YAFARAY_GUI_QT
+
+class QtAnimWorking final : public QWidget
+{
+		Q_OBJECT
+
+	public:
+		explicit QtAnimWorking(QWidget *parent = nullptr);
+
+	private:
+		void paintEvent(QPaintEvent *event) override;
+		void timerEvent(QTimerEvent *event) override;
+
+		std::vector<QPixmap> sprites_;
+		size_t timer_act_frame_ = 0;
+		int timer_id_ = -1;
+		static const size_t timer_top_frame_ = 50;
+};
+
+END_YAFARAY_GUI_QT
+
+#endif // YAFARAY_ANIMWORKING_H

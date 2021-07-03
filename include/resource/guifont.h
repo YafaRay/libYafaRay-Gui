@@ -1,4 +1,4 @@
-// Font for buffer window - yafarayqt.dll (Bitstream Vera Sans)
+// Font for buffer window (Bitstream Vera Sans)
 /*
 Bitstream Vera Fonts Copyright
 The fonts have a generous copyright, allowing derivative works (as long as "Bitstream" or "Vera" are not in the names),

@@ -1,6 +1,6 @@
 /****************************************************************************
  *      events.cc: custom events to enable thread communication to the UI
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *      Copyright (C) 2009 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -19,46 +19,46 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/events.h"
+#include "gui_qt/events.h"
 
 BEGIN_YAFARAY_GUI_QT
 
-GuiUpdateEvent::GuiUpdateEvent(const QRect &rect, bool full_update)
+QtGuiUpdateEvent::QtGuiUpdateEvent(const QRect &rect, bool full_update)
 	: QEvent(static_cast<QEvent::Type>(GuiUpdate)), rect_(rect), full_update_(full_update)
 {
 }
 
-PutPixelEvent::PutPixelEvent(const QPoint &point, const QColor &color)
+QtPutPixelEvent::QtPutPixelEvent(const QPoint &point, const QColor &color)
 		: QEvent(static_cast<QEvent::Type>(PutPixel)), point_(point), color_(color)
 {
 }
 
-FlushEvent::FlushEvent()
+QtFlushEvent::QtFlushEvent()
 		: QEvent(static_cast<QEvent::Type>(Flush))
 {
 }
 
-FlushAreaEvent::FlushAreaEvent(int area_number, const QRect &rect)
+QtFlushAreaEvent::QtFlushAreaEvent(int area_number, const QRect &rect)
 		: QEvent(static_cast<QEvent::Type>(FlushArea)), area_number_(area_number), rect_(rect)
 {
 }
 
-AreaHighlightEvent::AreaHighlightEvent(int area_number, const QRect &rect)
+QtAreaHighlightEvent::QtAreaHighlightEvent(int area_number, const QRect &rect)
 	: QEvent(static_cast<QEvent::Type>(AreaHighlight)), area_number_(area_number), rect_(rect)
 {
 }
 
-ProgressUpdateEvent::ProgressUpdateEvent(int current_steps, int min_steps, int max_steps)
+QtProgressUpdateEvent::QtProgressUpdateEvent(int current_steps, int min_steps, int max_steps)
 	: QEvent(static_cast<QEvent::Type>(ProgressUpdate)), current_steps_(current_steps), min_steps_(min_steps), max_steps_(max_steps)
 {
 }
 
-ProgressUpdateTagEvent::ProgressUpdateTagEvent(const char *tag)
+QtProgressUpdateTagEvent::QtProgressUpdateTagEvent(const char *tag)
 	: QEvent(static_cast<QEvent::Type>(ProgressUpdateTag)), tag_(tag)
 {
 }
 
-LogAppendEvent::LogAppendEvent(const LogEntry &log_entry)
+QtLogAppendEvent::QtLogAppendEvent(const LogEntry &log_entry)
 		: QEvent(static_cast<QEvent::Type>(LogAppend)), log_entry_(log_entry)
 {
 }

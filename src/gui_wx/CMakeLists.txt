@@ -1,5 +1,5 @@
 #****************************************************************************
-#      This is part of the libYafaRay-Gui-Qt package
+#      This is part of the libYafaRay-Gui package
 #
 #      This library is free software; you can redistribute it and/or
 #      modify it under the terms of the GNU Lesser General Public
@@ -16,16 +16,7 @@
 #      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-target_sources(libyafaray4_gui_qt
+target_sources(libyafaray4_gui
 	PRIVATE
-		animworking.cc
-		events.cc
-		renderwidget.cc
-		worker.cc
-		main_window.cc
-		#Adding directly all include files with classes containing "Q_OBJECT" for Qt MOC to generate proper code and linking virtual parent Qt classes correctly
-		${PROJECT_SOURCE_DIR}/include/gui/animworking.h
-		${PROJECT_SOURCE_DIR}/include/gui/renderwidget.h #For Qt MOC to generate proper code
-		${PROJECT_SOURCE_DIR}/include/gui/worker.h #For Qt MOC to generate proper code
-		${PROJECT_SOURCE_DIR}/include/gui/main_window.h #For Qt MOC to generate proper code
+
 )

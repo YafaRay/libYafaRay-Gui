@@ -1,7 +1,7 @@
 #pragma once
 /****************************************************************************
  *      renderwidget.h: the widget for displaying the render output
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *      Copyright (C) 2008 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -20,10 +20,10 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef YAFARAY_GUI_QT_RENDERWIDGET_H
-#define YAFARAY_GUI_QT_RENDERWIDGET_H
+#ifndef YAFARAY_GUI_RENDERWIDGET_H
+#define YAFARAY_GUI_RENDERWIDGET_H
 
-#include "common/yafaray_gui_qt_common.h"
+#include "common/yafaray_gui_common.h"
 #include "common/output.h"
 #include <QWidget>
 #include <QImage>
@@ -35,12 +35,12 @@
 
 BEGIN_YAFARAY_GUI_QT
 
-class RenderWidget final : public QLabel
+class QtRenderWidget final : public QLabel
 {
 		Q_OBJECT
 
 	public:
-		explicit RenderWidget(QScrollArea *parent = nullptr);
+		explicit QtRenderWidget(QScrollArea *parent = nullptr);
 		void setup(const QSize &size);
 		void setRenderBorderStart(const QPoint &start) { border_start_ = start; }
 		void startRendering();
@@ -84,4 +84,4 @@ class RenderWidget final : public QLabel
 
 END_YAFARAY_GUI_QT
 
-#endif //YAFARAY_GUI_QT_RENDERWIDGET_H
+#endif //YAFARAY_GUI_RENDERWIDGET_H

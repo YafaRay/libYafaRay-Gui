@@ -1,13 +1,13 @@
-libYafaRay-Gui-Qt ChangeLog
-===========================
-Important: read the README file for installation instructions and important information about libYafaRay-Gui-Qt
+libYafaRay-Gui ChangeLog
+========================
+Important: read the README file for installation instructions and important information about libYafaRay-Gui
 
 This is an abbreviated list of changes. The full/detailed list of changes can be seen at:
-* libYafaRay-Gui-Qt code: https://github.com/YafaRay/libYafaRay-Gui-Qt
+* libYafaRay-Gui code: https://github.com/YafaRay/libYafaRay-Gui
 
-(2021-06-22) VERY IMPORTANT! Split libYafaRay-Gui-Qt from core libYafaRay
+(2021-06-22) VERY IMPORTANT! Split libYafaRay-Gui from core libYafaRay
 -------------------------------------------------------------------------
-* Dedicated repository for libYafaRay-Gui-Qt
+* Dedicated repository for libYafaRay-Gui
 * Removed all code unrelated to Qt GUI
 * Now using libYafaRay as a dependency for all the core code
 * Using libYafaRay-Xml as an optional dependency for XML files loading

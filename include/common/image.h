@@ -1,6 +1,6 @@
 #pragma once
 /****************************************************************************
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -17,10 +17,10 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LIBYAFARAY_GUI_QT_IMAGE_H
-#define LIBYAFARAY_GUI_QT_IMAGE_H
+#ifndef LIBYAFARAY_GUI_IMAGE_H
+#define LIBYAFARAY_GUI_IMAGE_H
 
-#include "common/yafaray_gui_qt_common.h"
+#include "common/yafaray_gui_common.h"
 #include <vector>
 
 BEGIN_YAFARAY_GUI_QT
@@ -66,4 +66,4 @@ class Image final
 
 END_YAFARAY_GUI_QT
 
-#endif //LIBYAFARAY_GUI_QT_IMAGE_H
+#endif //LIBYAFARAY_GUI_IMAGE_H

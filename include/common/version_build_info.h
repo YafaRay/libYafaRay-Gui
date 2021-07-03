@@ -1,7 +1,7 @@
 #pragma once
 /****************************************************************************
  *
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef YAFARAY_GUI_QT_VERSION_BUILD_INFO_H
-#define YAFARAY_GUI_QT_VERSION_BUILD_INFO_H
+#ifndef YAFARAY_GUI_VERSION_BUILD_INFO_H
+#define YAFARAY_GUI_VERSION_BUILD_INFO_H
 
-#include "yafaray_gui_qt_common.h"
+#include "yafaray_gui_common.h"
 #include <string>
 #include <vector>
 
@@ -58,4 +58,4 @@ namespace buildinfo
 
 END_YAFARAY_GUI_QT
 
-#endif //YAFARAY_GUI_QT_VERSION_BUILD_INFO_H
+#endif //YAFARAY_GUI_VERSION_BUILD_INFO_H

@@ -1,0 +1,16 @@
+# Symbols for GCC
+
+LIBYAFARAYGUI_4.0.0 {
+    global:
+        yafaray_gui_createRenderWidget;
+        yafaray_gui_ParseFile;
+        yafaray_gui_ParseMemory;
+        yafaray_gui_getVersionMajor;
+        yafaray_gui_getVersionMinor;
+        yafaray_gui_getVersionPatch;
+        yafaray_gui_getVersionString;
+        yafaray_gui_deallocateCharPointer;
+
+    local:
+        *;
+};

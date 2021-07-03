@@ -1,6 +1,6 @@
 /****************************************************************************
  *      animworking.cc: a widget to show something is being processed
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *      Copyright (C) 2009 Gustavo Pichorim Boiko
  *
  *      This library is free software; you can redistribute it and/or
@@ -19,63 +19,63 @@
  */
 
 
-#include "gui/animworking.h"
+#include "gui_qt/animworking.h"
 #include <QPainter>
 // Animation Resources
-#include "resource/qtanim/00001.h"
-#include "resource/qtanim/00002.h"
-#include "resource/qtanim/00003.h"
-#include "resource/qtanim/00004.h"
-#include "resource/qtanim/00005.h"
-#include "resource/qtanim/00006.h"
-#include "resource/qtanim/00007.h"
-#include "resource/qtanim/00008.h"
-#include "resource/qtanim/00009.h"
-#include "resource/qtanim/00010.h"
-#include "resource/qtanim/00011.h"
-#include "resource/qtanim/00012.h"
-#include "resource/qtanim/00013.h"
-#include "resource/qtanim/00014.h"
-#include "resource/qtanim/00015.h"
-#include "resource/qtanim/00016.h"
-#include "resource/qtanim/00017.h"
-#include "resource/qtanim/00018.h"
-#include "resource/qtanim/00019.h"
-#include "resource/qtanim/00020.h"
-#include "resource/qtanim/00021.h"
-#include "resource/qtanim/00022.h"
-#include "resource/qtanim/00023.h"
-#include "resource/qtanim/00024.h"
-#include "resource/qtanim/00025.h"
-#include "resource/qtanim/00026.h"
-#include "resource/qtanim/00027.h"
-#include "resource/qtanim/00028.h"
-#include "resource/qtanim/00029.h"
-#include "resource/qtanim/00030.h"
-#include "resource/qtanim/00031.h"
-#include "resource/qtanim/00032.h"
-#include "resource/qtanim/00033.h"
-#include "resource/qtanim/00034.h"
-#include "resource/qtanim/00035.h"
-#include "resource/qtanim/00036.h"
-#include "resource/qtanim/00037.h"
-#include "resource/qtanim/00038.h"
-#include "resource/qtanim/00039.h"
-#include "resource/qtanim/00040.h"
-#include "resource/qtanim/00041.h"
-#include "resource/qtanim/00042.h"
-#include "resource/qtanim/00043.h"
-#include "resource/qtanim/00044.h"
-#include "resource/qtanim/00045.h"
-#include "resource/qtanim/00046.h"
-#include "resource/qtanim/00047.h"
-#include "resource/qtanim/00048.h"
-#include "resource/qtanim/00049.h"
-#include "resource/qtanim/00050.h"
+#include "resource/logo_animation/00001.h"
+#include "resource/logo_animation/00002.h"
+#include "resource/logo_animation/00003.h"
+#include "resource/logo_animation/00004.h"
+#include "resource/logo_animation/00005.h"
+#include "resource/logo_animation/00006.h"
+#include "resource/logo_animation/00007.h"
+#include "resource/logo_animation/00008.h"
+#include "resource/logo_animation/00009.h"
+#include "resource/logo_animation/00010.h"
+#include "resource/logo_animation/00011.h"
+#include "resource/logo_animation/00012.h"
+#include "resource/logo_animation/00013.h"
+#include "resource/logo_animation/00014.h"
+#include "resource/logo_animation/00015.h"
+#include "resource/logo_animation/00016.h"
+#include "resource/logo_animation/00017.h"
+#include "resource/logo_animation/00018.h"
+#include "resource/logo_animation/00019.h"
+#include "resource/logo_animation/00020.h"
+#include "resource/logo_animation/00021.h"
+#include "resource/logo_animation/00022.h"
+#include "resource/logo_animation/00023.h"
+#include "resource/logo_animation/00024.h"
+#include "resource/logo_animation/00025.h"
+#include "resource/logo_animation/00026.h"
+#include "resource/logo_animation/00027.h"
+#include "resource/logo_animation/00028.h"
+#include "resource/logo_animation/00029.h"
+#include "resource/logo_animation/00030.h"
+#include "resource/logo_animation/00031.h"
+#include "resource/logo_animation/00032.h"
+#include "resource/logo_animation/00033.h"
+#include "resource/logo_animation/00034.h"
+#include "resource/logo_animation/00035.h"
+#include "resource/logo_animation/00036.h"
+#include "resource/logo_animation/00037.h"
+#include "resource/logo_animation/00038.h"
+#include "resource/logo_animation/00039.h"
+#include "resource/logo_animation/00040.h"
+#include "resource/logo_animation/00041.h"
+#include "resource/logo_animation/00042.h"
+#include "resource/logo_animation/00043.h"
+#include "resource/logo_animation/00044.h"
+#include "resource/logo_animation/00045.h"
+#include "resource/logo_animation/00046.h"
+#include "resource/logo_animation/00047.h"
+#include "resource/logo_animation/00048.h"
+#include "resource/logo_animation/00049.h"
+#include "resource/logo_animation/00050.h"
 
 BEGIN_YAFARAY_GUI_QT
 
-AnimWorking::AnimWorking(QWidget *parent) : QWidget(parent)
+QtAnimWorking::QtAnimWorking(QWidget *parent) : QWidget(parent)
 {
 	sprites_.resize(timer_top_frame_);
 	sprites_[0].loadFromData(sprite_00001_global, sprite_00001_size_global);
@@ -135,14 +135,14 @@ AnimWorking::AnimWorking(QWidget *parent) : QWidget(parent)
 	timer_act_frame_ = 0;
 }
 
-void AnimWorking::paintEvent(QPaintEvent *event)
+void QtAnimWorking::paintEvent(QPaintEvent *event)
 {
 	if(timer_id_ < 0) timer_id_ = startTimer(40);
 	QPainter p(this);
 	p.drawPixmap(0, 0, sprites_[timer_act_frame_]);
 }
 
-void AnimWorking::timerEvent(QTimerEvent *event)
+void QtAnimWorking::timerEvent(QTimerEvent *event)
 {
 	if(timer_act_frame_ < timer_top_frame_ - 1) timer_act_frame_++;
 	else timer_act_frame_ = 0;

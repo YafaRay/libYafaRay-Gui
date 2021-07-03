@@ -1,5 +1,5 @@
 #****************************************************************************
-#      This is part of the libYafaRay-Gui-Qt package
+#      This is part of the libYafaRay-Gui package
 #
 #      This library is free software; you can redistribute it and/or
 #      modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
 #      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-target_sources(libyafaray4_gui_qt
+target_sources(libyafaray4_gui
 	PRIVATE
 		version_build_info.cc
 		images_collection.cc

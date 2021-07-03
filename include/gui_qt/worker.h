@@ -1,7 +1,7 @@
 #pragma once
 /****************************************************************************
  *      worker.h: a thread for doing the rendering process
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *      Copyright (C) 2008 Gustavo Pichorim Boiko
  *
  *      This library is free software; you can redistribute it and/or
@@ -22,26 +22,26 @@
 #ifndef YAFARAY_WORKER_H
 #define YAFARAY_WORKER_H
 
-#include "common/yafaray_gui_qt_common.h"
+#include "common/yafaray_gui_common.h"
 #include <QThread>
 
 typedef struct yafaray_Interface yafaray_Interface_t;
 
 BEGIN_YAFARAY_GUI_QT
 
-class MainWindow;
+class QtMainWindow;
 
-class Worker final : public QThread
+class QtWorker final : public QThread
 {
 	Q_OBJECT
 
 	public:
-		Worker(yafaray_Interface_t *yafaray_interface, MainWindow *main_window);
+		QtWorker(yafaray_Interface_t *yafaray_interface, QtMainWindow *main_window);
 		void run() override;
 
 	private:
 		yafaray_Interface_t *yafaray_interface_ = nullptr;
-		MainWindow *main_window_ = nullptr;
+		QtMainWindow *main_window_ = nullptr;
 		bool valid_ = false;
 };
 

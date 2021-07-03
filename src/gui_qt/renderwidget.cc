@@ -1,6 +1,6 @@
 /****************************************************************************
  *      renderwidget.cc: a widget for displaying the rendering output
- *      This is part of the libYafaRay-Gui-Qt package
+ *      This is part of the libYafaRay-Gui package
  *      Copyright (C) 2008 Gustavo Pichorim Boiko
  *      Copyright (C) 2009 Rodrigo Placencia Vazquez
  *
@@ -19,8 +19,8 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "gui/renderwidget.h"
-#include "gui/events.h"
+#include "gui_qt/renderwidget.h"
+#include "gui_qt/events.h"
 #include "common/image.h"
 #include <QDebug>
 #include <QApplication>
@@ -35,12 +35,12 @@ BEGIN_YAFARAY_GUI_QT
 /	RenderWidget implementation
 /=====================================*/
 
-RenderWidget::RenderWidget(QScrollArea *parent): QLabel(static_cast<QWidget *>(parent)), parent_(parent), h_bar_(parent_->horizontalScrollBar()), v_bar_(parent_->verticalScrollBar())
+QtRenderWidget::QtRenderWidget(QScrollArea *parent): QLabel(static_cast<QWidget *>(parent)), parent_(parent), h_bar_(parent_->horizontalScrollBar()), v_bar_(parent_->verticalScrollBar())
 {
 	setScaledContents(true);
 }
 
-void RenderWidget::setup(const QSize &size)
+void QtRenderWidget::setup(const QSize &size)
 {
 	image_size_ = size;
 	initBuffers();
@@ -49,7 +49,7 @@ void RenderWidget::setup(const QSize &size)
 	setPalette(palette);
 }
 
-void RenderWidget::initBuffers()
+void QtRenderWidget::initBuffers()
 {
 	color_buffer_ = QImage(image_size_, QImage::Format_ARGB32);
 	color_buffer_.fill(QColor(0, 0, 0, 0));
@@ -59,14 +59,14 @@ void RenderWidget::initBuffers()
 	setPixmap(pixmap_);
 }
 
-void RenderWidget::startRendering()
+void QtRenderWidget::startRendering()
 {
 	rendering_ = true;
 	scale_factor_ = 1.f;
 	initBuffers();
 }
 
-void RenderWidget::finishRendering()
+void QtRenderWidget::finishRendering()
 {
 	rendering_ = false;
 	pixmap_ = QPixmap::fromImage(*active_buffer_);
@@ -74,14 +74,14 @@ void RenderWidget::finishRendering()
 	update();
 }
 
-void RenderWidget::setPixel(int x, int y, const QColor &color)
+void QtRenderWidget::setPixel(int x, int y, const QColor &color)
 {
 	const int ix = x + border_start_.x();
 	const int iy = y + border_start_.y();
 	color_buffer_.setPixelColor(ix, iy, color);
 }
 
-void RenderWidget::paintColorBuffer()
+void QtRenderWidget::paintColorBuffer()
 {
 	buffer_mutex_.lock();
 	pixmap_ = QPixmap::fromImage(color_buffer_);
@@ -91,7 +91,7 @@ void RenderWidget::paintColorBuffer()
 	if(!rendering_) zoom(1.f, QPoint(0, 0));
 }
 
-void RenderWidget::zoom(float zoom_factor, QPoint center)
+void QtRenderWidget::zoom(float zoom_factor, QPoint center)
 {
 	scale_factor_ *= zoom_factor;
 	const QSize new_size = scale_factor_ * active_buffer_->size();
@@ -105,23 +105,23 @@ void RenderWidget::zoom(float zoom_factor, QPoint center)
 	v_bar_->setValue(dv);
 }
 
-void RenderWidget::zoomIn(QPoint center)
+void QtRenderWidget::zoomIn(QPoint center)
 {
 	if(scale_factor_ > 5.f) return;
 	zoom(1.25f, center);
 }
 
-void RenderWidget::zoomOut(QPoint center)
+void QtRenderWidget::zoomOut(QPoint center)
 {
 	if(scale_factor_ < 0.2f) return;
 	zoom(0.8f, center);
 }
 
-bool RenderWidget::event(QEvent *event)
+bool QtRenderWidget::event(QEvent *event)
 {
 	if(event->type() == static_cast<QEvent::Type>(GuiUpdate) && rendering_)
 	{
-		const auto ge = static_cast<GuiUpdateEvent *>(event);
+		const auto ge = static_cast<QtGuiUpdateEvent *>(event);
 		ge->accept();
 		if(ge->isFullUpdate())
 		{
@@ -143,7 +143,7 @@ bool RenderWidget::event(QEvent *event)
 	}
 	else if(event->type() == static_cast<QEvent::Type>(PutPixel))
 	{
-		const auto ge = static_cast<PutPixelEvent *>(event);
+		const auto ge = static_cast<QtPutPixelEvent *>(event);
 		ge->accept();
 		buffer_mutex_.lock();
 		const auto coords = ge->getCoords();
@@ -154,7 +154,7 @@ bool RenderWidget::event(QEvent *event)
 	}
 	else if(event->type() == static_cast<QEvent::Type>(Flush))
 	{
-		const auto ge = static_cast<FlushEvent *>(event);
+		const auto ge = static_cast<QtFlushEvent *>(event);
 		ge->accept();
 		buffer_mutex_.lock();
 		const int width = static_cast<int>(output_->images_collection_.getWidth());
@@ -174,7 +174,7 @@ bool RenderWidget::event(QEvent *event)
 	}
 	else if(event->type() == static_cast<QEvent::Type>(FlushArea))
 	{
-		const auto ge = static_cast<FlushAreaEvent *>(event);
+		const auto ge = static_cast<QtFlushAreaEvent *>(event);
 		ge->accept();
 		buffer_mutex_.lock();
 		int x_0, x_1, y_0, y_1;
@@ -194,7 +194,7 @@ bool RenderWidget::event(QEvent *event)
 	}
 	else if(event->type() == static_cast<QEvent::Type>(AreaHighlight) && rendering_)
 	{
-		const auto ge = static_cast<AreaHighlightEvent *>(event);
+		const auto ge = static_cast<QtAreaHighlightEvent *>(event);
 		QPainter p(&pixmap_);
 		ge->accept();
 		const int line_l = std::min(4, std::min(ge->getRect().height() - 1, ge->getRect().width() - 1));
@@ -221,7 +221,7 @@ bool RenderWidget::event(QEvent *event)
 	return QLabel::event(event);
 }
 
-void RenderWidget::paintEvent(QPaintEvent *event)
+void QtRenderWidget::paintEvent(QPaintEvent *event)
 {
 	const QRect r = event->rect();
 	QPainter painter(this);
@@ -229,7 +229,7 @@ void RenderWidget::paintEvent(QPaintEvent *event)
 	painter.drawPixmap(r, pixmap_, r);
 }
 
-void RenderWidget::wheelEvent(QWheelEvent *event)
+void QtRenderWidget::wheelEvent(QWheelEvent *event)
 {
 	event->accept();
 	if(!rendering_ && !panning_ && (event->modifiers() & Qt::ControlModifier))
@@ -239,7 +239,7 @@ void RenderWidget::wheelEvent(QWheelEvent *event)
 	}
 }
 
-void RenderWidget::mousePressEvent(QMouseEvent *event)
+void QtRenderWidget::mousePressEvent(QMouseEvent *event)
 {
 	if(event->button() == Qt::MidButton)
 	{
@@ -255,7 +255,7 @@ void RenderWidget::mousePressEvent(QMouseEvent *event)
 	}
 }
 
-void RenderWidget::mouseReleaseEvent(QMouseEvent *event)
+void QtRenderWidget::mouseReleaseEvent(QMouseEvent *event)
 {
 	if(event->button() == Qt::MidButton)
 	{
@@ -269,7 +269,7 @@ void RenderWidget::mouseReleaseEvent(QMouseEvent *event)
 	}
 }
 
-void RenderWidget::mouseMoveEvent(QMouseEvent *event)
+void QtRenderWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	if(panning_)
 	{
