@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 class LogEntry final
 {
@@ -53,6 +53,6 @@ class Log final
 		std::vector<LogEntry> data_;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
 #endif //LIBYAFARAY_GUI_LOG_ENTRY_H

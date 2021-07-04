@@ -25,7 +25,7 @@
 #include <yafaray_c_api.h>
 #include <vector>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 class Output final
 {
@@ -34,6 +34,6 @@ class Output final
 		ImagesCollection images_collection_;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
 #endif //LIBYAFARAY_GUI_OUTPUT_H

@@ -21,7 +21,7 @@
 
 #include "gui_qt/events.h"
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 QtGuiUpdateEvent::QtGuiUpdateEvent(const QRect &rect, bool full_update)
 	: QEvent(static_cast<QEvent::Type>(GuiUpdate)), rect_(rect), full_update_(full_update)
@@ -63,4 +63,4 @@ QtLogAppendEvent::QtLogAppendEvent(const LogEntry &log_entry)
 {
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI

@@ -21,7 +21,7 @@
 #include <memory>
 #include "common/image.h"
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 std::map<std::string, std::shared_ptr<Image>> *ImagesCollection::findView(const std::string &view_name)
 {
@@ -83,4 +83,4 @@ RgbaFloat ImagesCollection::getColor(const std::string &view_name, const std::st
 	return image->getColor(x, y);
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI

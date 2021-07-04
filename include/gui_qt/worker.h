@@ -19,15 +19,15 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef YAFARAY_WORKER_H
-#define YAFARAY_WORKER_H
+#ifndef YAFARAY_GUI_QT_WORKER_H
+#define YAFARAY_GUI_QT_WORKER_H
 
 #include "common/yafaray_gui_common.h"
 #include <QThread>
 
 typedef struct yafaray_Interface yafaray_Interface_t;
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 class QtMainWindow;
 
@@ -45,6 +45,6 @@ class QtWorker final : public QThread
 		bool valid_ = false;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
 #endif

@@ -29,7 +29,7 @@
 #include <QPaintEvent>
 #include <QPoint>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 /*=====================================
 /	RenderWidget implementation
@@ -284,4 +284,4 @@ void QtRenderWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI

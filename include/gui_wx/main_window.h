@@ -17,10 +17,34 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef YAFARAY_GUI_COMMON_H
-#define YAFARAY_GUI_COMMON_H
+#ifndef YAFARAY_GUI_WX_MAIN_WINDOW_H
+#define YAFARAY_GUI_WX_MAIN_WINDOW_H
 
-#define BEGIN_YAFARAY_GUI namespace yafaray_gui {
-#define END_YAFARAY_GUI }
+#include "common/yafaray_gui_common.h"
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 
-#endif /* YAFARAY_GUI_COMMON_H */
+BEGIN_YAFARAY_GUI
+
+class WxApp final : public wxApp
+{
+	public:
+		bool OnInit() override;
+};
+
+class WxFrame final : public wxFrame
+{
+	public:
+		WxFrame();
+	private:
+		enum ButtonId : int { Test, };
+		void onTest(wxCommandEvent& event);
+		void onExit(wxCommandEvent& event);
+		void onAbout(wxCommandEvent& event);
+};
+
+END_YAFARAY_GUI
+
+#endif //YAFARAY_GUI_WX_MAIN_WINDOW_H

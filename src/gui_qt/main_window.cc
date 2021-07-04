@@ -48,7 +48,7 @@
 #include "resource/guifont.h"
 #endif
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
 {
@@ -628,4 +628,4 @@ void QtMainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, c
 	if(log_level == YAFARAY_LOG_LEVEL_INFO || log_level == YAFARAY_LOG_LEVEL_WARNING || log_level == YAFARAY_LOG_LEVEL_ERROR) QCoreApplication::postEvent(main_window, new QtProgressUpdateTagEvent(description));
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI

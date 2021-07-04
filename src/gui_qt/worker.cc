@@ -24,7 +24,7 @@
 #include "gui_qt/renderwidget.h"
 #include "common/output.h"
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 QtWorker::QtWorker(::yafaray_Interface_t *yafaray_interface, QtMainWindow *main_window)
 	: QThread(), yafaray_interface_(yafaray_interface), main_window_(main_window)
@@ -36,4 +36,4 @@ void QtWorker::run()
 	if(yafaray_interface_) yafaray_render(yafaray_interface_, QtMainWindow::monitorCallback, this, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI

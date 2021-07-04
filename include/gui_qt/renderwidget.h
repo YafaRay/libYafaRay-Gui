@@ -20,8 +20,8 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef YAFARAY_GUI_RENDERWIDGET_H
-#define YAFARAY_GUI_RENDERWIDGET_H
+#ifndef YAFARAY_GUI_QT_RENDERWIDGET_H
+#define YAFARAY_GUI_QT_RENDERWIDGET_H
 
 #include "common/yafaray_gui_common.h"
 #include "common/output.h"
@@ -33,7 +33,7 @@
 #include <QScrollBar>
 #include <QMutex>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 class QtRenderWidget final : public QLabel
 {
@@ -82,6 +82,6 @@ class QtRenderWidget final : public QLabel
 		QImage *active_buffer_ = nullptr;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
-#endif //YAFARAY_GUI_RENDERWIDGET_H
+#endif //YAFARAY_GUI_QT_RENDERWIDGET_H

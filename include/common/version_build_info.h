@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 namespace buildinfo
 {
@@ -56,6 +56,6 @@ namespace buildinfo
 	std::vector<std::string> getAllBuildDetails();
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
 #endif //YAFARAY_GUI_VERSION_BUILD_INFO_H

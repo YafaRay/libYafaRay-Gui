@@ -23,6 +23,9 @@
 #include "gui_qt/main_window.h"
 #include <QApplication>
 #endif
+#ifdef YAFARAY_GUI_WITH_WXWIDGETS
+#include "gui_wx/main_window.h"
+#endif
 
 int yafaray_gui_createRenderWidget(yafaray_Interface_t *yafaray_interface, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish)
 {
@@ -42,13 +45,12 @@ int yafaray_gui_createRenderWidget(yafaray_Interface_t *yafaray_interface, yafar
 #ifdef YAFARAY_GUI_WITH_WXWIDGETS
 	if(gui_tool_kit == YAFARAY_GUI_WXWIDGETS)
 	{
+		wxApp* pApp = new yafaray_gui::WxApp();
+		wxApp::SetInstance(pApp);
 		int argc = 0;
-		auto app = new QApplication(argc, nullptr, 0);
-		yafaray_gui::QtMainWindow w(yafaray_interface, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
-		w.show();
-		w.adjustWindow();
-		if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();
-		return QApplication::exec();
+		char *argv[] = {};
+		wxEntry(argc, argv);
+		return 0;
 	}
 	else
 #endif

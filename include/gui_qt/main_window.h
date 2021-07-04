@@ -17,8 +17,8 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LIBYAFARAY_GUI_MAIN_WINDOW_H
-#define LIBYAFARAY_GUI_MAIN_WINDOW_H
+#ifndef YAFARAY_GUI_QT_MAIN_WINDOW_H
+#define YAFARAY_GUI_QT_MAIN_WINDOW_H
 
 #include "common/yafaray_gui_common.h"
 #include "common/log.h"
@@ -33,7 +33,7 @@ class QLabel;
 class QPushButton;
 class QTextEdit;
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 class QtAnimWorking;
 class QtRenderWidget;
@@ -110,6 +110,6 @@ class QtMainWindow final : public QMainWindow
 		Log log_;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
-#endif //LIBYAFARAY_GUI_MAIN_WINDOW_H
+#endif //YAFARAY_GUI_QT_MAIN_WINDOW_H

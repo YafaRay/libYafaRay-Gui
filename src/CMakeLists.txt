@@ -28,9 +28,11 @@ endif()
 
 message_boolean("Building with WxWidgets GUI support" YAFARAY_GUI_WITH_WXWIDGETS "yes" "no")
 if(YAFARAY_GUI_WITH_WXWIDGETS)
-	find_package(wxWidgets 3.0.0 REQUIRED COMPONENTS core base) #Note: to find wxWidgets the CMake variable wxWidgets_ROOT_DIR might be needed to be set to point to the root folder where wxWidgets libraries reside
+	find_package(wxWidgets 3.0.0 REQUIRED COMPONENTS core base)
+	include(${wxWidgets_USE_FILE}) #This is necessary to use wxWidgets with CMake properly
 	list(APPEND YAFARAY_GUI_CUSTOM_DEFINITIONS "YAFARAY_GUI_WITH_WXWIDGETS")
-	target_link_libraries(libyafaray4_gui PRIVATE  ${wxWidgets_LIBRARIES})
+	list(APPEND YAF_GUI_DEPS_INCLUDE_DIRS ${wxWidgets_INCLUDE_DIRS})
+	target_link_libraries(libyafaray4_gui PRIVATE ${wxWidgets_LIBRARIES})
 	add_subdirectory(gui_wx)
 endif()
 
@@ -38,6 +40,8 @@ endif()
 if(YAFARAY_GUI_EMBED_FONT)
 	list(APPEND YAFARAY_GUI_CUSTOM_DEFINITIONS "YAFARAY_GUI_EMBEDDED_FONT")
 endif()
+
+target_include_directories(libyafaray4_gui SYSTEM BEFORE PRIVATE ${YAF_GUI_DEPS_INCLUDE_DIRS})
 
 target_compile_definitions(libyafaray4_gui
 		PRIVATE

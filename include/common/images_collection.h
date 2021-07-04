@@ -25,7 +25,7 @@
 #include <map>
 #include <memory>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 class RgbaFloat;
 class Image;
@@ -49,6 +49,6 @@ class ImagesCollection final
 		std::map<std::string, std::map<std::string, std::shared_ptr<Image>>> images_;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
 #endif //LIBYAFARAY_GUI_IMAGES_COLLECTION_H

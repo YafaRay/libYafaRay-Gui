@@ -20,8 +20,8 @@
  *      Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef YAFARAY_EVENTS_H
-#define YAFARAY_EVENTS_H
+#ifndef YAFARAY_GUI_QT_EVENTS_H
+#define YAFARAY_GUI_QT_EVENTS_H
 
 #include "common/yafaray_gui_common.h"
 #include "common/log.h"
@@ -30,7 +30,7 @@
 #include <QString>
 #include <QColor>
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 enum QtCustomEvents
 {
@@ -136,6 +136,6 @@ class QtLogAppendEvent final  : public QEvent
 		LogEntry log_entry_;
 };
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
 
 #endif

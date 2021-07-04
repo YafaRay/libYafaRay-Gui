@@ -18,5 +18,5 @@
 
 target_sources(libyafaray4_gui
 	PRIVATE
-
+		main_window.cc
 )

@@ -21,7 +21,7 @@
 #include "common/version_build_info.h"
 #include "yafaray_gui_version_build_info.h"
 
-BEGIN_YAFARAY_GUI_QT
+BEGIN_YAFARAY_GUI
 
 std::string buildinfo::getVersionString() { return YAFARAY_GUI_VERSION_STRING + getGitLine(false); }
 std::string buildinfo::getVersionDescription() { return YAFARAY_GUI_VERSION_DESCRIPTION; }
@@ -99,4 +99,4 @@ std::vector<std::string> buildinfo::getAllBuildDetails()
 	return result;
 }
 
-END_YAFARAY_GUI_QT
+END_YAFARAY_GUI
