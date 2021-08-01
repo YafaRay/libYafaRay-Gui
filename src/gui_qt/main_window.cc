@@ -535,7 +535,7 @@ bool QtMainWindow::closeUnsaved()
 
 void QtMainWindow::slotCancel()
 {
-	yafaray_cancel(yafaray_interface_);
+	yafaray_cancelRendering(yafaray_interface_);
 	cancel_button_->setEnabled(false);
 	action_cancel_->setEnabled(false);
 }
