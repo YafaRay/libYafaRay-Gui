@@ -589,12 +589,12 @@ void QtMainWindow::putPixelCallback(const char *view_name, const char *layer_nam
 	output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
 }
 
-void QtMainWindow::flushAreaCallback(const char *view_name, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+void QtMainWindow::flushAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_user_data);
 	if(!render_widget) return;
 	const QRect rect { QPoint(x_0, y_0), QPoint(x_1, y_1) };
-	QCoreApplication::postEvent(render_widget, new QtFlushAreaEvent(0, rect));
+	QCoreApplication::postEvent(render_widget, new QtFlushAreaEvent(area_id, rect));
 	QCoreApplication::postEvent(render_widget, new QtGuiUpdateEvent(rect));
 }
 
@@ -606,11 +606,11 @@ void QtMainWindow::flushCallback(const char *view_name, void *callback_user_data
 	QCoreApplication::postEvent(render_widget, new QtGuiUpdateEvent(QRect(), true));
 }
 
-void QtMainWindow::highlightCallback(const char *view_name, int area_number, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+void QtMainWindow::highlightCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_user_data);
 	if(!render_widget) return;
-	QCoreApplication::postEvent(render_widget, new QtAreaHighlightEvent(area_number, QRect(QPoint(x_0, y_0), QPoint(x_1, y_1))));
+	QCoreApplication::postEvent(render_widget, new QtAreaHighlightEvent(area_id, QRect(QPoint(x_0, y_0), QPoint(x_1, y_1))));
 }
 
 void QtMainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)

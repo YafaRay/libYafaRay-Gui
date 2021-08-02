@@ -38,13 +38,13 @@ QtFlushEvent::QtFlushEvent()
 {
 }
 
-QtFlushAreaEvent::QtFlushAreaEvent(int area_number, const QRect &rect)
-		: QEvent(static_cast<QEvent::Type>(FlushArea)), area_number_(area_number), rect_(rect)
+QtFlushAreaEvent::QtFlushAreaEvent(int area_id, const QRect &rect)
+		: QEvent(static_cast<QEvent::Type>(FlushArea)), area_id_(area_id), rect_(rect)
 {
 }
 
-QtAreaHighlightEvent::QtAreaHighlightEvent(int area_number, const QRect &rect)
-	: QEvent(static_cast<QEvent::Type>(AreaHighlight)), area_number_(area_number), rect_(rect)
+QtAreaHighlightEvent::QtAreaHighlightEvent(int area_id, const QRect &rect)
+	: QEvent(static_cast<QEvent::Type>(AreaHighlight)), area_id_(area_id), rect_(rect)
 {
 }
 

@@ -81,24 +81,24 @@ class QtFlushEvent final  : public QEvent
 class QtFlushAreaEvent final  : public QEvent
 {
 	public:
-		explicit QtFlushAreaEvent(int area_number, const QRect &rect);
+		explicit QtFlushAreaEvent(int area_id, const QRect &rect);
 		QRect getRect() const { return rect_; }
-		int getAreaNumber() const { return area_number_; }
+		int getAreaId() const { return area_id_; }
 
 	private:
-		int area_number_ = 0;
+		int area_id_ = -1;
 		QRect rect_;
 };
 
 class QtAreaHighlightEvent final  : public QEvent
 {
 	public:
-		explicit QtAreaHighlightEvent(int area_number, const QRect &rect);
+		explicit QtAreaHighlightEvent(int area_id, const QRect &rect);
 		QRect getRect() const { return rect_; }
-		int getAreaNumber() const { return area_number_; }
+		int getAreaId() const { return area_id_; }
 
 	private:
-		int area_number_ = 0;
+		int area_id_ = -1;
 		QRect rect_;
 };
 
