@@ -172,17 +172,6 @@ int main()
 	yafaray_createIntegrator(yi, "volintegr");
 	yafaray_paramsClearAll(yi);
 
-	/* Defining internal and exported layers */
-	yafaray_paramsSetString(yi, "type", "combined");
-	yafaray_paramsSetString(yi, "image_type", "ColorAlphaWeight");
-	yafaray_paramsSetString(yi, "exported_image_name", "Combined");
-	yafaray_paramsSetString(yi, "exported_image_type", "ColorAlpha");
-	yafaray_defineLayer(yi);
-	yafaray_paramsClearAll(yi);
-
-	yafaray_setupLayersParameters(yi);
-	yafaray_paramsClearAll(yi);
-
 	/* Setting up render parameters */
 	yafaray_paramsSetString(yi, "integrator_name", "surfintegr");
 	yafaray_paramsSetString(yi, "volintegrator_name", "volintegr");
@@ -190,14 +179,16 @@ int main()
 	yafaray_paramsSetString(yi, "background_name", "world_background");
 	yafaray_paramsSetInt(yi, "width", result_width);
 	yafaray_paramsSetInt(yi, "height", result_height);
-	yafaray_paramsSetInt(yi, "AA_minsamples",  50);
-	yafaray_paramsSetInt(yi, "AA_passes",  100);
+	//yafaray_paramsSetInt(yi, "AA_minsamples",  50);
+	//yafaray_paramsSetInt(yi, "AA_passes",  100);
 	yafaray_paramsSetInt(yi, "threads", -1);
 	yafaray_paramsSetInt(yi, "threads_photons", -1);
 	yafaray_setupRender(yi);
 	yafaray_paramsClearAll(yi);
+
 	/* Rendering */
-	yafaray_gui_createRenderWidget(yi, YAFARAY_GUI_WXWIDGETS, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
+	yafaray_gui_createRenderWidget(yi, YAFARAY_GUI_QT, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
+
 	/* Destroying YafaRay interface. Scene and all objects inside are automatically destroyed */
 	yafaray_destroyInterface(yi);
 	yafaray_gui_deallocateCharPointer(version_string);

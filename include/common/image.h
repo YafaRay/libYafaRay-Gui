@@ -47,7 +47,7 @@ class RgbaFloat
 		float a_ = 0.f;
 };
 
-struct ImagesCollection;
+class ImagesCollection;
 
 class Image final
 {
