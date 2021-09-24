@@ -381,31 +381,23 @@ void QtMainWindow::slotRender()
 	action_render_->setEnabled(false);
 	cancel_button_->setEnabled(true);
 	action_cancel_->setEnabled(true);
-
 	progress_bar_->show();
+	render_saved_ = false;
+
+	yafaray_setRenderNotifyViewCallback(yafaray_interface_, QtMainWindow::notifyViewCallback, render_widget_.get());
+	yafaray_setRenderNotifyLayerCallback(yafaray_interface_, QtMainWindow::notifyLayerCallback, render_widget_.get());
+	yafaray_setRenderPutPixelCallback(yafaray_interface_, QtMainWindow::putPixelCallback, render_widget_.get());
+	yafaray_setRenderFlushAreaCallback(yafaray_interface_, QtMainWindow::flushAreaCallback, render_widget_.get());
+	yafaray_setRenderFlushCallback(yafaray_interface_, QtMainWindow::flushCallback, render_widget_.get());
+	yafaray_setRenderHighlightAreaCallback(yafaray_interface_, QtMainWindow::highlightAreaCallback, render_widget_.get());
+	yafaray_setRenderHighlightPixelCallback(yafaray_interface_, QtMainWindow::highlightPixelCallback, render_widget_.get());
+
 	time_measure_.start();
 	render_widget_->startRendering();
-	render_saved_ = false;
-	yafaray_setInteractive(yafaray_interface_, YAFARAY_BOOL_TRUE);
+
 	const int output_width = yafaray_getSceneFilmWidth(yafaray_interface_);
 	const int output_height = yafaray_getSceneFilmHeight(yafaray_interface_);
-	this->render_widget_->output_ = new Output(output_width, output_height);
-	char *views_table = yafaray_getViewsTable(yafaray_interface_);
-	char *layers_table = yafaray_getLayersTable(yafaray_interface_);
-	yafaray_printVerbose(yafaray_interface_, views_table);
-	yafaray_printVerbose(yafaray_interface_, layers_table);
-	yafaray_deallocateCharPointer(layers_table);
-	yafaray_deallocateCharPointer(views_table);
-
 	this->render_widget_->setup(QSize(output_width, output_height));
-
-	yafaray_paramsSetString(yafaray_interface_, "type", "callback_output");
-	yafaray_createOutput(yafaray_interface_, "test_callback_output", YAFARAY_BOOL_TRUE);
-
-	yafaray_setOutputPutPixelCallback(yafaray_interface_, "test_callback_output", QtMainWindow::putPixelCallback, static_cast<void *>(this->render_widget_->output_));
-	yafaray_setOutputFlushAreaCallback(yafaray_interface_, "test_callback_output", QtMainWindow::flushAreaCallback, static_cast<void *>(this->render_widget_.get()));
-	yafaray_setOutputFlushCallback(yafaray_interface_, "test_callback_output", QtMainWindow::flushCallback, static_cast<void *>(this->render_widget_.get()));
-	yafaray_setOutputHighlightCallback(yafaray_interface_, "test_callback_output", QtMainWindow::highlightCallback, static_cast<void *>(this->render_widget_.get()));
 	worker_->start();
 }
 
@@ -463,11 +455,6 @@ void QtMainWindow::slotFinished()
 		return;
 	}
 	progress_bar_->hide();
-
-	yafaray_removeOutput(yafaray_interface_, "test_callback_output");
-	delete this->render_widget_->output_;
-	this->render_widget_->output_ = nullptr;
-
 	QApplication::alert(this);
 }
 
@@ -581,48 +568,68 @@ void QtMainWindow::adjustWindow()
 	scroll_area_->setMinimumSize(0, 0);
 }
 
-void QtMainWindow::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_user_data)
+void QtMainWindow::notifyViewCallback(const char *view_name, void *callback_data)
 {
-	const auto output = static_cast<Output *>(callback_user_data);
-	if(!output) return;
-	RgbaFloat rgba(r, g, b, a);
-	output->images_collection_.setColor(view_name, layer_name, x, y, rgba);
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
+	if(!render_widget) return;
+	QCoreApplication::postEvent(render_widget, new QtNotifyViewEvent(view_name));
 }
 
-void QtMainWindow::flushAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+void QtMainWindow::notifyLayerCallback(const char *internal_layer_name, const char *exported_layer_name, int width, int height, int exported_channels, void *callback_data)
 {
-	const auto render_widget = static_cast<QtRenderWidget *>(callback_user_data);
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
+	if(!render_widget) return;
+	QCoreApplication::postEvent(render_widget, new QtNotifyLayerEvent(internal_layer_name, exported_layer_name, width, height, exported_channels));
+}
+
+void QtMainWindow::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_data)
+{
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
+	if(!render_widget) return;
+	render_widget->images_collection_.setColor(view_name, layer_name, x, y, {r, g, b, a});
+}
+
+void QtMainWindow::flushAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data)
+{
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
 	const QRect rect { QPoint(x_0, y_0), QPoint(x_1, y_1) };
 	QCoreApplication::postEvent(render_widget, new QtFlushAreaEvent(area_id, rect));
 	QCoreApplication::postEvent(render_widget, new QtGuiUpdateEvent(rect));
 }
 
-void QtMainWindow::flushCallback(const char *view_name, void *callback_user_data)
+void QtMainWindow::flushCallback(const char *view_name, void *callback_data)
 {
-	const auto render_widget = static_cast<QtRenderWidget *>(callback_user_data);
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
 	QCoreApplication::postEvent(render_widget, new QtFlushEvent());
 	QCoreApplication::postEvent(render_widget, new QtGuiUpdateEvent(QRect(), true));
 }
 
-void QtMainWindow::highlightCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_user_data)
+void QtMainWindow::highlightAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data)
 {
-	const auto render_widget = static_cast<QtRenderWidget *>(callback_user_data);
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
-	QCoreApplication::postEvent(render_widget, new QtAreaHighlightEvent(area_id, QRect(QPoint(x_0, y_0), QPoint(x_1, y_1))));
+	QCoreApplication::postEvent(render_widget, new QtHighlightAreaEvent(area_id, {QPoint(x_0, y_0), QPoint(x_1, y_1)}));
 }
 
-void QtMainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_user_data)
+void QtMainWindow::highlightPixelCallback(const char *view_name, int x, int y, float r, float g, float b, float a, void *callback_data)
 {
-	const auto main_window = static_cast<QtMainWindow *>(callback_user_data);
+	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
+	if(!render_widget) return;
+	render_widget->images_collection_.setColor(view_name, "combined", x, y, {r, g, b, a});
+}
+
+void QtMainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_data)
+{
+	const auto main_window = static_cast<QtMainWindow *>(callback_data);
 	if(!main_window) return;
 	QCoreApplication::postEvent(main_window, new QtProgressUpdateEvent(steps_done, 0, steps_total));
 }
 
-void QtMainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_user_data)
+void QtMainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_data)
 {
-	const auto main_window = static_cast<QtMainWindow *>(callback_user_data);
+	const auto main_window = static_cast<QtMainWindow *>(callback_data);
 	if(!main_window) return;
 	QCoreApplication::postEvent(main_window, new QtLogAppendEvent({log_level, datetime, time_of_day, description}));
 	if(log_level == YAFARAY_LOG_LEVEL_INFO || log_level == YAFARAY_LOG_LEVEL_WARNING || log_level == YAFARAY_LOG_LEVEL_ERROR) QCoreApplication::postEvent(main_window, new QtProgressUpdateTagEvent(description));

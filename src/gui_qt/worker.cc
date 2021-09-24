@@ -22,7 +22,6 @@
 #include "gui_qt/main_window.h"
 #include "gui_qt/worker.h"
 #include "gui_qt/renderwidget.h"
-#include "common/output.h"
 
 BEGIN_YAFARAY_GUI
 

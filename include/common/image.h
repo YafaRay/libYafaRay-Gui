@@ -22,6 +22,7 @@
 
 #include "common/yafaray_gui_common.h"
 #include <vector>
+#include <cmath>
 
 BEGIN_YAFARAY_GUI
 
@@ -38,6 +39,7 @@ class RgbaFloat
 		unsigned char getG8Bit() const { return floatColorTo8Bit(g_); }
 		unsigned char getB8Bit() const { return floatColorTo8Bit(b_); }
 		unsigned char getA8Bit() const { return floatColorTo8Bit(a_); }
+		float absCol2Bri() const { return (0.2126f * std::abs(r_) + 0.7152f * std::abs(g_) + 0.0722f * std::abs(b_)); }
 
 	private:
 		static unsigned char floatColorTo8Bit(float color_float) { return static_cast<unsigned char>(std::max(0.f, std::min(color_float, 1.f) * 255.f)); }
@@ -53,16 +55,33 @@ class Image final
 {
 	public:
 		Image() = default;
-		Image(unsigned int width, unsigned int height) : width_(width), height_(height) { setSize(width, height); }
-		void setSize(unsigned int width, unsigned int height) { width_ = width; height_ = height; data_.resize(width * height); }
-		void setColor(unsigned int x, unsigned int y, const RgbaFloat &rgba) { if(x < width_ && y < height_) data_[y * width_ + x] = rgba; }
-		RgbaFloat getColor(unsigned int x, unsigned int y) const { if(x < width_ && y < height_) return data_[y * width_ + x]; else return {}; }
+		Image(int width, int height) : width_(width), height_(height) { setSize(width, height); }
+		void setSize(int width, int height) { width_ = width; height_ = height; data_.resize(width * height); }
+		void setColor(int x, int y, const RgbaFloat &rgba);
+		RgbaFloat getColor(int x, int y) const;
+		int getWidth() const { return width_; }
+		int getHeight() const { return height_; }
 
 	private:
-		unsigned int width_ = 0;
-		unsigned int height_ = 0;
+		int indexFromCoords(int x, int y) const { return y * width_ + x; }
+		bool indexInBounds(int index) const { return index >= 0 && index < data_.size(); }
+		int width_ = 0;
+		int height_ = 0;
 		std::vector<RgbaFloat> data_;
 };
+
+inline void Image::setColor(int x, int y, const RgbaFloat &rgba)
+{
+	const int index = indexFromCoords(x, y);
+	if(indexInBounds(index)) data_[index] = rgba;
+}
+
+inline RgbaFloat Image::getColor(int x, int y) const
+{
+	const int index = indexFromCoords(x, y);
+	if(indexInBounds(index)) return data_[index];
+	else return {};
+}
 
 END_YAFARAY_GUI
 

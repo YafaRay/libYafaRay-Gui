@@ -141,6 +141,22 @@ bool QtRenderWidget::event(QEvent *event)
 		}
 		return true;
 	}
+	else if(event->type() == static_cast<QEvent::Type>(NotifyView))
+	{
+		const auto ge = static_cast<QtNotifyViewEvent *>(event);
+		ge->accept();
+		images_collection_.defineView(ge->getViewName());
+		update();
+		return true;
+	}
+	else if(event->type() == static_cast<QEvent::Type>(NotifyLayer))
+	{
+		const auto ge = static_cast<QtNotifyLayerEvent *>(event);
+		ge->accept();
+		images_collection_.defineLayer(ge->getInternalLayerName(), ge->getExportedLayerName(), ge->getWidth(), ge->getHeight(), ge->getExportedChannels());
+		update();
+		return true;
+	}
 	else if(event->type() == static_cast<QEvent::Type>(PutPixel))
 	{
 		const auto ge = static_cast<QtPutPixelEvent *>(event);
@@ -157,13 +173,13 @@ bool QtRenderWidget::event(QEvent *event)
 		const auto ge = static_cast<QtFlushEvent *>(event);
 		ge->accept();
 		buffer_mutex_.lock();
-		const int width = static_cast<int>(output_->images_collection_.getWidth());
-		const int height = static_cast<int>(output_->images_collection_.getHeight());
+		const int width = static_cast<int>(images_collection_.getWidth());
+		const int height = static_cast<int>(images_collection_.getHeight());
 		for(int x = 0; x < width; ++x)
 		{
 			for(int y = 0; y < height; ++y)
 			{
-				const RgbaFloat col = output_->images_collection_.getColor("view_1", "combined", x, y);
+				const RgbaFloat col = images_collection_.getColor("view_1", "combined", x, y);
 				const QColor qcol { col.getR8Bit(), col.getG8Bit(), col.getB8Bit(), col.getA8Bit() };
 				setPixel(x, y, qcol);
 			}
@@ -183,7 +199,7 @@ bool QtRenderWidget::event(QEvent *event)
 		{
 			for(int y = y_0; y < y_1; ++y)
 			{
-				const RgbaFloat col = output_->images_collection_.getColor("view_1", "combined", x, y);
+				const RgbaFloat col = images_collection_.getColor("view_1", "combined", x, y);
 				const QColor qcol { col.getR8Bit(), col.getG8Bit(), col.getB8Bit(), col.getA8Bit() };
 				setPixel(x, y, qcol);
 			}
@@ -192,9 +208,9 @@ bool QtRenderWidget::event(QEvent *event)
 		update();
 		return true;
 	}
-	else if(event->type() == static_cast<QEvent::Type>(AreaHighlight) && rendering_)
+	else if(event->type() == static_cast<QEvent::Type>(HighlightArea) && rendering_)
 	{
-		const auto ge = static_cast<QtAreaHighlightEvent *>(event);
+		const auto ge = static_cast<QtHighlightAreaEvent *>(event);
 		QPainter p(&pixmap_);
 		ge->accept();
 		const int line_l = std::min(4, std::min(ge->getRect().height() - 1, ge->getRect().width() - 1));

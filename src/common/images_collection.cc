@@ -57,30 +57,84 @@ const Image *ImagesCollection::findLayer(const std::string &view_name, const std
 	else return nullptr;
 }
 
-void ImagesCollection::setColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y, const RgbaFloat &rgba)
+void ImagesCollection::setColor(const std::string &view_name, const std::string &layer_name, int x, int y, const RgbaFloat &rgba)
 {
 	std::map<std::string, std::shared_ptr<Image>> *layers = findView(view_name);
-	if(!layers)
-	{
-		std::map<std::string, std::shared_ptr<Image>> layers_new;
-		layers_new[layer_name] = std::make_shared<Image>(images_width_, images_height_);
-		images_[view_name] = layers_new;
-		layers = findView(view_name);
-	}
+	if(!layers) return;
 	Image *image = findLayer(view_name, layer_name);
-	if(!image)
-	{
-		(*layers)[layer_name] = std::make_shared<Image>(images_width_, images_height_);
-		image = findLayer(view_name, layer_name);
-	}
+	if(!image) return;
 	image->setColor(x, y, rgba);
 }
 
-RgbaFloat ImagesCollection::getColor(const std::string &view_name, const std::string &layer_name, unsigned int x, unsigned int y) const
+RgbaFloat ImagesCollection::getColor(const std::string &view_name, const std::string &layer_name, int x, int y) const
 {
 	const Image *image = findLayer(view_name, layer_name);
-	if(!image) return { };
+	if(!image) return {};
 	return image->getColor(x, y);
+}
+
+int ImagesCollection::getExportedChannels(const std::string &layer_name) const
+{
+	auto iterator = layers_exported_channels_.find(layer_name);
+	if(iterator != layers_exported_channels_.end()) return iterator->second;
+	else return 0;
+}
+
+std::string ImagesCollection::getExportedLayerName(const std::string &layer_name) const
+{
+	auto iterator = dict_internal_exported_layers_.find(layer_name);
+	if(iterator != dict_internal_exported_layers_.end()) return iterator->second;
+	else return "(unknown)";
+}
+
+void ImagesCollection::clear()
+{
+	images_.clear();
+	layers_exported_channels_.clear();
+	dict_internal_exported_layers_.clear();
+}
+
+void ImagesCollection::defineView(const std::string &view_name)
+{
+	images_[view_name] = {};
+}
+
+void ImagesCollection::defineLayer(const std::string &internal_layer_name, const std::string &exported_layer_name, int width, int height, int channels_exported)
+{
+	for(auto &view : images_)
+	{
+		view.second[internal_layer_name] = std::make_shared<Image>(width, height);
+		layers_exported_channels_[internal_layer_name] = channels_exported;
+		dict_internal_exported_layers_[internal_layer_name] = exported_layer_name;
+	}
+}
+
+int ImagesCollection::getWidth() const
+{
+	int result = 0;
+	for(const auto &view : images_)
+	{
+		for(const auto &image : view.second)
+		{
+			const int image_dimension = image.second->getWidth();
+			if(result < image_dimension) result = image_dimension;
+		}
+	}
+	return result;
+}
+
+int ImagesCollection::getHeight() const
+{
+	int result = 0;
+	for(const auto &view : images_)
+	{
+		for(const auto &image : view.second)
+		{
+			const int image_dimension = image.second->getHeight();
+			if(result < image_dimension) result = image_dimension;
+		}
+	}
+	return result;
 }
 
 END_YAFARAY_GUI

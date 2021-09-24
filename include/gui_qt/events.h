@@ -35,10 +35,13 @@ BEGIN_YAFARAY_GUI
 enum QtCustomEvents
 {
 	GuiUpdate = QEvent::User,
+	NotifyView,
+	NotifyLayer,
 	PutPixel,
 	FlushArea,
 	Flush,
-	AreaHighlight,
+	HighlightArea,
+	HighlightPixel,
 	ProgressUpdate,
 	ProgressUpdateTag,
 	LogAppend,
@@ -56,6 +59,34 @@ class QtGuiUpdateEvent final : public QEvent
 	private:
 		QRect rect_;
 		bool full_update_;
+};
+
+class QtNotifyViewEvent final  : public QEvent
+{
+	public:
+		explicit QtNotifyViewEvent(const std::string &view_name);
+		std::string getViewName() const { return view_name_; }
+
+	private:
+		std::string view_name_;
+};
+
+class QtNotifyLayerEvent final  : public QEvent
+{
+	public:
+		explicit QtNotifyLayerEvent(const std::string &internal_layer_name, const std::string &exported_layer_name, int width, int height, int exported_channels);
+		std::string getInternalLayerName() const { return internal_layer_name_; }
+		std::string getExportedLayerName() const { return exported_layer_name_; }
+		int getWidth() const { return width_; }
+		int getHeight() const { return height_; }
+		int getExportedChannels() const { return exported_channels_; }
+
+	private:
+		std::string internal_layer_name_;
+		std::string exported_layer_name_;
+		int width_;
+		int height_;
+		int exported_channels_;
 };
 
 class QtPutPixelEvent final  : public QEvent
@@ -90,10 +121,10 @@ class QtFlushAreaEvent final  : public QEvent
 		QRect rect_;
 };
 
-class QtAreaHighlightEvent final  : public QEvent
+class QtHighlightAreaEvent final  : public QEvent
 {
 	public:
-		explicit QtAreaHighlightEvent(int area_id, const QRect &rect);
+		explicit QtHighlightAreaEvent(int area_id, const QRect &rect);
 		QRect getRect() const { return rect_; }
 		int getAreaId() const { return area_id_; }
 

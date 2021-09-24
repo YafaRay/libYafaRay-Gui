@@ -24,7 +24,17 @@
 BEGIN_YAFARAY_GUI
 
 QtGuiUpdateEvent::QtGuiUpdateEvent(const QRect &rect, bool full_update)
-	: QEvent(static_cast<QEvent::Type>(GuiUpdate)), rect_(rect), full_update_(full_update)
+		: QEvent(static_cast<QEvent::Type>(GuiUpdate)), rect_(rect), full_update_(full_update)
+{
+}
+
+QtNotifyViewEvent::QtNotifyViewEvent(const std::string &view_name)
+		: QEvent(static_cast<QEvent::Type>(NotifyView)), view_name_(view_name)
+{
+}
+
+QtNotifyLayerEvent::QtNotifyLayerEvent(const std::string &internal_layer_name, const std::string &exported_layer_name, int width, int height, int exported_channels)
+		: QEvent(static_cast<QEvent::Type>(NotifyLayer)), internal_layer_name_(internal_layer_name), exported_layer_name_(exported_layer_name), width_(width), height_(height), exported_channels_(exported_channels)
 {
 }
 
@@ -43,18 +53,18 @@ QtFlushAreaEvent::QtFlushAreaEvent(int area_id, const QRect &rect)
 {
 }
 
-QtAreaHighlightEvent::QtAreaHighlightEvent(int area_id, const QRect &rect)
-	: QEvent(static_cast<QEvent::Type>(AreaHighlight)), area_id_(area_id), rect_(rect)
+QtHighlightAreaEvent::QtHighlightAreaEvent(int area_id, const QRect &rect)
+		: QEvent(static_cast<QEvent::Type>(HighlightArea)), area_id_(area_id), rect_(rect)
 {
 }
 
 QtProgressUpdateEvent::QtProgressUpdateEvent(int current_steps, int min_steps, int max_steps)
-	: QEvent(static_cast<QEvent::Type>(ProgressUpdate)), current_steps_(current_steps), min_steps_(min_steps), max_steps_(max_steps)
+		: QEvent(static_cast<QEvent::Type>(ProgressUpdate)), current_steps_(current_steps), min_steps_(min_steps), max_steps_(max_steps)
 {
 }
 
 QtProgressUpdateTagEvent::QtProgressUpdateTagEvent(const char *tag)
-	: QEvent(static_cast<QEvent::Type>(ProgressUpdateTag)), tag_(tag)
+		: QEvent(static_cast<QEvent::Type>(ProgressUpdateTag)), tag_(tag)
 {
 }
 
