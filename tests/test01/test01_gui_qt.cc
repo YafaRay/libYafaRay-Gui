@@ -18,7 +18,7 @@
 
 #include "yafaray_gui_c_api.h"
 #include <yafaray_c_api.h>
-#include <memory>
+#include <string>
 
 int main()
 {
@@ -29,7 +29,6 @@ int main()
 	yafaray_Interface_t *yi = yafaray_createInterface(YAFARAY_INTERFACE_FOR_RENDERING, "test01.xml", nullptr, nullptr, YAFARAY_DISPLAY_CONSOLE_NORMAL);
 	yafaray_setConsoleLogColorsEnabled(yi, YAFARAY_BOOL_TRUE);
 	yafaray_setConsoleVerbosityLevel(yi, YAFARAY_LOG_LEVEL_DEBUG);
-	yafaray_setInteractive(yi, YAFARAY_BOOL_TRUE);
 	yafaray_printInfo(yi, "***** Test client 'test01' for libYafaRay-Gui *****");
 	yafaray_printInfo(yi, ("Using libYafaRay version (" + std::to_string(yafaray_getVersionMajor()) + "." + std::to_string(yafaray_getVersionMinor()) + "." + std::to_string(yafaray_getVersionPatch()) + ") and libYafaRay-Gui version " + std::string(version_string)).c_str());
 
