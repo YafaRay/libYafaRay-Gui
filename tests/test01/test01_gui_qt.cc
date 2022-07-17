@@ -133,7 +133,7 @@ int main()
 	/* Creating scene background */
 	yafaray_paramsSetString(yi, "type", "constant");
 	yafaray_paramsSetColor(yi, "color", 1.f, 1.f, 1.f, 1.f);
-	yafaray_createBackground(yi, "world_background");
+	yafaray_defineBackground(yi);
 	yafaray_paramsClearAll(yi);
 
 	/* Creating camera */
@@ -162,19 +162,16 @@ int main()
 	/* Creating surface integrator */
 	/*yafaray_paramsSetString(yi, "type", "directlighting");*/
 	yafaray_paramsSetString(yi, "type", "photonmapping");
-	yafaray_createIntegrator(yi, "surfintegr");
+	yafaray_defineSurfaceIntegrator(yi);
 	yafaray_paramsClearAll(yi);
 
 	/* Creating volume integrator */
 	yafaray_paramsSetString(yi, "type", "none");
-	yafaray_createIntegrator(yi, "volintegr");
+	yafaray_defineVolumeIntegrator(yi);
 	yafaray_paramsClearAll(yi);
 
 	/* Setting up render parameters */
-	yafaray_paramsSetString(yi, "integrator_name", "surfintegr");
-	yafaray_paramsSetString(yi, "volintegrator_name", "volintegr");
 	yafaray_paramsSetString(yi, "scene_accelerator", "yafaray-kdtree-original");
-	yafaray_paramsSetString(yi, "background_name", "world_background");
 	yafaray_paramsSetInt(yi, "width", result_width);
 	yafaray_paramsSetInt(yi, "height", result_height);
 	//yafaray_paramsSetInt(yi, "AA_minsamples",  50);
