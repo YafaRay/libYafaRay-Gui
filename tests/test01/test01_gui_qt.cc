@@ -45,8 +45,8 @@ int main()
 
 	yafaray_paramsSetString(yi, "type", "ColorAlpha");
 	yafaray_paramsSetString(yi, "image_optimization", "none"); /* Note: only "none" allows more HDR values > 1.f */
-	yafaray_paramsSetInt(yi, "tex_width", tex_width);
-	yafaray_paramsSetInt(yi, "tex_height", tex_height);
+	yafaray_paramsSetInt(yi, "width", tex_width);
+	yafaray_paramsSetInt(yi, "height", tex_height);
 	yafaray_paramsSetString(yi, "filename", "test01_tex.tga");
 	image = yafaray_createImage(yi, "Image01");
 	yafaray_paramsClearAll(yi);
