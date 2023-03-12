@@ -18,7 +18,8 @@
 
 #include "gui_wx/main_window.h"
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 bool WxApp::OnInit()
 {
@@ -63,4 +64,4 @@ void WxFrame::onTest(wxCommandEvent& event)
 	wxLogMessage("Test menu entry");
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

@@ -23,19 +23,18 @@
 #ifndef YAFARAY_GUI_QT_EVENTS_H
 #define YAFARAY_GUI_QT_EVENTS_H
 
-#include "common/yafaray_gui_common.h"
 #include "common/log.h"
 #include <QEvent>
 #include <QRect>
 #include <QString>
 #include <QColor>
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 enum QtCustomEvents
 {
 	GuiUpdate = QEvent::User,
-	NotifyView,
 	NotifyLayer,
 	PutPixel,
 	FlushArea,
@@ -59,16 +58,6 @@ class QtGuiUpdateEvent final : public QEvent
 	private:
 		QRect rect_;
 		bool full_update_;
-};
-
-class QtNotifyViewEvent final  : public QEvent
-{
-	public:
-		explicit QtNotifyViewEvent(const std::string &view_name);
-		std::string getViewName() const { return view_name_; }
-
-	private:
-		std::string view_name_;
 };
 
 class QtNotifyLayerEvent final  : public QEvent
@@ -167,6 +156,6 @@ class QtLogAppendEvent final  : public QEvent
 		LogEntry log_entry_;
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif

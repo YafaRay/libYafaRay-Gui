@@ -21,54 +21,33 @@
 #include <memory>
 #include "common/image.h"
 
-BEGIN_YAFARAY_GUI
-
-std::map<std::string, std::shared_ptr<Image>> *ImagesCollection::findView(const std::string &view_name)
+namespace yafaray_gui
 {
-	auto iterator = images_.find(view_name);
-	if(iterator != images_.end()) return &iterator->second;
+
+Image *ImagesCollection::findLayer(const std::string &layer_name)
+{
+	auto iterator = images_.find(layer_name);
+	if(iterator != images_.end()) return iterator->second.get();
 	else return nullptr;
 }
 
-const std::map<std::string, std::shared_ptr<Image>> *ImagesCollection::findView(const std::string &view_name) const
+const Image *ImagesCollection::findLayer(const std::string &layer_name) const
 {
-	auto iterator = images_.find(view_name);
-	if(iterator != images_.end()) return &iterator->second;
+	auto iterator = images_.find(layer_name);
+	if(iterator != images_.end()) return iterator->second.get();
 	else return nullptr;
 }
 
-Image *ImagesCollection::findLayer(const std::string &view_name, const std::string &layer_name)
+void ImagesCollection::setColor(const std::string &layer_name, int x, int y, const RgbaFloat &rgba)
 {
-	std::map<std::string, std::shared_ptr<Image>> *layers = findView(view_name);
-	if(!layers) return nullptr;
-
-	auto iterator = layers->find(layer_name);
-	if(iterator != layers->end()) return iterator->second.get();
-	else return nullptr;
-}
-
-const Image *ImagesCollection::findLayer(const std::string &view_name, const std::string &layer_name) const
-{
-	const std::map<std::string, std::shared_ptr<Image>> *layers = findView(view_name);
-	if(!layers) return nullptr;
-
-	auto iterator = layers->find(layer_name);
-	if(iterator != layers->end()) return iterator->second.get();
-	else return nullptr;
-}
-
-void ImagesCollection::setColor(const std::string &view_name, const std::string &layer_name, int x, int y, const RgbaFloat &rgba)
-{
-	std::map<std::string, std::shared_ptr<Image>> *layers = findView(view_name);
-	if(!layers) return;
-	Image *image = findLayer(view_name, layer_name);
+	Image *image = findLayer(layer_name);
 	if(!image) return;
 	image->setColor(x, y, rgba);
 }
 
-RgbaFloat ImagesCollection::getColor(const std::string &view_name, const std::string &layer_name, int x, int y) const
+RgbaFloat ImagesCollection::getColor(const std::string &layer_name, int x, int y) const
 {
-	const Image *image = findLayer(view_name, layer_name);
+	const Image *image = findLayer(layer_name);
 	if(!image) return {};
 	return image->getColor(x, y);
 }
@@ -94,31 +73,20 @@ void ImagesCollection::clear()
 	dict_internal_exported_layers_.clear();
 }
 
-void ImagesCollection::defineView(const std::string &view_name)
-{
-	images_[view_name] = {};
-}
-
 void ImagesCollection::defineLayer(const std::string &internal_layer_name, const std::string &exported_layer_name, int width, int height, int channels_exported)
 {
-	for(auto &view : images_)
-	{
-		view.second[internal_layer_name] = std::make_shared<Image>(width, height);
-		layers_exported_channels_[internal_layer_name] = channels_exported;
-		dict_internal_exported_layers_[internal_layer_name] = exported_layer_name;
-	}
+	images_[internal_layer_name] = std::make_shared<Image>(width, height);
+	layers_exported_channels_[internal_layer_name] = channels_exported;
+	dict_internal_exported_layers_[internal_layer_name] = exported_layer_name;
 }
 
 int ImagesCollection::getWidth() const
 {
 	int result = 0;
-	for(const auto &view : images_)
+	for(const auto &image : images_)
 	{
-		for(const auto &image : view.second)
-		{
-			const int image_dimension = image.second->getWidth();
-			if(result < image_dimension) result = image_dimension;
-		}
+		const int image_dimension = image.second->getWidth();
+		if(result < image_dimension) result = image_dimension;
 	}
 	return result;
 }
@@ -126,15 +94,12 @@ int ImagesCollection::getWidth() const
 int ImagesCollection::getHeight() const
 {
 	int result = 0;
-	for(const auto &view : images_)
+	for(const auto &image : images_)
 	{
-		for(const auto &image : view.second)
-		{
-			const int image_dimension = image.second->getHeight();
-			if(result < image_dimension) result = image_dimension;
-		}
+		const int image_dimension = image.second->getHeight();
+		if(result < image_dimension) result = image_dimension;
 	}
 	return result;
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

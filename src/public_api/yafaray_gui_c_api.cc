@@ -27,14 +27,14 @@
 #include "gui_wx/main_window.h"
 #endif
 
-int yafaray_gui_createRenderWidget(yafaray_Interface_t *yafaray_interface, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_bool_t auto_render, yafaray_bool_t close_after_finish)
+int yafaray_gui_createRenderWidget(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_Renderer **yafaray_renderer, yafaray_Film **yafaray_film, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_Bool auto_render, yafaray_Bool close_after_finish)
 {
 #ifdef YAFARAY_GUI_WITH_QT
 	if(gui_tool_kit == YAFARAY_GUI_QT)
 	{
 		int argc = 0;
 		auto app = new QApplication(argc, nullptr, 0);
-		yafaray_gui::QtMainWindow w(yafaray_interface, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
+		yafaray_gui::QtMainWindow w(yafaray_logger, yafaray_scene, yafaray_renderer, yafaray_film, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
 		w.show();
 		w.adjustWindow();
 		if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();
@@ -55,14 +55,14 @@ int yafaray_gui_createRenderWidget(yafaray_Interface_t *yafaray_interface, yafar
 	else
 #endif
 	{
-		yafaray_printError(yafaray_interface, "The GUI toolkit selected is not available, exiting.");
+		yafaray_printError(yafaray_logger, "The GUI toolkit selected is not available, exiting.");
 		return 0;
 	}
 }
 
-int yafaray_gui_getVersionMajor() { return yafaray_gui::buildinfo::getVersionMajor(); }
-int yafaray_gui_getVersionMinor() { return yafaray_gui::buildinfo::getVersionMinor(); }
-int yafaray_gui_getVersionPatch() { return yafaray_gui::buildinfo::getVersionPatch(); }
+int yafaray_gui_getVersionMajor() { return yafaray_gui::build_info::getVersionMajor(); }
+int yafaray_gui_getVersionMinor() { return yafaray_gui::build_info::getVersionMinor(); }
+int yafaray_gui_getVersionPatch() { return yafaray_gui::build_info::getVersionPatch(); }
 
 char *createCString(const std::string &std_string)
 {
@@ -74,10 +74,10 @@ char *createCString(const std::string &std_string)
 
 char *yafaray_gui_getVersionString()
 {
-	return createCString(yafaray_gui::buildinfo::getVersionString());
+	return createCString(yafaray_gui::build_info::getVersionString());
 }
 
-void yafaray_gui_deallocateCharPointer(char *string_pointer_to_deallocate)
+void yafaray_gui_destroyCharString(char *string)
 {
-	delete[] string_pointer_to_deallocate;
+	delete[] string;
 }

@@ -20,25 +20,25 @@
 #ifndef LIBYAFARAY_GUI_LOG_ENTRY_H
 #define LIBYAFARAY_GUI_LOG_ENTRY_H
 
-#include "common/yafaray_gui_common.h"
 #include <yafaray_c_api.h>
 #include <string>
 #include <vector>
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 class LogEntry final
 {
 	public:
-		LogEntry(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description) : log_level_(log_level), datetime_(datetime), time_of_day_(time_of_day), description_(description) { }
-		yafaray_LogLevel_t getLogLevel() const { return log_level_; }
-		long getDateTime() const { return datetime_; }
+		LogEntry(yafaray_LogLevel log_level, size_t datetime, const char *time_of_day, const char *description) : log_level_(log_level), datetime_(datetime), time_of_day_(time_of_day), description_(description) { }
+		yafaray_LogLevel getLogLevel() const { return log_level_; }
+		size_t getDateTime() const { return datetime_; }
 		std::string getTimeOfDay() const { return time_of_day_; }
 		std::string getDescription() const { return description_; }
 
 	private:
-		yafaray_LogLevel_t log_level_ = YAFARAY_LOG_LEVEL_MUTE;
-		long datetime_ = 0;
+		yafaray_LogLevel log_level_ = YAFARAY_LOG_LEVEL_MUTE;
+		size_t datetime_ = 0;
 		std::string time_of_day_;
 		std::string description_;
 };
@@ -53,6 +53,6 @@ class Log final
 		std::vector<LogEntry> data_;
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif //LIBYAFARAY_GUI_LOG_ENTRY_H

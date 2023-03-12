@@ -21,37 +21,38 @@
 #include "common/version_build_info.h"
 #include "yafaray_gui_version_build_info.h"
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
-std::string buildinfo::getVersionString() { return YAFARAY_GUI_VERSION_STRING + getGitLine(false); }
-std::string buildinfo::getVersionDescription() { return YAFARAY_GUI_VERSION_DESCRIPTION; }
-int buildinfo::getVersionMajor() { return YAFARAY_GUI_VERSION_MAJOR; }
-int buildinfo::getVersionMinor() { return YAFARAY_GUI_VERSION_MINOR; }
-int buildinfo::getVersionPatch() { return YAFARAY_GUI_VERSION_PATCH; }
-std::string buildinfo::getVersionPreRelease() { return YAFARAY_GUI_VERSION_PRE_RELEASE; }
-std::string buildinfo::getVersionPreReleaseDescription() { return YAFARAY_GUI_VERSION_PRE_RELEASE_DESCRIPTION; }
-std::string buildinfo::getGitDescribe() { return YAFARAY_GUI_VERSION_GIT; }
-std::string buildinfo::getGitTag() { return YAFARAY_GUI_VERSION_GIT_TAG; }
-std::string buildinfo::getGitBranch() { return YAFARAY_GUI_VERSION_GIT_BRANCH; }
-std::string buildinfo::getGitDirty() { return YAFARAY_GUI_VERSION_GIT_DIRTY; }
-std::string buildinfo::getGitCommit() { return YAFARAY_GUI_VERSION_GIT_COMMIT; }
-std::string buildinfo::getGitCommitDateTime() { return YAFARAY_GUI_VERSION_GIT_COMMIT_DATETIME; }
-std::string buildinfo::getCommitsSinceTag() { return YAFARAY_GUI_VERSION_GIT_COMMITS_SINCE_TAG; }
-std::string buildinfo::getBuildArchitectureBits() { return YAFARAY_GUI_BUILD_ARCHITECTURE_BITS; }
-std::string buildinfo::getBuildCompiler() { return YAFARAY_GUI_BUILD_COMPILER; }
-std::string buildinfo::getBuildCompilerVersion() { return YAFARAY_GUI_BUILD_COMPILER_VERSION; }
-std::string buildinfo::getBuildOs() { return YAFARAY_GUI_BUILD_OS; }
-std::string buildinfo::getBuildType() { return YAFARAY_GUI_BUILD_TYPE; }
-std::string buildinfo::getBuildOptions() { return YAFARAY_GUI_BUILD_OPTIONS; }
-std::string buildinfo::getBuildFlags() { return YAFARAY_GUI_BUILD_FLAGS; }
-std::string buildinfo::getBuildTypeSuffix()
+std::string build_info::getVersionString() { return YAFARAY_GUI_VERSION_STRING + getGitLine(false); }
+std::string build_info::getVersionDescription() { return YAFARAY_GUI_VERSION_DESCRIPTION; }
+int build_info::getVersionMajor() { return YAFARAY_GUI_VERSION_MAJOR; }
+int build_info::getVersionMinor() { return YAFARAY_GUI_VERSION_MINOR; }
+int build_info::getVersionPatch() { return YAFARAY_GUI_VERSION_PATCH; }
+std::string build_info::getVersionPreRelease() { return YAFARAY_GUI_VERSION_PRE_RELEASE; }
+std::string build_info::getVersionPreReleaseDescription() { return YAFARAY_GUI_VERSION_PRE_RELEASE_DESCRIPTION; }
+std::string build_info::getGitDescribe() { return YAFARAY_GUI_VERSION_GIT; }
+std::string build_info::getGitTag() { return YAFARAY_GUI_VERSION_GIT_TAG; }
+std::string build_info::getGitBranch() { return YAFARAY_GUI_VERSION_GIT_BRANCH; }
+std::string build_info::getGitDirty() { return YAFARAY_GUI_VERSION_GIT_DIRTY; }
+std::string build_info::getGitCommit() { return YAFARAY_GUI_VERSION_GIT_COMMIT; }
+std::string build_info::getGitCommitDateTime() { return YAFARAY_GUI_VERSION_GIT_COMMIT_DATETIME; }
+std::string build_info::getCommitsSinceTag() { return YAFARAY_GUI_VERSION_GIT_COMMITS_SINCE_TAG; }
+std::string build_info::getBuildArchitectureBits() { return YAFARAY_GUI_BUILD_ARCHITECTURE_BITS; }
+std::string build_info::getBuildCompiler() { return YAFARAY_GUI_BUILD_COMPILER; }
+std::string build_info::getBuildCompilerVersion() { return YAFARAY_GUI_BUILD_COMPILER_VERSION; }
+std::string build_info::getBuildOs() { return YAFARAY_GUI_BUILD_OS; }
+std::string build_info::getBuildType() { return YAFARAY_GUI_BUILD_TYPE; }
+std::string build_info::getBuildOptions() { return YAFARAY_GUI_BUILD_OPTIONS; }
+std::string build_info::getBuildFlags() { return YAFARAY_GUI_BUILD_FLAGS; }
+std::string build_info::getBuildTypeSuffix()
 {
 	const std::string build_type = getBuildType();
 	if(build_type.empty() || build_type == "RELEASE") return "";
 	else return "/" + build_type;
 }
 
-std::string buildinfo::getGitLine(bool long_line)
+std::string build_info::getGitLine(bool long_line)
 {
 	// If no Git data or it's just master branch without any changes since last tag, then return an empty string
 	std::string branch = getGitBranch();
@@ -73,7 +74,7 @@ std::string buildinfo::getGitLine(bool long_line)
 	return result;
 }
 
-std::vector<std::string> buildinfo::getAllBuildDetails()
+std::vector<std::string> build_info::getAllBuildDetails()
 {
 	std::vector<std::string> result;
 	result.emplace_back("Version = '" + getVersionString() + "'");
@@ -99,4 +100,4 @@ std::vector<std::string> buildinfo::getAllBuildDetails()
 	return result;
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

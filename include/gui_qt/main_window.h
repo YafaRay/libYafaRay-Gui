@@ -20,20 +20,19 @@
 #ifndef YAFARAY_GUI_QT_MAIN_WINDOW_H
 #define YAFARAY_GUI_QT_MAIN_WINDOW_H
 
-#include "common/yafaray_gui_common.h"
 #include "common/log.h"
 #include <QMainWindow>
 #include <QTime>
 #include <memory>
 
-typedef struct yafaray_Interface yafaray_Interface_t;
 class QScrollArea;
 class QProgressBar;
 class QLabel;
 class QPushButton;
 class QTextEdit;
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 class QtAnimWorking;
 class QtRenderWidget;
@@ -44,19 +43,22 @@ class QtMainWindow final : public QMainWindow
 	Q_OBJECT
 
 	public:
-		QtMainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish);
+		QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_Renderer **yafaray_renderer, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish);
 		~QtMainWindow() override;
 		void adjustWindow();
 		void setup();
-		static void notifyViewCallback(const char *view_name, void *callback_data);
 		static void notifyLayerCallback(const char *internal_layer_name, const char *exported_layer_name, int width, int height, int exported_channels, void *callback_data);
-		static void putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_data);
-		static void flushAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data);
-		static void flushCallback(const char *view_name, void *callback_data);
-		static void highlightAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data);
-		static void highlightPixelCallback(const char *view_name, int x, int y, float r, float g, float b, float a, void *callback_data);
+		static void putPixelCallback(const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_data);
+		static void flushAreaCallback(int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data);
+		static void flushCallback(void *callback_data);
+		static void highlightAreaCallback(int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data);
+		static void highlightPixelCallback(int x, int y, float r, float g, float b, float a, void *callback_data);
 		static void monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_data);
-		static void loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_data);
+		static void loggerCallback(yafaray_LogLevel log_level, size_t datetime, const char *time_of_day, const char *description, void *callback_data);
+		yafaray_Logger *getLogger() { return yafaray_logger_; }
+		yafaray_Scene *getScene() { return yafaray_scene_ ? *yafaray_scene_ : nullptr; }
+		yafaray_Renderer *getRenderer() { return yafaray_renderer_ ? *yafaray_renderer_ : nullptr; }
+		yafaray_Film *getFilm() { return yafaray_film_ ? *yafaray_film_ : nullptr; }
 
 		std::unique_ptr<QtRenderWidget> render_widget_;
 		QTextEdit *log_widget_;
@@ -89,6 +91,15 @@ class QtMainWindow final : public QMainWindow
 		static QProgressBar *setupProgressBar(QWidget *widget_base);
 		static QScrollArea *setupRenderArea(QWidget *widget_base);
 
+		yafaray_Logger *yafaray_logger_ = nullptr;
+		yafaray_ParamMap *yafaray_param_map_ = nullptr;
+		yafaray_ParamMapList *yafaray_param_map_list_ = nullptr;
+		yafaray_Scene **yafaray_scene_ = nullptr;
+		yafaray_Renderer **yafaray_renderer_ = nullptr;
+		yafaray_Film **yafaray_film_ = nullptr;
+		std::string input_color_space_ = "LinearRGB";
+		float input_gamma_ = 1.f;
+
 		QAction *action_quit_ = nullptr;
 		QAction *action_open_ = nullptr;
 		QAction *action_save_as_ = nullptr;
@@ -101,7 +112,6 @@ class QtMainWindow final : public QMainWindow
 		QLabel *label_ = nullptr;
 
 		std::unique_ptr<QtWorker> worker_;
-		yafaray_Interface_t *yafaray_interface_ = nullptr;
 		QString last_path_;
 		int width_ = 0, height_ = 0, border_start_x_ = 0, border_start_y_ = 0;
 		bool auto_close_ = false; // if true, rendering gets saved to fileName after finish and GUI gets closed (for animation)
@@ -113,6 +123,6 @@ class QtMainWindow final : public QMainWindow
 		Log log_;
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif //YAFARAY_GUI_QT_MAIN_WINDOW_H

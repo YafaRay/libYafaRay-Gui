@@ -73,7 +73,8 @@
 #include "resource/logo_animation/00049.h"
 #include "resource/logo_animation/00050.h"
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 QtAnimWorking::QtAnimWorking(QWidget *parent) : QWidget(parent)
 {
@@ -154,4 +155,4 @@ void QtAnimWorking::timerEvent(QTimerEvent *event)
 	}
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

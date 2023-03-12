@@ -21,15 +21,11 @@
 
 #include "gui_qt/events.h"
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 QtGuiUpdateEvent::QtGuiUpdateEvent(const QRect &rect, bool full_update)
 		: QEvent(static_cast<QEvent::Type>(GuiUpdate)), rect_(rect), full_update_(full_update)
-{
-}
-
-QtNotifyViewEvent::QtNotifyViewEvent(const std::string &view_name)
-		: QEvent(static_cast<QEvent::Type>(NotifyView)), view_name_(view_name)
 {
 }
 
@@ -73,4 +69,4 @@ QtLogAppendEvent::QtLogAppendEvent(const LogEntry &log_entry)
 {
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

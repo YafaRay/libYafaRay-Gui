@@ -20,13 +20,13 @@
 #ifndef YAFARAY_GUI_WX_MAIN_WINDOW_H
 #define YAFARAY_GUI_WX_MAIN_WINDOW_H
 
-#include "common/yafaray_gui_common.h"
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 class WxApp final : public wxApp
 {
@@ -45,6 +45,6 @@ class WxFrame final : public wxFrame
 		void onAbout(wxCommandEvent& event);
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif //YAFARAY_GUI_WX_MAIN_WINDOW_H

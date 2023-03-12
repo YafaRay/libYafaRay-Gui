@@ -23,11 +23,11 @@
 #ifndef YAFARAY_GUI_QT_ANIMWORKING_H
 #define YAFARAY_GUI_QT_ANIMWORKING_H
 
-#include "common/yafaray_gui_common.h"
 #include <QWidget>
 #include <vector>
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 class QtAnimWorking final : public QWidget
 {
@@ -46,6 +46,6 @@ class QtAnimWorking final : public QWidget
 		static const size_t timer_top_frame_ = 50;
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif // YAFARAY_GUI_QT_ANIMWORKING_H

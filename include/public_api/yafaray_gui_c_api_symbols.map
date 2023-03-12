@@ -9,7 +9,7 @@ LIBYAFARAYGUI_4.0.0 {
         yafaray_gui_getVersionMinor;
         yafaray_gui_getVersionPatch;
         yafaray_gui_getVersionString;
-        yafaray_gui_deallocateCharPointer;
+        yafaray_gui_destroyCharString;
 
     local:
         *;

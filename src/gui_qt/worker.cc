@@ -23,16 +23,18 @@
 #include "gui_qt/worker.h"
 #include "gui_qt/renderwidget.h"
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
-QtWorker::QtWorker(::yafaray_Interface_t *yafaray_interface, QtMainWindow *main_window)
-	: QThread(), yafaray_interface_(yafaray_interface), main_window_(main_window)
+QtWorker::QtWorker(QtMainWindow *main_window) : QThread{}, main_window_{main_window}
 {
 }
 
 void QtWorker::run()
 {
-	if(yafaray_interface_) yafaray_render(yafaray_interface_, QtMainWindow::monitorCallback, this, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
+	yafaray_ParamMap *param_map = yafaray_createParamMap();
+	yafaray_setupRender(main_window_->getScene(), main_window_->getRenderer(), param_map);
+	yafaray_render(main_window_->getRenderer(), main_window_->getFilm(), main_window_->getScene(), QtMainWindow::monitorCallback, this, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

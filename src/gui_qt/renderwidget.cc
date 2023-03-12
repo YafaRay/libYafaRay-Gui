@@ -29,7 +29,8 @@
 #include <QPaintEvent>
 #include <QPoint>
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 /*=====================================
 /	RenderWidget implementation
@@ -141,14 +142,6 @@ bool QtRenderWidget::event(QEvent *event)
 		}
 		return true;
 	}
-	else if(event->type() == static_cast<QEvent::Type>(NotifyView))
-	{
-		const auto ge = static_cast<QtNotifyViewEvent *>(event);
-		ge->accept();
-		images_collection_.defineView(ge->getViewName());
-		update();
-		return true;
-	}
 	else if(event->type() == static_cast<QEvent::Type>(NotifyLayer))
 	{
 		const auto ge = static_cast<QtNotifyLayerEvent *>(event);
@@ -179,7 +172,7 @@ bool QtRenderWidget::event(QEvent *event)
 		{
 			for(int y = 0; y < height; ++y)
 			{
-				const RgbaFloat col = images_collection_.getColor("view_1", "combined", x, y);
+				const RgbaFloat col = images_collection_.getColor("combined", x, y);
 				const QColor qcol { col.getR8Bit(), col.getG8Bit(), col.getB8Bit(), col.getA8Bit() };
 				setPixel(x, y, qcol);
 			}
@@ -199,7 +192,7 @@ bool QtRenderWidget::event(QEvent *event)
 		{
 			for(int y = y_0; y < y_1; ++y)
 			{
-				const RgbaFloat col = images_collection_.getColor("view_1", "combined", x, y);
+				const RgbaFloat col = images_collection_.getColor("combined", x, y);
 				const QColor qcol { col.getR8Bit(), col.getG8Bit(), col.getB8Bit(), col.getA8Bit() };
 				setPixel(x, y, qcol);
 			}
@@ -300,4 +293,4 @@ void QtRenderWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui

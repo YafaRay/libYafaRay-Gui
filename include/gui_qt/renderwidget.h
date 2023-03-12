@@ -23,7 +23,6 @@
 #ifndef YAFARAY_GUI_QT_RENDERWIDGET_H
 #define YAFARAY_GUI_QT_RENDERWIDGET_H
 
-#include "common/yafaray_gui_common.h"
 #include "common/images_collection.h"
 #include <QWidget>
 #include <QImage>
@@ -33,7 +32,8 @@
 #include <QScrollBar>
 #include <QMutex>
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 class ImagesCollection;
 
@@ -86,6 +86,6 @@ class QtRenderWidget final : public QLabel
 
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif //YAFARAY_GUI_QT_RENDERWIDGET_H

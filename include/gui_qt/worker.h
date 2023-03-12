@@ -22,12 +22,10 @@
 #ifndef YAFARAY_GUI_QT_WORKER_H
 #define YAFARAY_GUI_QT_WORKER_H
 
-#include "common/yafaray_gui_common.h"
 #include <QThread>
 
-typedef struct yafaray_Interface yafaray_Interface_t;
-
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
 class QtMainWindow;
 
@@ -36,15 +34,14 @@ class QtWorker final : public QThread
 	Q_OBJECT
 
 	public:
-		QtWorker(yafaray_Interface_t *yafaray_interface, QtMainWindow *main_window);
+		QtWorker(QtMainWindow *main_window);
 		void run() override;
 
 	private:
-		yafaray_Interface_t *yafaray_interface_ = nullptr;
 		QtMainWindow *main_window_ = nullptr;
 		bool valid_ = false;
 };
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
 
 #endif

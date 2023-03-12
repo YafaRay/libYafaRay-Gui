@@ -48,13 +48,22 @@
 #include "resource/guifont.h"
 #endif
 
-BEGIN_YAFARAY_GUI
+namespace yafaray_gui
+{
 
-QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) : QMainWindow(), yafaray_interface_(yafaray_interface), width_(width), height_(height), border_start_x_(border_start_x), border_start_y_(border_start_y), auto_close_(close_after_finish)
+QtMainWindow::QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_Renderer **yafaray_renderer, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) :
+	QMainWindow{},
+	yafaray_logger_{yafaray_logger},
+	yafaray_param_map_{yafaray_createParamMap()},
+	yafaray_param_map_list_{yafaray_createParamMapList()},
+	yafaray_scene_{yafaray_scene},
+	yafaray_renderer_{yafaray_renderer},
+	yafaray_film_{yafaray_film},
+	width_{width}, height_{height}, border_start_x_{border_start_x}, border_start_y_{border_start_y}, auto_close_{close_after_finish}
 {
 	log_widget_ = new QTextEdit(this);
 	log_widget_->setReadOnly(true);
-	yafaray_setLoggingCallback(yafaray_interface_, QtMainWindow::loggerCallback, static_cast<void *>(this));
+	yafaray_setLoggerCallbacks(yafaray_logger, QtMainWindow::loggerCallback, static_cast<void *>(this));
 
 	QCoreApplication::setOrganizationName("YafaRay Team");
 	QCoreApplication::setOrganizationDomain("yafaray.org");
@@ -91,10 +100,10 @@ QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int width, in
 	render_saved_ = false;
 	action_ask_save_->setChecked(ask_unsaved_);
 
-	render_widget_ = std::unique_ptr<QtRenderWidget>(new QtRenderWidget(scroll_area_));
-	worker_ = std::unique_ptr<QtWorker>(new QtWorker(yafaray_interface_, this));
+	render_widget_ = std::make_unique<QtRenderWidget>(scroll_area_);
+	worker_ = std::make_unique<QtWorker>(this);
 	// animation widget
-	anim_working_ = std::unique_ptr<QtAnimWorking>(new QtAnimWorking(scroll_area_));
+	anim_working_ = std::make_unique<QtAnimWorking>(scroll_area_);
 	anim_working_->resize(200, 87);
 	this->move(20, 20);
 	scroll_area_->setWidgetResizable(false);
@@ -118,7 +127,7 @@ QtMainWindow::QtMainWindow(yafaray_Interface_t *yafaray_interface, int width, in
 
 QtMainWindow::~QtMainWindow()
 {
-	yafaray_setLoggingCallback(yafaray_interface_, nullptr, nullptr);
+	yafaray_setLoggerCallbacks(yafaray_logger_, nullptr, nullptr);
 }
 
 
@@ -384,19 +393,18 @@ void QtMainWindow::slotRender()
 	progress_bar_->show();
 	render_saved_ = false;
 
-	yafaray_setRenderNotifyViewCallback(yafaray_interface_, QtMainWindow::notifyViewCallback, render_widget_.get());
-	yafaray_setRenderNotifyLayerCallback(yafaray_interface_, QtMainWindow::notifyLayerCallback, render_widget_.get());
-	yafaray_setRenderPutPixelCallback(yafaray_interface_, QtMainWindow::putPixelCallback, render_widget_.get());
-	yafaray_setRenderFlushAreaCallback(yafaray_interface_, QtMainWindow::flushAreaCallback, render_widget_.get());
-	yafaray_setRenderFlushCallback(yafaray_interface_, QtMainWindow::flushCallback, render_widget_.get());
-	yafaray_setRenderHighlightAreaCallback(yafaray_interface_, QtMainWindow::highlightAreaCallback, render_widget_.get());
-	yafaray_setRenderHighlightPixelCallback(yafaray_interface_, QtMainWindow::highlightPixelCallback, render_widget_.get());
+	yafaray_setNotifyLayerCallback(*yafaray_film_, QtMainWindow::notifyLayerCallback, render_widget_.get());
+	yafaray_setPutPixelCallback(*yafaray_film_, QtMainWindow::putPixelCallback, render_widget_.get());
+	yafaray_setFlushAreaCallback(*yafaray_film_, QtMainWindow::flushAreaCallback, render_widget_.get());
+	yafaray_setFlushCallback(*yafaray_film_, QtMainWindow::flushCallback, render_widget_.get());
+	yafaray_setHighlightAreaCallback(*yafaray_film_, QtMainWindow::highlightAreaCallback, render_widget_.get());
+	yafaray_setHighlightPixelCallback(*yafaray_film_, QtMainWindow::highlightPixelCallback, render_widget_.get());
 
 	time_measure_.start();
 	render_widget_->startRendering();
 
-	const int output_width = yafaray_getSceneFilmWidth(yafaray_interface_);
-	const int output_height = yafaray_getSceneFilmHeight(yafaray_interface_);
+	const int output_width = yafaray_getFilmWidth(*yafaray_film_);
+	const int output_height = yafaray_getFilmHeight(*yafaray_film_);
 	this->render_widget_->setup(QSize(output_width, output_height));
 	worker_->start();
 }
@@ -439,7 +447,7 @@ void QtMainWindow::slotFinished()
 	QString rt;
 	rt.append(QString("Render time: %1 [%2s.]").arg(time_str).arg(time_sec, 5));
 	label_->setText(rt);
-	yafaray_printInfo(yafaray_interface_, "Render completed!");
+	yafaray_printInfo(yafaray_logger_, "Render completed!");
 
 	render_widget_->finishRendering();
 	update();
@@ -482,15 +490,20 @@ bool QtMainWindow::openDlg()
 	if(xml_file_path.empty()) return false;
 	else
 	{
-		yafaray_clearAll(yafaray_interface_);
-		yafaray_printInfo(yafaray_interface_, ("Clearing interface and scene and loading xml file '" + xml_file_path + "'").c_str());
-		const bool parsing_result_ok = yafaray_xml_ParseFile(yafaray_interface_, xml_file_path.c_str());
-		if(parsing_result_ok) yafaray_printInfo(yafaray_interface_, ("Xml file '" + xml_file_path + "' loaded").c_str());
-		else yafaray_printWarning(yafaray_interface_, ("Xml file '" + xml_file_path + "' could not be loaded. Scene/interface is empty now!").c_str());
+		yafaray_destroyFilm(*yafaray_film_);
+		*yafaray_film_ = nullptr;
+		yafaray_destroyRenderer(*yafaray_renderer_);
+		*yafaray_renderer_ = nullptr;
+		yafaray_destroyScene(*yafaray_scene_);
+		*yafaray_scene_ = nullptr;
+		yafaray_printInfo(yafaray_logger_, ("Clearing interface and scene and loading xml file '" + xml_file_path + "'").c_str());
+		const bool parsing_result_ok = yafaray_xml_ParseFile(yafaray_logger_, yafaray_scene_, yafaray_renderer_, yafaray_film_, xml_file_path.c_str(), input_color_space_.c_str(), input_gamma_);
+		if(parsing_result_ok) yafaray_printInfo(yafaray_logger_, ("Xml file '" + xml_file_path + "' loaded").c_str());
+		else yafaray_printWarning(yafaray_logger_, ("Xml file '" + xml_file_path + "' could not be loaded. Scene/interface is empty now!").c_str());
 		return parsing_result_ok;
 	}
 #else
-	yafaray_printError(yafaray_interface_, "libYafaRay-Gui is built without XML support, cannot open the file");
+	yafaray_printError(yafaray_logger_, yafaray_scene_, yafaray_renderer_, *yafaray_film__, "libYafaRay-Gui is built without XML support, cannot open the file");
 	return false;
 #endif
 }
@@ -522,7 +535,7 @@ bool QtMainWindow::closeUnsaved()
 
 void QtMainWindow::slotCancel()
 {
-	yafaray_cancelRendering(yafaray_interface_);
+	yafaray_cancelRendering(yafaray_logger_, *yafaray_renderer_);
 	cancel_button_->setEnabled(false);
 	action_cancel_->setEnabled(false);
 }
@@ -568,13 +581,6 @@ void QtMainWindow::adjustWindow()
 	scroll_area_->setMinimumSize(0, 0);
 }
 
-void QtMainWindow::notifyViewCallback(const char *view_name, void *callback_data)
-{
-	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
-	if(!render_widget) return;
-	QCoreApplication::postEvent(render_widget, new QtNotifyViewEvent(view_name));
-}
-
 void QtMainWindow::notifyLayerCallback(const char *internal_layer_name, const char *exported_layer_name, int width, int height, int exported_channels, void *callback_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
@@ -582,14 +588,14 @@ void QtMainWindow::notifyLayerCallback(const char *internal_layer_name, const ch
 	QCoreApplication::postEvent(render_widget, new QtNotifyLayerEvent(internal_layer_name, exported_layer_name, width, height, exported_channels));
 }
 
-void QtMainWindow::putPixelCallback(const char *view_name, const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_data)
+void QtMainWindow::putPixelCallback(const char *layer_name, int x, int y, float r, float g, float b, float a, void *callback_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
-	render_widget->images_collection_.setColor(view_name, layer_name, x, y, {r, g, b, a});
+	render_widget->images_collection_.setColor(layer_name, x, y, {r, g, b, a});
 }
 
-void QtMainWindow::flushAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data)
+void QtMainWindow::flushAreaCallback(int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
@@ -598,7 +604,7 @@ void QtMainWindow::flushAreaCallback(const char *view_name, int area_id, int x_0
 	QCoreApplication::postEvent(render_widget, new QtGuiUpdateEvent(rect));
 }
 
-void QtMainWindow::flushCallback(const char *view_name, void *callback_data)
+void QtMainWindow::flushCallback(void *callback_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
@@ -606,18 +612,18 @@ void QtMainWindow::flushCallback(const char *view_name, void *callback_data)
 	QCoreApplication::postEvent(render_widget, new QtGuiUpdateEvent(QRect(), true));
 }
 
-void QtMainWindow::highlightAreaCallback(const char *view_name, int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data)
+void QtMainWindow::highlightAreaCallback(int area_id, int x_0, int y_0, int x_1, int y_1, void *callback_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
 	QCoreApplication::postEvent(render_widget, new QtHighlightAreaEvent(area_id, {QPoint(x_0, y_0), QPoint(x_1, y_1)}));
 }
 
-void QtMainWindow::highlightPixelCallback(const char *view_name, int x, int y, float r, float g, float b, float a, void *callback_data)
+void QtMainWindow::highlightPixelCallback(int x, int y, float r, float g, float b, float a, void *callback_data)
 {
 	const auto render_widget = static_cast<QtRenderWidget *>(callback_data);
 	if(!render_widget) return;
-	render_widget->images_collection_.setColor(view_name, "combined", x, y, {r, g, b, a});
+	render_widget->images_collection_.setColor("combined", x, y, {r, g, b, a});
 }
 
 void QtMainWindow::monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_data)
@@ -627,7 +633,7 @@ void QtMainWindow::monitorCallback(int steps_total, int steps_done, const char *
 	QCoreApplication::postEvent(main_window, new QtProgressUpdateEvent(steps_done, 0, steps_total));
 }
 
-void QtMainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, const char *time_of_day, const char *description, void *callback_data)
+void QtMainWindow::loggerCallback(yafaray_LogLevel log_level, size_t datetime, const char *time_of_day, const char *description, void *callback_data)
 {
 	const auto main_window = static_cast<QtMainWindow *>(callback_data);
 	if(!main_window) return;
@@ -635,4 +641,4 @@ void QtMainWindow::loggerCallback(yafaray_LogLevel_t log_level, long datetime, c
 	if(log_level == YAFARAY_LOG_LEVEL_INFO || log_level == YAFARAY_LOG_LEVEL_WARNING || log_level == YAFARAY_LOG_LEVEL_ERROR) QCoreApplication::postEvent(main_window, new QtProgressUpdateTagEvent(description));
 }
 
-END_YAFARAY_GUI
+} // namespace yafaray_gui
