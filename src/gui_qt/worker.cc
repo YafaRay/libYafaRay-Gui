@@ -33,8 +33,11 @@ QtWorker::QtWorker(QtMainWindow *main_window) : QThread{}, main_window_{main_win
 void QtWorker::run()
 {
 	yafaray_ParamMap *param_map = yafaray_createParamMap();
-	yafaray_setupRender(main_window_->getScene(), main_window_->getRenderer(), param_map);
-	yafaray_render(main_window_->getRenderer(), main_window_->getFilm(), main_window_->getScene(), QtMainWindow::monitorCallback, this, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
+	yafaray_RenderMonitor *render_monitor{yafaray_createRenderMonitor(QtMainWindow::monitorCallback, this, YAFARAY_DISPLAY_CONSOLE_HIDDEN)};
+	yafaray_SceneModifiedFlags scene_modified_flags{yafaray_checkAndClearSceneModifiedFlags(main_window_->getScene())};
+	yafaray_preprocessScene(main_window_->getScene(), main_window_->getRenderControl(), scene_modified_flags);
+	yafaray_preprocessSurfaceIntegrator(main_window_->getRenderControl(), render_monitor, main_window_->getSurfaceIntegrator(), main_window_->getScene());
+	yafaray_render(main_window_->getRenderControl(), render_monitor, main_window_->getSurfaceIntegrator(), main_window_->getFilm(), YAFARAY_RENDER_NORMAL);
 }
 
 } // namespace yafaray_gui

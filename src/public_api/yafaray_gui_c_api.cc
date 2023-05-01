@@ -27,14 +27,14 @@
 #include "gui_wx/main_window.h"
 #endif
 
-int yafaray_gui_createRenderWidget(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_Renderer **yafaray_renderer, yafaray_Film **yafaray_film, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_Bool auto_render, yafaray_Bool close_after_finish)
+int yafaray_gui_createRenderWidget(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_SurfaceIntegrator **yafaray_surface_integrator, yafaray_Film **yafaray_film, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_Bool auto_render, yafaray_Bool close_after_finish)
 {
 #ifdef YAFARAY_GUI_WITH_QT
 	if(gui_tool_kit == YAFARAY_GUI_QT)
 	{
 		int argc = 0;
 		auto app = new QApplication(argc, nullptr, 0);
-		yafaray_gui::QtMainWindow w(yafaray_logger, yafaray_scene, yafaray_renderer, yafaray_film, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
+		yafaray_gui::QtMainWindow w(yafaray_logger, yafaray_scene, yafaray_surface_integrator, yafaray_film, width, height, border_start_x, border_start_y, close_after_finish == YAFARAY_BOOL_TRUE);
 		w.show();
 		w.adjustWindow();
 		if(auto_render == YAFARAY_BOOL_TRUE) w.slotRender();

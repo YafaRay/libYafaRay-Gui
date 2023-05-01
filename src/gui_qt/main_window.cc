@@ -51,13 +51,11 @@
 namespace yafaray_gui
 {
 
-QtMainWindow::QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_Renderer **yafaray_renderer, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) :
+QtMainWindow::QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_SurfaceIntegrator **yafaray_surface_integrator, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) :
 	QMainWindow{},
 	yafaray_logger_{yafaray_logger},
-	yafaray_param_map_{yafaray_createParamMap()},
-	yafaray_param_map_list_{yafaray_createParamMapList()},
 	yafaray_scene_{yafaray_scene},
-	yafaray_renderer_{yafaray_renderer},
+	yafaray_surface_integrator_{yafaray_surface_integrator},
 	yafaray_film_{yafaray_film},
 	width_{width}, height_{height}, border_start_x_{border_start_x}, border_start_y_{border_start_y}, auto_close_{close_after_finish}
 {
@@ -492,18 +490,18 @@ bool QtMainWindow::openDlg()
 	{
 		yafaray_destroyFilm(*yafaray_film_);
 		*yafaray_film_ = nullptr;
-		yafaray_destroyRenderer(*yafaray_renderer_);
-		*yafaray_renderer_ = nullptr;
+		yafaray_destroySurfaceIntegrator(*yafaray_surface_integrator_);
+		*yafaray_surface_integrator_ = nullptr;
 		yafaray_destroyScene(*yafaray_scene_);
 		*yafaray_scene_ = nullptr;
 		yafaray_printInfo(yafaray_logger_, ("Clearing interface and scene and loading xml file '" + xml_file_path + "'").c_str());
-		const bool parsing_result_ok = yafaray_xml_ParseFile(yafaray_logger_, yafaray_scene_, yafaray_renderer_, yafaray_film_, xml_file_path.c_str(), input_color_space_.c_str(), input_gamma_);
+		const bool parsing_result_ok = yafaray_xml_ParseFile(yafaray_logger_, yafaray_scene_, yafaray_surface_integrator_, yafaray_film_, xml_file_path.c_str(), input_color_space_.c_str(), input_gamma_);
 		if(parsing_result_ok) yafaray_printInfo(yafaray_logger_, ("Xml file '" + xml_file_path + "' loaded").c_str());
 		else yafaray_printWarning(yafaray_logger_, ("Xml file '" + xml_file_path + "' could not be loaded. Scene/interface is empty now!").c_str());
 		return parsing_result_ok;
 	}
 #else
-	yafaray_printError(yafaray_logger_, yafaray_scene_, yafaray_renderer_, *yafaray_film__, "libYafaRay-Gui is built without XML support, cannot open the file");
+	yafaray_printError(yafaray_logger_, yafaray_scene_, yafaray_surface_integrator_, *yafaray_film__, "libYafaRay-Gui is built without XML support, cannot open the file");
 	return false;
 #endif
 }
@@ -535,7 +533,7 @@ bool QtMainWindow::closeUnsaved()
 
 void QtMainWindow::slotCancel()
 {
-	yafaray_cancelRendering(yafaray_logger_, *yafaray_renderer_);
+	yafaray_cancelRendering(render_control_);
 	cancel_button_->setEnabled(false);
 	action_cancel_->setEnabled(false);
 }

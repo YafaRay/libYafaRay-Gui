@@ -43,7 +43,7 @@ int main()
 	yafaray_ParamMap *param_map = yafaray_createParamMap();
 	yafaray_ParamMapList *param_map_list = yafaray_createParamMapList();
 	yafaray_Scene *yafaray_scene = nullptr;
-	yafaray_Renderer *yafaray_renderer = nullptr;
+	yafaray_SurfaceIntegrator *yafaray_surface_integrator = nullptr;
 	yafaray_Film *yafaray_film = nullptr;
 
 	yafaray_clearParamMap(param_map);
@@ -139,20 +139,18 @@ int main()
 	yafaray_setParamMapColor(param_map, "color", 1.f, 1.f, 1.f, 1.f);
 	yafaray_defineBackground(yafaray_scene, param_map);
 
-	/* Setting up render parameters and creating renderer */
-	yafaray_clearParamMap(param_map);
-	yafaray_renderer = yafaray_createRenderer(yafaray_logger_, yafaray_scene, "Renderer_Gui", YAFARAY_DISPLAY_CONSOLE_HIDDEN, param_map);
-
 	/* Creating surface integrator */
 	yafaray_clearParamMap(param_map);
 	/*yafaray_setParamMapString(param_map, "type", "directlighting");*/
 	yafaray_setParamMapString(param_map, "type", "photonmapping");
-	yafaray_defineSurfaceIntegrator(yafaray_renderer, param_map);
+	//yafaray_setParamMapInt(param_map, "AA_minsamples",  50);
+	//yafaray_setParamMapInt(param_map, "AA_passes",  100);
+	yafaray_surface_integrator = yafaray_createSurfaceIntegrator(yafaray_logger_, "SurfaceIntegrator_Gui", param_map);
 
 	/* Creating volume integrator */
 	yafaray_clearParamMap(param_map);
 	yafaray_setParamMapString(param_map, "type", "none");
-	yafaray_defineVolumeIntegrator(yafaray_renderer, yafaray_scene, param_map);
+	yafaray_defineVolumeIntegrator(yafaray_surface_integrator, yafaray_scene, param_map);
 
 	/* Setting up film parameters and creating image film */
 	const int result_width = 400;
@@ -160,9 +158,7 @@ int main()
 	yafaray_clearParamMap(param_map);
 	yafaray_setParamMapInt(param_map, "width", result_width);
 	yafaray_setParamMapInt(param_map, "height", result_height);
-	//yafaray_setParamMapInt(param_map, "AA_minsamples",  50);
-	//yafaray_setParamMapInt(param_map, "AA_passes",  100);
-	yafaray_film = yafaray_createFilm(yafaray_logger_, yafaray_renderer, "Film_Gui", param_map);
+	yafaray_film = yafaray_createFilm(yafaray_logger_, yafaray_surface_integrator, "Film_Gui", param_map);
 
 	/* Creating camera */
 	yafaray_clearParamMap(param_map);
@@ -181,11 +177,11 @@ int main()
 	yafaray_createOutput(yafaray_film, "output1_tga", param_map);
 
 	/* Rendering */
-	yafaray_gui_createRenderWidget(yafaray_logger_, &yafaray_scene, &yafaray_renderer, &yafaray_film, YAFARAY_GUI_QT, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
+	yafaray_gui_createRenderWidget(yafaray_logger_, &yafaray_scene, &yafaray_surface_integrator, &yafaray_film, YAFARAY_GUI_QT, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
 
 	/* Final cleanup */
 	yafaray_destroyFilm(yafaray_film);
-	yafaray_destroyRenderer(yafaray_renderer);
+	yafaray_destroySurfaceIntegrator(yafaray_surface_integrator);
 	yafaray_destroyScene(yafaray_scene);
 	yafaray_destroyParamMapList(param_map_list);
 	yafaray_destroyParamMap(param_map);

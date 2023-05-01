@@ -43,7 +43,7 @@ class QtMainWindow final : public QMainWindow
 	Q_OBJECT
 
 	public:
-		QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_Renderer **yafaray_renderer, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish);
+		QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_SurfaceIntegrator **yafaray_surface_integrator, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish);
 		~QtMainWindow() override;
 		void adjustWindow();
 		void setup();
@@ -55,9 +55,9 @@ class QtMainWindow final : public QMainWindow
 		static void highlightPixelCallback(int x, int y, float r, float g, float b, float a, void *callback_data);
 		static void monitorCallback(int steps_total, int steps_done, const char *tag, void *callback_data);
 		static void loggerCallback(yafaray_LogLevel log_level, size_t datetime, const char *time_of_day, const char *description, void *callback_data);
-		yafaray_Logger *getLogger() { return yafaray_logger_; }
+		yafaray_RenderControl *getRenderControl() { return render_control_; }
 		yafaray_Scene *getScene() { return yafaray_scene_ ? *yafaray_scene_ : nullptr; }
-		yafaray_Renderer *getRenderer() { return yafaray_renderer_ ? *yafaray_renderer_ : nullptr; }
+		yafaray_SurfaceIntegrator *getSurfaceIntegrator() { return yafaray_surface_integrator_ ? *yafaray_surface_integrator_ : nullptr; }
 		yafaray_Film *getFilm() { return yafaray_film_ ? *yafaray_film_ : nullptr; }
 
 		std::unique_ptr<QtRenderWidget> render_widget_;
@@ -92,10 +92,9 @@ class QtMainWindow final : public QMainWindow
 		static QScrollArea *setupRenderArea(QWidget *widget_base);
 
 		yafaray_Logger *yafaray_logger_ = nullptr;
-		yafaray_ParamMap *yafaray_param_map_ = nullptr;
-		yafaray_ParamMapList *yafaray_param_map_list_ = nullptr;
+		yafaray_RenderControl *render_control_{yafaray_createRenderControl()};
 		yafaray_Scene **yafaray_scene_ = nullptr;
-		yafaray_Renderer **yafaray_renderer_ = nullptr;
+		yafaray_SurfaceIntegrator **yafaray_surface_integrator_ = nullptr;
 		yafaray_Film **yafaray_film_ = nullptr;
 		std::string input_color_space_ = "LinearRGB";
 		float input_gamma_ = 1.f;
