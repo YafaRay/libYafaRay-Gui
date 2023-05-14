@@ -34,10 +34,10 @@ void QtWorker::run()
 {
 	yafaray_RenderMonitor *render_monitor{yafaray_createRenderMonitor(QtMainWindow::monitorCallback, this, YAFARAY_DISPLAY_CONSOLE_HIDDEN)};
 	yafaray_setRenderControlForNormalStart(main_window_->getRenderControl());
-	yafaray_SceneModifiedFlags scene_modified_flags{yafaray_checkAndClearSceneModifiedFlags(main_window_->getScene())};
-	yafaray_preprocessScene(main_window_->getScene(), main_window_->getRenderControl(), scene_modified_flags);
-	yafaray_preprocessSurfaceIntegrator(render_monitor, main_window_->getSurfaceIntegrator(), main_window_->getRenderControl(), main_window_->getScene());
-	yafaray_render(main_window_->getRenderControl(), render_monitor, main_window_->getSurfaceIntegrator(), main_window_->getFilm());
+	yafaray_SceneModifiedFlags scene_modified_flags{yafaray_checkAndClearSceneModifiedFlags(main_window_->getScene(0))};
+	yafaray_preprocessScene(main_window_->getScene(0), main_window_->getRenderControl(), scene_modified_flags);
+	yafaray_preprocessSurfaceIntegrator(render_monitor, main_window_->getSurfaceIntegrator(0), main_window_->getRenderControl(), main_window_->getScene(0));
+	yafaray_render(main_window_->getRenderControl(), render_monitor, main_window_->getSurfaceIntegrator(0), main_window_->getFilm(0));
 }
 
 } // namespace yafaray_gui

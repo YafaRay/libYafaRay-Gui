@@ -31,25 +31,20 @@ int main()
 	yafaray_setConsoleVerbosityLevel(yafaray_logger_, YAFARAY_LOG_LEVEL_DEBUG);
 	yafaray_printInfo(yafaray_logger_, "***** Test client 'test01' for libYafaRay-Gui *****");
 	yafaray_printInfo(yafaray_logger_, ("Using libYafaRay version (" + std::to_string(yafaray_getVersionMajor()) + "." + std::to_string(yafaray_getVersionMinor()) + "." + std::to_string(yafaray_getVersionPatch()) + ") and libYafaRay-Gui version " + std::string(version_string)).c_str());
+	yafaray_gui_destroyCharString(version_string);
+
+	auto param_map{yafaray_createParamMap()};
+	auto param_map_list{yafaray_createParamMapList()};
+
+	yafaray_Scene *yafaray_scene = yafaray_createScene(yafaray_logger_, "Scene_Gui");
+	yafaray_clearParamMap(param_map);
+	yafaray_setParamMapString(param_map, "type", "yafaray-kdtree-original");
+	yafaray_setSceneAcceleratorParams(yafaray_scene, param_map);
 
 	/* Creating image from RAM or file */
 	const int tex_width = 200;
 	const int tex_height = 200;
-	size_t object_id = 0;
-	size_t material_id = 0;
 	size_t image_id = 0;
-	int i, j;
-
-	yafaray_ParamMap *param_map = yafaray_createParamMap();
-	yafaray_ParamMapList *param_map_list = yafaray_createParamMapList();
-	yafaray_Scene *yafaray_scene = nullptr;
-	yafaray_SurfaceIntegrator *yafaray_surface_integrator = nullptr;
-	yafaray_Film *yafaray_film = nullptr;
-
-	yafaray_clearParamMap(param_map);
-	yafaray_setParamMapString(param_map, "scene_accelerator", "yafaray-kdtree-original");
-	yafaray_scene = yafaray_createScene(yafaray_logger_, "Scene_Gui", param_map);
-
 	yafaray_clearParamMap(param_map);
 	yafaray_setParamMapString(param_map, "type", "ColorAlpha");
 	yafaray_setParamMapString(param_map, "image_optimization", "none"); /* Note: only "none" allows more HDR values > 1.f */
@@ -58,8 +53,8 @@ int main()
 	yafaray_setParamMapString(param_map, "filename", "test01_tex.tga");
 	yafaray_createImage(yafaray_scene, "Image01", &image_id, param_map);
 
-	for(i = 0; i < tex_width; ++i)
-		for(j = 0; j < tex_height; ++j)
+	for(int i = 0; i < tex_width; ++i)
+		for(int j = 0; j < tex_height; ++j)
 			yafaray_setImageColor(yafaray_scene, image_id, i, j, 0.01f * static_cast<float>(i), 0.01f * static_cast<float>(j), 0.01f * static_cast<float>(i + j), 1.f);
 
 	/* Creating texture from image */
@@ -94,6 +89,9 @@ int main()
 	yafaray_setParamMapColor(param_map, "color", 0.9f, 0.9f, 0.9f, 1.f);
 	yafaray_setParamMapString(param_map, "diffuse_shader", "diff_layer0");
 	yafaray_createMaterial(yafaray_scene, nullptr, "MaterialTGA", param_map, param_map_list);
+
+	size_t object_id = 0;
+	size_t material_id = 0;
 
 	/* Creating a geometric object */
 	yafaray_clearParamMap(param_map);
@@ -145,7 +143,7 @@ int main()
 	yafaray_setParamMapString(param_map, "type", "photonmapping");
 	//yafaray_setParamMapInt(param_map, "AA_minsamples",  50);
 	//yafaray_setParamMapInt(param_map, "AA_passes",  100);
-	yafaray_surface_integrator = yafaray_createSurfaceIntegrator(yafaray_logger_, "SurfaceIntegrator_Gui", param_map);
+	auto yafaray_surface_integrator{yafaray_createSurfaceIntegrator(yafaray_logger_, "SurfaceIntegrator_Gui", param_map)};
 
 	/* Creating volume integrator */
 	yafaray_clearParamMap(param_map);
@@ -158,7 +156,7 @@ int main()
 	yafaray_clearParamMap(param_map);
 	yafaray_setParamMapInt(param_map, "width", result_width);
 	yafaray_setParamMapInt(param_map, "height", result_height);
-	yafaray_film = yafaray_createFilm(yafaray_logger_, yafaray_surface_integrator, "Film_Gui", param_map);
+	auto yafaray_film{yafaray_createFilm(yafaray_logger_, yafaray_surface_integrator, "Film_Gui", param_map)};
 
 	/* Creating camera */
 	yafaray_clearParamMap(param_map);
@@ -175,16 +173,17 @@ int main()
 	yafaray_clearParamMap(param_map);
 	yafaray_setParamMapString(param_map, "image_path", "./test01-output1.tga");
 	yafaray_createOutput(yafaray_film, "output1_tga", param_map);
-
-	/* Rendering */
-	yafaray_gui_createRenderWidget(yafaray_logger_, &yafaray_scene, &yafaray_surface_integrator, &yafaray_film, YAFARAY_GUI_QT, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
-
-	/* Final cleanup */
-	yafaray_destroyFilm(yafaray_film);
-	yafaray_destroySurfaceIntegrator(yafaray_surface_integrator);
-	yafaray_destroyScene(yafaray_scene);
 	yafaray_destroyParamMapList(param_map_list);
 	yafaray_destroyParamMap(param_map);
-	yafaray_gui_destroyCharString(version_string);
+
+	/* Creating GUI widget */
+	auto yafaray_container{yafaray_createContainer()};
+	yafaray_addSceneToContainer(yafaray_container, yafaray_scene);
+	yafaray_addSurfaceIntegratorToContainer(yafaray_container, yafaray_surface_integrator);
+	yafaray_addFilmToContainer(yafaray_container, yafaray_film);
+	yafaray_gui_createRenderWidget(yafaray_logger_, &yafaray_container, YAFARAY_GUI_QT, 640, 480, 0, 0, YAFARAY_BOOL_FALSE, YAFARAY_BOOL_FALSE);
+
+	/* Final cleanup */
+	yafaray_destroyContainerAndContainedPointers(yafaray_container);
 	return 0;
 }

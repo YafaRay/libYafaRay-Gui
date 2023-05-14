@@ -51,12 +51,10 @@
 namespace yafaray_gui
 {
 
-QtMainWindow::QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_SurfaceIntegrator **yafaray_surface_integrator, yafaray_Film **yafaray_film, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) :
+QtMainWindow::QtMainWindow(yafaray_Logger *yafaray_logger, yafaray_Container **yafaray_container, int width, int height, int border_start_x, int border_start_y, bool close_after_finish) :
 	QMainWindow{},
 	yafaray_logger_{yafaray_logger},
-	yafaray_scene_{yafaray_scene},
-	yafaray_surface_integrator_{yafaray_surface_integrator},
-	yafaray_film_{yafaray_film},
+	yafaray_container_{yafaray_container},
 	width_{width}, height_{height}, border_start_x_{border_start_x}, border_start_y_{border_start_y}, auto_close_{close_after_finish}
 {
 	log_widget_ = new QTextEdit(this);
@@ -391,18 +389,18 @@ void QtMainWindow::slotRender()
 	progress_bar_->show();
 	render_saved_ = false;
 
-	yafaray_setNotifyLayerCallback(*yafaray_film_, QtMainWindow::notifyLayerCallback, render_widget_.get());
-	yafaray_setPutPixelCallback(*yafaray_film_, QtMainWindow::putPixelCallback, render_widget_.get());
-	yafaray_setFlushAreaCallback(*yafaray_film_, QtMainWindow::flushAreaCallback, render_widget_.get());
-	yafaray_setFlushCallback(*yafaray_film_, QtMainWindow::flushCallback, render_widget_.get());
-	yafaray_setHighlightAreaCallback(*yafaray_film_, QtMainWindow::highlightAreaCallback, render_widget_.get());
-	yafaray_setHighlightPixelCallback(*yafaray_film_, QtMainWindow::highlightPixelCallback, render_widget_.get());
+	yafaray_setNotifyLayerCallback(getFilm(0), QtMainWindow::notifyLayerCallback, render_widget_.get());
+	yafaray_setPutPixelCallback(getFilm(0), QtMainWindow::putPixelCallback, render_widget_.get());
+	yafaray_setFlushAreaCallback(getFilm(0), QtMainWindow::flushAreaCallback, render_widget_.get());
+	yafaray_setFlushCallback(getFilm(0), QtMainWindow::flushCallback, render_widget_.get());
+	yafaray_setHighlightAreaCallback(getFilm(0), QtMainWindow::highlightAreaCallback, render_widget_.get());
+	yafaray_setHighlightPixelCallback(getFilm(0), QtMainWindow::highlightPixelCallback, render_widget_.get());
 
 	time_measure_.start();
 	render_widget_->startRendering();
 
-	const int output_width = yafaray_getFilmWidth(*yafaray_film_);
-	const int output_height = yafaray_getFilmHeight(*yafaray_film_);
+	const int output_width = yafaray_getFilmWidth(getFilm(0));
+	const int output_height = yafaray_getFilmHeight(getFilm(0));
 	this->render_widget_->setup(QSize(output_width, output_height));
 	worker_->start();
 }
@@ -488,17 +486,16 @@ bool QtMainWindow::openDlg()
 	if(xml_file_path.empty()) return false;
 	else
 	{
-		yafaray_destroyFilm(*yafaray_film_);
-		*yafaray_film_ = nullptr;
-		yafaray_destroySurfaceIntegrator(*yafaray_surface_integrator_);
-		*yafaray_surface_integrator_ = nullptr;
-		yafaray_destroyScene(*yafaray_scene_);
-		*yafaray_scene_ = nullptr;
-		yafaray_printInfo(yafaray_logger_, ("Clearing interface and scene and loading xml file '" + xml_file_path + "'").c_str());
-		const bool parsing_result_ok = yafaray_xml_ParseFile(yafaray_logger_, yafaray_scene_, yafaray_surface_integrator_, yafaray_film_, xml_file_path.c_str(), input_color_space_.c_str(), input_gamma_);
-		if(parsing_result_ok) yafaray_printInfo(yafaray_logger_, ("Xml file '" + xml_file_path + "' loaded").c_str());
+		yafaray_destroyContainerAndContainedPointers(*yafaray_container_);
+		*yafaray_container_ = nullptr;
+		yafaray_printInfo(yafaray_logger_, ("Clearing and loading xml file '" + xml_file_path + "'").c_str());
+		*yafaray_container_ = yafaray_xml_ParseFile(yafaray_logger_, xml_file_path.c_str(), input_color_space_.c_str(), input_gamma_);
+		if(*yafaray_container_)
+		{
+			yafaray_printInfo(yafaray_logger_, ("Xml file '" + xml_file_path + "' loaded").c_str());
+		}
 		else yafaray_printWarning(yafaray_logger_, ("Xml file '" + xml_file_path + "' could not be loaded. Scene/interface is empty now!").c_str());
-		return parsing_result_ok;
+		return *yafaray_container_ != nullptr;
 	}
 #else
 	yafaray_printError(yafaray_logger_, yafaray_scene_, yafaray_surface_integrator_, *yafaray_film__, "libYafaRay-Gui is built without XML support, cannot open the file");

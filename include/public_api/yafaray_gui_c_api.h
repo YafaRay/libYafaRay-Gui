@@ -30,7 +30,7 @@ extern "C" {
 
 	typedef enum { YAFARAY_GUI_NONE = 0, YAFARAY_GUI_QT, YAFARAY_GUI_WXWIDGETS,  } yafaray_gui_GuiToolKit_t;
 
-	YAFARAY_GUI_C_API_EXPORT int yafaray_gui_createRenderWidget(yafaray_Logger *yafaray_logger, yafaray_Scene **yafaray_scene, yafaray_SurfaceIntegrator **yafaray_surface_integrator, yafaray_Film **yafaray_film, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_Bool auto_render, yafaray_Bool close_after_finish);
+	YAFARAY_GUI_C_API_EXPORT int yafaray_gui_createRenderWidget(yafaray_Logger *yafaray_logger, yafaray_Container **yafaray_container, yafaray_gui_GuiToolKit_t gui_tool_kit, int width, int height, int border_start_x, int border_start_y, yafaray_Bool auto_render, yafaray_Bool close_after_finish);
 	YAFARAY_GUI_C_API_EXPORT int yafaray_gui_getVersionMajor();
 	YAFARAY_GUI_C_API_EXPORT int yafaray_gui_getVersionMinor();
 	YAFARAY_GUI_C_API_EXPORT int yafaray_gui_getVersionPatch();
