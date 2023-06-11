@@ -167,7 +167,7 @@ int main()
 	yafaray_setParamMapVector(param_map, "from", 8.6f, -7.2f, 8.1f);
 	yafaray_setParamMapVector(param_map, "to", 8.0f, -6.7f, 7.6f);
 	yafaray_setParamMapVector(param_map, "up", 8.3f, -6.8f, 9.f);
-	yafaray_defineCamera(yafaray_film, "cam_1", param_map);
+	yafaray_defineCamera(yafaray_film, param_map);
 
 	/* Creating image output */
 	yafaray_clearParamMap(param_map);
