@@ -26,7 +26,7 @@ int main()
 	/* Basic libYafaRay C API usage example, rendering a cube with a TGA texture */
 
 	/* YafaRay standard rendering interface */
-	yafaray_Logger *yafaray_logger_ = yafaray_createLogger(nullptr, nullptr, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
+	yafaray_Logger *yafaray_logger_ = yafaray_createLogger("", nullptr, nullptr, YAFARAY_DISPLAY_CONSOLE_HIDDEN);
 	yafaray_setConsoleLogColorsEnabled(yafaray_logger_, YAFARAY_BOOL_TRUE);
 	yafaray_setConsoleVerbosityLevel(yafaray_logger_, YAFARAY_LOG_LEVEL_DEBUG);
 	yafaray_printInfo(yafaray_logger_, "***** Test client 'test01' for libYafaRay-Gui *****");
